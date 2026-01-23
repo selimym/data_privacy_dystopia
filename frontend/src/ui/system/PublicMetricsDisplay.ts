@@ -176,13 +176,17 @@ export class PublicMetricsDisplay {
    * Update metrics and check for tier crossings
    */
   public update(newMetrics: PublicMetricsRead): void {
+    // Check if this is the first time metrics are being set
+    const isFirstUpdate = !this.config.metrics;
+
     // Check if values have actually changed
     const awarenessChanged = newMetrics.international_awareness !== this.lastAwarenessValue;
     const angerChanged = newMetrics.public_anger !== this.lastAngerValue;
     const tierChanged = newMetrics.awareness_tier !== this.lastAwarenessTier || newMetrics.anger_tier !== this.lastAngerTier;
 
     // Skip update if nothing changed (prevents ghost clicks from unnecessary DOM updates)
-    if (!awarenessChanged && !angerChanged && !tierChanged) {
+    // BUT always update if this is the first time we're receiving metrics
+    if (!isFirstUpdate && !awarenessChanged && !angerChanged && !tierChanged) {
       return;
     }
 

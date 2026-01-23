@@ -93,6 +93,21 @@ make deploy-ghpages       # Deploy to GitHub Pages
 
 See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions.
 
+### Testing
+
+Run comprehensive E2E tests with Playwright:
+
+```bash
+make test                 # Run all E2E tests
+make test-critical        # Run critical path tests only
+make test-features        # Run feature tests
+make test-performance     # Run performance benchmarks
+make test-ui              # Open Playwright UI mode
+make test-report          # View test report
+```
+
+See [frontend/tests/e2e/README.md](frontend/tests/e2e/README.md) for detailed testing documentation.
+
 ### Linting
 ```bash
 cd frontend && pnpm lint
@@ -335,14 +350,46 @@ All generators use deterministic seeding for reproducible populations.
 
 ## Testing
 
-The frontend uses standard JavaScript testing practices. The backend tests are archived but still available for reference.
+### Frontend E2E Testing
 
-### Frontend Testing
-- Unit tests for services and generators
-- Browser-based integration testing
-- Deterministic data generation for reproducible tests
+Comprehensive Playwright test suite covering all gameplay flows:
+
+```bash
+make test                 # Run all E2E tests
+make test-critical        # Critical path tests (must pass)
+make test-features        # Feature coverage tests
+make test-integration     # Integration tests
+make test-performance     # Performance benchmarks
+make test-edge-cases      # Edge case validation
+make test-ui              # Interactive Playwright UI
+make test-report          # View HTML report
+```
+
+**Test Categories:**
+- **Critical Path** (5 specs) - Core functionality that must always work
+- **Features** (6 specs) - Comprehensive feature coverage
+- **Integration** (4 specs) - System-wide behavior and state persistence
+- **Performance** (3 specs) - Load time, FPS, memory benchmarks
+- **Edge Cases** (2 specs) - Extreme behaviors and data validation
+
+**Performance Targets:**
+- Boot to dashboard: <3 seconds
+- Citizen file load: <100ms (first), <10ms (cached)
+- Average FPS: ≥55 FPS
+- Memory usage: <100MB
+- No memory leaks
+
+See [frontend/tests/e2e/README.md](frontend/tests/e2e/README.md) for detailed documentation.
+
+### CI/CD Integration
+
+Tests run automatically on every push via GitHub Actions:
+- Critical path tests must pass (blocks build)
+- Other test suites report results but don't block
+- Test reports and failure screenshots uploaded as artifacts
 
 ### Backend Testing (Archived)
+
 The original Python backend includes comprehensive test coverage:
 - **Core Services**: Inference engines, risk scoring, outcome calculation, ending logic
 - **System Mode Services**: Reluctance tracking, public metrics, severity scoring

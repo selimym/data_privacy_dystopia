@@ -10,7 +10,14 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
-    "test:e2e:debug": "playwright test --debug"
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:critical": "playwright test --project=critical",
+    "test:e2e:features": "playwright test --project=features",
+    "test:e2e:integration": "playwright test --project=integration",
+    "test:e2e:performance": "playwright test --project=performance",
+    "test:e2e:edge-cases": "playwright test --project=edge-cases",
+    "test:e2e:legacy": "playwright test --project=legacy",
+    "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
     "@faker-js/faker": "^10.2.0",

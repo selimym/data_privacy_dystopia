@@ -115,11 +115,16 @@ export class OperatorTracker {
 
     // If flagged, create CitizenFlag record
     if (decision.action_taken === 'flag' && decision.flag_type) {
+      // Get current week number for the flag
+      const directive = gameStore.getDirective(decision.directive_id);
+      const currentWeekNumber = directive?.week_number || gameStore.getCurrentWeek();
+
       const flag: CitizenFlagRead = {
         id: this.generateId(),
         operator_id: operatorId,
         citizen_id: decision.citizen_id,
         directive_id: decision.directive_id,
+        week_number: currentWeekNumber,  // Store week number directly
         flag_type: decision.flag_type,
         risk_score_at_flag: decision.risk_score_at_decision,
         contributing_factors: [],

@@ -3898,7 +3898,7 @@
   background: var(--system-panel);
   border: 1px solid var(--system-border);
   border-radius: 8px;
-  padding: 20px 24px;
+  padding: 14px 18px;
   margin-bottom: 16px;
 }
 
@@ -3906,8 +3906,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 12px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
   border-bottom: 1px solid var(--system-border);
 }
 
@@ -3933,7 +3933,7 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 
 .public-metrics-display .metric-row:last-of-type {
@@ -3948,8 +3948,8 @@
 }
 
 .public-metrics-display .metric-icon {
-  font-size: 24px;
-  width: 32px;
+  font-size: 20px;
+  width: 28px;
   text-align: center;
 }
 
@@ -3981,9 +3981,9 @@
 
 .public-metrics-display .progress-bar {
   position: relative;
-  height: 32px;
+  height: 26px;
   background: rgba(0, 0, 0, 0.3);
-  border-radius: 16px;
+  border-radius: 13px;
   overflow: hidden;
   border: 1px solid var(--system-border);
 }
@@ -3991,7 +3991,7 @@
 .public-metrics-display .progress-fill {
   height: 100%;
   transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 16px;
+  border-radius: 13px;
   position: relative;
   z-index: 1;
 }
@@ -4052,8 +4052,8 @@
 }
 
 .public-metrics-display .metrics-footer {
-  margin-top: 16px;
-  padding-top: 16px;
+  margin-top: 12px;
+  padding-top: 12px;
   border-top: 1px solid var(--system-border);
   display: flex;
   align-items: center;
@@ -6102,4 +6102,18 @@
   border-color: var(--system-accent);
   color: var(--system-accent);
   transform: translateY(-1px);
+}
+
+/* Public Metrics Container - positioned at top of dashboard */
+.public-metrics-container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto 16px auto;
+}
+
+.public-metrics-display .metrics-loading {
+  text-align: center;
+  padding: 20px;
+  color: var(--system-text-dim);
+  font-size: 13px;
 }

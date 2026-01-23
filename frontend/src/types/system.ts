@@ -161,6 +161,7 @@ export interface CitizenFlagRead {
   operator_id: string;
   citizen_id: string;
   directive_id: string;
+  week_number: number;  // Store week number directly to avoid lookup race conditions
   flag_type: FlagType;
   risk_score_at_flag: number;
   contributing_factors: string[];

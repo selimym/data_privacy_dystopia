@@ -571,6 +571,12 @@ export function submitFlag(request: FlagRequest): FlagResult {
     updated_at: new Date().toISOString(),
   });
 
+  // Get current directive week number for the flag
+  const flagDirective = operator.current_directive_id
+    ? gameStore.getDirective(operator.current_directive_id)
+    : null;
+  const currentWeekNumber = flagDirective?.week_number || 1;
+
   // Create flag record (for backward compatibility)
   const flagId = result.action_id || generateId();
   const flag: CitizenFlagRead = {
@@ -578,6 +584,7 @@ export function submitFlag(request: FlagRequest): FlagResult {
     operator_id: request.operator_id,
     citizen_id: request.citizen_id,
     directive_id: operator.current_directive_id || '',
+    week_number: currentWeekNumber,  // Store week number directly
     flag_type: request.flag_type,
     risk_score_at_flag: citizen.cached_risk_score || 0,
     justification: request.justification,

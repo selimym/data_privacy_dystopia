@@ -30,6 +30,18 @@ make deploy-vercel        # Deploy to Vercel
 make clean                # Clean build artifacts
 ```
 
+**Testing commands**:
+```bash
+make test                 # Run all E2E tests
+make test-critical        # Critical path tests (must pass)
+make test-features        # Feature coverage tests
+make test-integration     # Integration tests
+make test-performance     # Performance benchmarks
+make test-edge-cases      # Edge case validation
+make test-ui              # Playwright UI mode
+make test-report          # View test report
+```
+
 **Archived backend commands** (still available):
 ```bash
 make dev-backend          # Run archived backend server
@@ -143,7 +155,40 @@ All data is generated client-side and stored in IndexedDB:
 
 ## Testing
 
-Frontend testing uses standard JavaScript practices. Archived backend tests:
+**Frontend E2E Testing** (Playwright):
+
+```bash
+make test                              # Run all E2E tests
+make test-critical                     # Critical path only
+make test-features                     # Feature tests
+make test-integration                  # Integration tests
+make test-performance                  # Performance benchmarks
+make test-ui                           # Interactive UI mode
+```
+
+**Test Structure**:
+- `frontend/tests/e2e/critical-path/` - 5 specs (must pass, no retries)
+- `frontend/tests/e2e/features/` - 6 specs (comprehensive coverage)
+- `frontend/tests/e2e/integration/` - 4 specs (state persistence, events)
+- `frontend/tests/e2e/performance/` - 3 specs (load time, FPS, memory)
+- `frontend/tests/e2e/edge-cases/` - 2 specs (extreme behaviors, validation)
+- `frontend/tests/e2e/helpers/` - Reusable test utilities
+
+**Helper Utilities**:
+- `test-data.ts` - Deterministic test data generation (Faker with fixed seeds)
+- `indexeddb-helpers.ts` - Storage management (clearGameStorage, getGameState)
+- `citizen-actions.ts` - Reusable actions (selectCitizen, flagCitizen, completeWeek)
+- `performance-helpers.ts` - Performance measurement (measureLoadTime, measureFPS, getMemoryUsage)
+
+**Performance Targets**:
+- Boot to dashboard: <3s
+- Citizen file load: <100ms (first), <10ms (cached)
+- Average FPS: ≥55, Minimum FPS: ≥30
+- Memory usage: <100MB
+
+See `frontend/tests/e2e/README.md` for detailed documentation.
+
+**Archived backend tests**:
 
 ```bash
 make test-backend                              # All archived tests

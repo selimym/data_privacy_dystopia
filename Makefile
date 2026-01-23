@@ -71,9 +71,43 @@ seed-db:
 	@echo "Seeding database (archived - game now generates data client-side)..."
 	cd backend && uv run python -m scripts.seed_database --reset --population 50 --scenario rogue_employee --seed 42
 
-# Alias for backwards compatibility
-test: test-backend
-	@echo "Note: Backend tests are archived. Frontend uses in-browser data generation."
+# TESTING COMMANDS
+
+test:
+	@echo "Running all frontend tests..."
+	cd frontend && pnpm test:e2e
+
+test-critical:
+	@echo "Running critical path E2E tests..."
+	cd frontend && pnpm test:e2e:critical
+
+test-features:
+	@echo "Running feature E2E tests..."
+	cd frontend && pnpm test:e2e:features
+
+test-integration:
+	@echo "Running integration tests..."
+	cd frontend && pnpm test:e2e:integration
+
+test-performance:
+	@echo "Running performance tests..."
+	cd frontend && pnpm test:e2e:performance
+
+test-edge-cases:
+	@echo "Running edge case tests..."
+	cd frontend && pnpm test:e2e:edge-cases
+
+test-ui:
+	@echo "Opening Playwright UI mode..."
+	cd frontend && pnpm test:e2e:ui
+
+test-headed:
+	@echo "Running tests in headed mode..."
+	cd frontend && pnpm test:e2e:headed
+
+test-report:
+	@echo "Opening test report..."
+	cd frontend && pnpm test:e2e:report
 
 dev-frontend:
 	@echo "Starting frontend development server..."

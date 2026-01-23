@@ -1088,9 +1088,12 @@ export class WorldScene extends Phaser.Scene {
       this.input.keyboard.enabled = true;
     }
 
-    // Return to SystemDashboardScene
+    // Return to SystemDashboardScene with skipAdvanceCheck flag to prevent infinite loop
     this.cleanupUI();
-    this.scene.start('SystemDashboardScene', { sessionId: this.currentSessionId });
+    this.scene.start('SystemDashboardScene', {
+      sessionId: this.currentSessionId,
+      skipAdvanceCheck: true
+    });
   }
 
   shutdown() {

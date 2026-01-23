@@ -4,11 +4,12 @@ import { defineConfig, devices } from '@playwright/test';
  * Playwright E2E Test Configuration
  *
  * Tests the data privacy educational game flows end-to-end.
+ * Organized into test projects by priority and type.
  */
 export default defineConfig({
   testDir: './tests/e2e',
 
-  // Test timeout
+  // Test timeout (varies by project)
   timeout: 30 * 1000,
 
   // Expect timeout for assertions
@@ -22,13 +23,14 @@ export default defineConfig({
   // Fail the build on CI if you accidentally left test.only in the source code
   forbidOnly: !!process.env.CI,
 
-  // Retry on CI only
+  // Retry configuration (varies by project)
   retries: process.env.CI ? 2 : 0,
 
   // Reporter to use
   reporter: [
     ['html'],
     ['list'],
+    ['json', { outputFile: 'test-results.json' }],
   ],
 
   // Shared settings for all the projects below
@@ -46,11 +48,56 @@ export default defineConfig({
     video: 'retain-on-failure',
   },
 
-  // Configure projects for major browsers
+  // Configure test projects by category
   projects: [
+    // Critical path tests - must pass, no retries
     {
-      name: 'chromium',
+      name: 'critical',
+      testDir: './tests/e2e/critical-path',
       use: { ...devices['Desktop Chrome'] },
+      retries: 0, // No retries - must pass on first try
+    },
+
+    // Feature tests - comprehensive coverage, allow 1 retry
+    {
+      name: 'features',
+      testDir: './tests/e2e/features',
+      use: { ...devices['Desktop Chrome'] },
+      retries: process.env.CI ? 1 : 0,
+    },
+
+    // Integration tests - allow 2 retries for stability
+    {
+      name: 'integration',
+      testDir: './tests/e2e/integration',
+      use: { ...devices['Desktop Chrome'] },
+      retries: process.env.CI ? 2 : 0,
+    },
+
+    // Performance tests - longer timeout, allow 1 retry
+    {
+      name: 'performance',
+      testDir: './tests/e2e/performance',
+      use: { ...devices['Desktop Chrome'] },
+      timeout: 60 * 1000, // 60 seconds for performance tests
+      retries: process.env.CI ? 1 : 0,
+    },
+
+    // Edge case tests - allow 2 retries
+    {
+      name: 'edge-cases',
+      testDir: './tests/e2e/edge-cases',
+      use: { ...devices['Desktop Chrome'] },
+      retries: process.env.CI ? 2 : 0,
+    },
+
+    // Legacy/existing tests (system-mode, user-journey, etc.)
+    {
+      name: 'legacy',
+      testDir: './tests/e2e',
+      testMatch: ['system-mode.spec.ts', 'user-journey.spec.ts', 'event-flows.spec.ts', 'metrics-updates.spec.ts'],
+      use: { ...devices['Desktop Chrome'] },
+      retries: process.env.CI ? 2 : 0,
     },
   ],
 

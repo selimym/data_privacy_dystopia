@@ -28,6 +28,7 @@ export class SystemDashboardScene extends Phaser.Scene {
   private container!: HTMLDivElement;
   private unsubscribe: (() => void) | null = null;
   private sessionId: string | null = null;
+  private skipAdvanceCheck: boolean = false;
   private decisionTimerInterval: number | null = null;
   private messagesPanel: MessagesPanel | null = null;
   private publicMetricsDisplay: PublicMetricsDisplay | null = null;
@@ -42,8 +43,9 @@ export class SystemDashboardScene extends Phaser.Scene {
     super({ key: 'SystemDashboardScene' });
   }
 
-  init(data: { sessionId: string }) {
+  init(data: { sessionId: string; skipAdvanceCheck?: boolean }) {
     this.sessionId = data.sessionId;
+    this.skipAdvanceCheck = data.skipAdvanceCheck || false;
   }
 
   async create() {
@@ -67,9 +69,15 @@ export class SystemDashboardScene extends Phaser.Scene {
     if (this.sessionId) {
       await systemState.initialize(this.sessionId);
 
-      // Check if directive is completed and time should advance
-      // This happens when returning from cinematics
-      await this.checkAndAdvanceTime();
+      // Resume polling after cinematics (if it was paused)
+      if (this.skipAdvanceCheck) {
+        console.log('[SystemDashboardScene] Resuming metrics polling after cinematics');
+        systemState.resumeMetricsPolling();
+        // Don't reset skipAdvanceCheck here - let renderState/checkAndAdvanceTime handle it
+      }
+
+      // Initial check happens in renderState, which is triggered by systemState.initialize
+      // This way we don't double-check on initial load
     }
   }
 
@@ -264,6 +272,11 @@ export class SystemDashboardScene extends Phaser.Scene {
     this.checkForNewProtests();
     this.checkForExposureEvents();
     this.checkEnding();
+
+    // Check if we should advance to next week
+    // This runs periodically as state updates
+    // checkAndAdvanceTime() internally handles skipAdvanceCheck to prevent infinite loops
+    this.checkAndAdvanceTime();
   }
 
   private initializePublicMetrics() {
@@ -1257,19 +1270,47 @@ export class SystemDashboardScene extends Phaser.Scene {
    * Called after returning from cinematics.
    */
   private async checkAndAdvanceTime() {
+    // Skip if we just returned from cinematics (prevents infinite loop)
+    if (this.skipAdvanceCheck) {
+      console.log('[SystemDashboardScene] Skipping advance check (just returned from cinematics)');
+      this.skipAdvanceCheck = false; // Reset for next time
+      return;
+    }
+
     if (!systemState.operatorId || !systemState.dashboard) {
       return;
     }
 
-    const flagsSubmitted = systemState.dashboard.operator.total_flags_submitted;
     const directive = systemState.currentDirective;
 
     if (!directive) {
       return;
     }
 
-    // Check if quota is met
-    if (flagsSubmitted >= directive.flag_quota) {
+    // Count flags submitted for CURRENT week only (not cumulative)
+    const allFlags = gameStore.getAllFlags();
+    const currentWeek = gameStore.getCurrentWeek();
+
+    // Use stored week_number field for reliable filtering (no directive lookup needed)
+    const flagsThisWeek = allFlags.filter(flag => flag.week_number === currentWeek).length;
+
+    console.log(`[checkAndAdvanceTime] Current week: ${currentWeek}, Flags this week: ${flagsThisWeek}, Quota: ${directive.flag_quota}`);
+
+    // Guard: Check if we're currently in a cinematic transition
+    // This prevents double-advancement if checkAndAdvanceTime is called during scene transition
+    if (this.scene.isActive('WorldScene')) {
+      console.log('[checkAndAdvanceTime] Skipping - WorldScene is active (cinematic in progress)');
+      return;
+    }
+
+    // Guard: Verify this directive matches the current week
+    if (directive.week_number !== currentWeek) {
+      console.warn(`[checkAndAdvanceTime] Directive week (${directive.week_number}) doesn't match current week (${currentWeek})`);
+      return;
+    }
+
+    // Check if quota is met for CURRENT week
+    if (flagsThisWeek >= directive.flag_quota) {
       console.log('Directive quota met! Advancing time...');
 
       try {
@@ -1302,6 +1343,12 @@ export class SystemDashboardScene extends Phaser.Scene {
           console.log('[SystemDashboardScene] Pausing metrics polling for weekly outcomes cinematic');
           systemState.pauseMetricsPolling();
 
+          // IMPORTANT: Advance to next directive BEFORE showing cinematics
+          // This ensures the week advances immediately, so subsequent quota checks
+          // won't trigger another advancement while cinematics are playing
+          console.log('[SystemDashboardScene] Advancing to next directive before cinematics');
+          advanceDirective(systemState.operatorId);
+
           // Transition to WorldScene with multiple cinematics (cleanup UI only, preserve state)
           this.cleanupUI();
           this.scene.start('WorldScene', {
@@ -1309,13 +1356,10 @@ export class SystemDashboardScene extends Phaser.Scene {
             cinematicQueue,
             sessionId: this.sessionId,
           });
-
-          // Advance to next directive after cinematics
-          await advanceDirective(systemState.operatorId);
         } else {
           console.log('No outcomes to show, just advancing directive');
           // No time progression needed, just advance directive
-          await advanceDirective(systemState.operatorId);
+          advanceDirective(systemState.operatorId);
           await systemState.loadDashboard();
         }
       } catch (error) {

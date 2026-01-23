@@ -1,0 +1,2149 @@
+{
+  "config": {
+    "configFile": "/home/selim/data_privacy_distopia/frontend/playwright.config.ts",
+    "rootDir": "/home/selim/data_privacy_distopia/frontend/tests/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 6
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        null
+      ],
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/home/selim/data_privacy_distopia/frontend/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 6
+        },
+        "id": "critical",
+        "name": "critical",
+        "testDir": "/home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/selim/data_privacy_distopia/frontend/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 6
+        },
+        "id": "features",
+        "name": "features",
+        "testDir": "/home/selim/data_privacy_distopia/frontend/tests/e2e/features",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/selim/data_privacy_distopia/frontend/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 6
+        },
+        "id": "integration",
+        "name": "integration",
+        "testDir": "/home/selim/data_privacy_distopia/frontend/tests/e2e/integration",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/selim/data_privacy_distopia/frontend/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 6
+        },
+        "id": "performance",
+        "name": "performance",
+        "testDir": "/home/selim/data_privacy_distopia/frontend/tests/e2e/performance",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/home/selim/data_privacy_distopia/frontend/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 6
+        },
+        "id": "edge-cases",
+        "name": "edge-cases",
+        "testDir": "/home/selim/data_privacy_distopia/frontend/tests/e2e/edge-cases",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/selim/data_privacy_distopia/frontend/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 6
+        },
+        "id": "legacy",
+        "name": "legacy",
+        "testDir": "/home/selim/data_privacy_distopia/frontend/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "system-mode.spec.ts",
+          "user-journey.spec.ts",
+          "event-flows.spec.ts",
+          "metrics-updates.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.57.0",
+    "workers": 6,
+    "webServer": {
+      "command": "pnpm dev",
+      "url": "http://localhost:5173",
+      "reuseExistingServer": true,
+      "timeout": 120000
+    }
+  },
+  "suites": [
+    {
+      "title": "critical-path/01-game-initialization.spec.ts",
+      "file": "critical-path/01-game-initialization.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Game Initialization",
+          "file": "critical-path/01-game-initialization.spec.ts",
+          "line": 12,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should boot sequence complete in <3s",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "critical",
+                  "projectName": "critical",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 8340,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"main-menu\"], .main-menu')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"main-menu\"], .main-menu')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"main-menu\"], .main-menu')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"main-menu\"], .main-menu')\u001b[22m\n\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/01-game-initialization.spec.ts:29:28",
+                        "location": {
+                          "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/01-game-initialization.spec.ts",
+                          "column": 28,
+                          "line": 29
+                        },
+                        "snippet": "  27 |     // Wait for MainMenuScene to render\n  28 |     const mainMenu = page.locator('[data-testid=\"main-menu\"], .main-menu');\n> 29 |     await expect(mainMenu).toBeVisible({ timeout: 3000 });\n     |                            ^\n  30 |\n  31 |     const duration = performance.now() - startTime;\n  32 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/01-game-initialization.spec.ts",
+                            "column": 28,
+                            "line": 29
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"main-menu\"], .main-menu')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"main-menu\"], .main-menu')\u001b[22m\n\n\n  27 |     // Wait for MainMenuScene to render\n  28 |     const mainMenu = page.locator('[data-testid=\"main-menu\"], .main-menu');\n> 29 |     await expect(mainMenu).toBeVisible({ timeout: 3000 });\n     |                            ^\n  30 |\n  31 |     const duration = performance.now() - startTime;\n  32 |\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/01-game-initialization.spec.ts:29:28"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-23T10:48:15.980Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/01-game-initialization-Gam-7c0fb-oot-sequence-complete-in-3s-critical/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/01-game-initialization-Gam-7c0fb-oot-sequence-complete-in-3s-critical/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/01-game-initialization-Gam-7c0fb-oot-sequence-complete-in-3s-critical/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/01-game-initialization.spec.ts",
+                        "column": 28,
+                        "line": 29
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "9cb62e00308508e9ae59-0e3530fd07db164e5566",
+              "file": "critical-path/01-game-initialization.spec.ts",
+              "line": 20,
+              "column": 3
+            },
+            {
+              "title": "should render MainMenuScene with all buttons",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "critical",
+                  "projectName": "critical",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 6256,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-23T10:48:15.963Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9cb62e00308508e9ae59-cbfa8d3602b1510c4455",
+              "file": "critical-path/01-game-initialization.spec.ts",
+              "line": 40,
+              "column": 3
+            },
+            {
+              "title": "should open and close settings modal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "critical",
+                  "projectName": "critical",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 7284,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-23T10:48:15.960Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9cb62e00308508e9ae59-5455b38e2efef468c1c4",
+              "file": "critical-path/01-game-initialization.spec.ts",
+              "line": 66,
+              "column": 3
+            },
+            {
+              "title": "should enable continue button after content warning checkbox",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "critical",
+                  "projectName": "critical",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 6914,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-23T10:48:15.977Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9cb62e00308508e9ae59-bc2d9e60bd50c421deb2",
+              "file": "critical-path/01-game-initialization.spec.ts",
+              "line": 91,
+              "column": 3
+            },
+            {
+              "title": "should start System Mode successfully",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "critical",
+                  "projectName": "critical",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 9994,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-23T10:48:15.984Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9cb62e00308508e9ae59-1959e077854fd319b05d",
+              "file": "critical-path/01-game-initialization.spec.ts",
+              "line": 124,
+              "column": 3
+            },
+            {
+              "title": "should measure and report load time metrics",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "critical",
+                  "projectName": "critical",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 5,
+                      "status": "passed",
+                      "duration": 5250,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Load Time Metrics:\n"
+                        },
+                        {
+                          "text": "  DOM Content Loaded: 0ms\n"
+                        },
+                        {
+                          "text": "  Load Complete: 0ms\n"
+                        },
+                        {
+                          "text": "  First Paint: 132ms\n"
+                        },
+                        {
+                          "text": "  First Contentful Paint: 1.26s\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-23T10:48:15.954Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9cb62e00308508e9ae59-4dfee5b2beb3add215c4",
+              "file": "critical-path/01-game-initialization.spec.ts",
+              "line": 173,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "critical-path/02-system-mode-core.spec.ts",
+      "file": "critical-path/02-system-mode-core.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "System Mode Core",
+          "file": "critical-path/02-system-mode-core.spec.ts",
+          "line": 15,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should load dashboard with citizens",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "critical",
+                  "projectName": "critical",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 5,
+                      "status": "passed",
+                      "duration": 10113,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-23T10:48:20.042Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "08192ef527ac760f027d-0278e66cd981e352a093",
+              "file": "critical-path/02-system-mode-core.spec.ts",
+              "line": 22,
+              "column": 3
+            },
+            {
+              "title": "should open citizen file with all tabs",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "critical",
+                  "projectName": "critical",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 11216,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/02-system-mode-core.spec.ts:66:28",
+                        "location": {
+                          "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/02-system-mode-core.spec.ts",
+                          "column": 28,
+                          "line": 66
+                        },
+                        "snippet": "  64 |     const mainContent = page.locator('[data-testid=\"citizen-overview\"], .citizen-details');\n  65 |     const contentVisible = await mainContent.isVisible();\n> 66 |     expect(contentVisible).toBeTruthy();\n     |                            ^\n  67 |   });\n  68 |\n  69 |   test('should populate all data fields correctly', async ({ page }) => {"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/02-system-mode-core.spec.ts",
+                            "column": 28,
+                            "line": 66
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n\n  64 |     const mainContent = page.locator('[data-testid=\"citizen-overview\"], .citizen-details');\n  65 |     const contentVisible = await mainContent.isVisible();\n> 66 |     expect(contentVisible).toBeTruthy();\n     |                            ^\n  67 |   });\n  68 |\n  69 |   test('should populate all data fields correctly', async ({ page }) => {\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/02-system-mode-core.spec.ts:66:28"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Tab \"Overview\": not found\n"
+                        },
+                        {
+                          "text": "Tab \"Risk Factors\": not found\n"
+                        },
+                        {
+                          "text": "Tab \"Messages\": not found\n"
+                        },
+                        {
+                          "text": "Tab \"Domains\": not found\n"
+                        },
+                        {
+                          "text": "Tab \"History\": not found\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-23T10:48:20.992Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/02-system-mode-core-System-65eac--citizen-file-with-all-tabs-critical/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/02-system-mode-core-System-65eac--citizen-file-with-all-tabs-critical/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/02-system-mode-core-System-65eac--citizen-file-with-all-tabs-critical/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/02-system-mode-core.spec.ts",
+                        "column": 28,
+                        "line": 66
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "08192ef527ac760f027d-c3215d65686c858d4c3d",
+              "file": "critical-path/02-system-mode-core.spec.ts",
+              "line": 44,
+              "column": 3
+            },
+            {
+              "title": "should populate all data fields correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "critical",
+                  "projectName": "critical",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 10776,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Risk score field exists: true\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-23T10:48:21.754Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "08192ef527ac760f027d-7f2b7c0d311e2d89a9b0",
+              "file": "critical-path/02-system-mode-core.spec.ts",
+              "line": 81,
+              "column": 3
+            },
+            {
+              "title": "should not have console errors during normal operation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "critical",
+                  "projectName": "critical",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 11450,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Console errors: 0\n"
+                        },
+                        {
+                          "text": "Console warnings: 2\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-23T10:48:22.041Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "08192ef527ac760f027d-05e6ed1ceb803fdadda0",
+              "file": "critical-path/02-system-mode-core.spec.ts",
+              "line": 114,
+              "column": 3
+            },
+            {
+              "title": "should display week and quota indicators",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "critical",
+                  "projectName": "critical",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 12972,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Week indicators found: 2\n"
+                        },
+                        {
+                          "text": "Quota indicators found: 1\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-23T10:48:24.788Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "08192ef527ac760f027d-a7214841e8e23efd958f",
+              "file": "critical-path/02-system-mode-core.spec.ts",
+              "line": 145,
+              "column": 3
+            },
+            {
+              "title": "should have functioning close button on citizen file",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "critical",
+                  "projectName": "critical",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 10860,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "No close button found - may close differently\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-23T10:48:24.780Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "08192ef527ac760f027d-4df11b7adf7c7471e31d",
+              "file": "critical-path/02-system-mode-core.spec.ts",
+              "line": 166,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "critical-path/03-flag-submission.spec.ts",
+      "file": "critical-path/03-flag-submission.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Flag Submission",
+          "file": "critical-path/03-flag-submission.spec.ts",
+          "line": 19,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should submit monitoring flag with justification",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "critical",
+                  "projectName": "critical",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 5,
+                      "status": "failed",
+                      "duration": 15690,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n\n    at flagCitizen (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:62:51)\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/03-flag-submission.spec.ts:37:5",
+                        "location": {
+                          "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                          "column": 51,
+                          "line": 62
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mhelpers/citizen-actions.ts:62\n\n  60 |\n  61 |   // Wait for dashboard to be visible again\n> 62 |   await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 3000 });\n     |                                                   ^\n  63 | }\n  64 |\n  65 | /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                            "column": 51,
+                            "line": 62
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n\n\n   at helpers/citizen-actions.ts:62\n\n  60 |\n  61 |   // Wait for dashboard to be visible again\n> 62 |   await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 3000 });\n     |                                                   ^\n  63 | }\n  64 |\n  65 | /**\n    at flagCitizen (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:62:51)\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/03-flag-submission.spec.ts:37:5"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Initial quota: 0/3\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-23T10:48:30.964Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/03-flag-submission-Flag-Su-6ba58-ing-flag-with-justification-critical/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/03-flag-submission-Flag-Su-6ba58-ing-flag-with-justification-critical/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/03-flag-submission-Flag-Su-6ba58-ing-flag-with-justification-critical/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                        "column": 51,
+                        "line": 62
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "eeb8630768e8ef98716f-6f497870782d964678bb",
+              "file": "critical-path/03-flag-submission.spec.ts",
+              "line": 27,
+              "column": 3
+            },
+            {
+              "title": "should submit restriction flag",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "critical",
+                  "projectName": "critical",
+                  "results": [
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 16492,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n\n    at flagCitizen (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:62:51)\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/03-flag-submission.spec.ts:71:5",
+                        "location": {
+                          "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                          "column": 51,
+                          "line": 62
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mhelpers/citizen-actions.ts:62\n\n  60 |\n  61 |   // Wait for dashboard to be visible again\n> 62 |   await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 3000 });\n     |                                                   ^\n  63 | }\n  64 |\n  65 | /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                            "column": 51,
+                            "line": 62
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n\n\n   at helpers/citizen-actions.ts:62\n\n  60 |\n  61 |   // Wait for dashboard to be visible again\n> 62 |   await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 3000 });\n     |                                                   ^\n  63 | }\n  64 |\n  65 | /**\n    at flagCitizen (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:62:51)\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/03-flag-submission.spec.ts:71:5"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-23T10:48:34.639Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/03-flag-submission-Flag-Su-a0340-uld-submit-restriction-flag-critical/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/03-flag-submission-Flag-Su-a0340-uld-submit-restriction-flag-critical/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/03-flag-submission-Flag-Su-a0340-uld-submit-restriction-flag-critical/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                        "column": 51,
+                        "line": 62
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "eeb8630768e8ef98716f-c8b8bb3dedf8f6cce69e",
+              "file": "critical-path/03-flag-submission.spec.ts",
+              "line": 71,
+              "column": 3
+            },
+            {
+              "title": "should submit intervention flag",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "critical",
+                  "projectName": "critical",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "failed",
+                      "duration": 15322,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n\n    at flagCitizen (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:62:51)\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/03-flag-submission.spec.ts:82:5",
+                        "location": {
+                          "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                          "column": 51,
+                          "line": 62
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mhelpers/citizen-actions.ts:62\n\n  60 |\n  61 |   // Wait for dashboard to be visible again\n> 62 |   await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 3000 });\n     |                                                   ^\n  63 | }\n  64 |\n  65 | /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                            "column": 51,
+                            "line": 62
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n\n\n   at helpers/citizen-actions.ts:62\n\n  60 |\n  61 |   // Wait for dashboard to be visible again\n> 62 |   await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 3000 });\n     |                                                   ^\n  63 | }\n  64 |\n  65 | /**\n    at flagCitizen (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:62:51)\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/03-flag-submission.spec.ts:82:5"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-23T10:48:33.231Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/03-flag-submission-Flag-Su-0c870-ld-submit-intervention-flag-critical/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/03-flag-submission-Flag-Su-0c870-ld-submit-intervention-flag-critical/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/03-flag-submission-Flag-Su-0c870-ld-submit-intervention-flag-critical/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                        "column": 51,
+                        "line": 62
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "eeb8630768e8ef98716f-b4ad8dce6e711c77ba46",
+              "file": "critical-path/03-flag-submission.spec.ts",
+              "line": 84,
+              "column": 3
+            },
+            {
+              "title": "should submit detention flag",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "critical",
+                  "projectName": "critical",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "failed",
+                      "duration": 15412,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n\n    at flagCitizen (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:62:51)\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/03-flag-submission.spec.ts:93:5",
+                        "location": {
+                          "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                          "column": 51,
+                          "line": 62
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mhelpers/citizen-actions.ts:62\n\n  60 |\n  61 |   // Wait for dashboard to be visible again\n> 62 |   await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 3000 });\n     |                                                   ^\n  63 | }\n  64 |\n  65 | /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                            "column": 51,
+                            "line": 62
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n\n\n   at helpers/citizen-actions.ts:62\n\n  60 |\n  61 |   // Wait for dashboard to be visible again\n> 62 |   await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 3000 });\n     |                                                   ^\n  63 | }\n  64 |\n  65 | /**\n    at flagCitizen (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:62:51)\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/03-flag-submission.spec.ts:93:5"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-23T10:48:34.135Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/03-flag-submission-Flag-Su-4a1e5-hould-submit-detention-flag-critical/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/03-flag-submission-Flag-Su-4a1e5-hould-submit-detention-flag-critical/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/03-flag-submission-Flag-Su-4a1e5-hould-submit-detention-flag-critical/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                        "column": 51,
+                        "line": 62
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "eeb8630768e8ef98716f-fccb61e3fc5e56ab2499",
+              "file": "critical-path/03-flag-submission.spec.ts",
+              "line": 97,
+              "column": 3
+            },
+            {
+              "title": "should update metrics after flag submission",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "critical",
+                  "projectName": "critical",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
+                      "status": "failed",
+                      "duration": 15900,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n\n    at flagCitizen (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:62:51)\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/03-flag-submission.spec.ts:105:5",
+                        "location": {
+                          "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                          "column": 51,
+                          "line": 62
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mhelpers/citizen-actions.ts:62\n\n  60 |\n  61 |   // Wait for dashboard to be visible again\n> 62 |   await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 3000 });\n     |                                                   ^\n  63 | }\n  64 |\n  65 | /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                            "column": 51,
+                            "line": 62
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n\n\n   at helpers/citizen-actions.ts:62\n\n  60 |\n  61 |   // Wait for dashboard to be visible again\n> 62 |   await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 3000 });\n     |                                                   ^\n  63 | }\n  64 |\n  65 | /**\n    at flagCitizen (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:62:51)\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/03-flag-submission.spec.ts:105:5"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-23T10:48:36.313Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/03-flag-submission-Flag-Su-f984a-trics-after-flag-submission-critical/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/03-flag-submission-Flag-Su-f984a-trics-after-flag-submission-critical/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/03-flag-submission-Flag-Su-f984a-trics-after-flag-submission-critical/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                        "column": 51,
+                        "line": 62
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "eeb8630768e8ef98716f-81100461e7476cad6f60",
+              "file": "critical-path/03-flag-submission.spec.ts",
+              "line": 110,
+              "column": 3
+            },
+            {
+              "title": "should remove flagged citizen from queue",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "critical",
+                  "projectName": "critical",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 15799,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n\n    at flagCitizen (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:62:51)\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/03-flag-submission.spec.ts:133:5",
+                        "location": {
+                          "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                          "column": 51,
+                          "line": 62
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mhelpers/citizen-actions.ts:62\n\n  60 |\n  61 |   // Wait for dashboard to be visible again\n> 62 |   await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 3000 });\n     |                                                   ^\n  63 | }\n  64 |\n  65 | /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                            "column": 51,
+                            "line": 62
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n\n\n   at helpers/citizen-actions.ts:62\n\n  60 |\n  61 |   // Wait for dashboard to be visible again\n> 62 |   await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 3000 });\n     |                                                   ^\n  63 | }\n  64 |\n  65 | /**\n    at flagCitizen (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:62:51)\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/03-flag-submission.spec.ts:133:5"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Initial citizen count: 50\n"
+                        },
+                        {
+                          "text": "First citizen: \n        \n          Kamille Casper\n          HIGH\n        \n        \n          Age: 62\n          Score: 63\n        \n        Treatment history for: Bipolar Disorder\n        \n          1 flagged messages\n          Less than 1 hour\n        \n      \n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-23T10:48:38.852Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/03-flag-submission-Flag-Su-43214--flagged-citizen-from-queue-critical/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/03-flag-submission-Flag-Su-43214--flagged-citizen-from-queue-critical/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/03-flag-submission-Flag-Su-43214--flagged-citizen-from-queue-critical/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                        "column": 51,
+                        "line": 62
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "eeb8630768e8ef98716f-3e9a00311df6d924bc87",
+              "file": "critical-path/03-flag-submission.spec.ts",
+              "line": 128,
+              "column": 3
+            },
+            {
+              "title": "should handle multiple flags in sequence",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "critical",
+                  "projectName": "critical",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 5,
+                      "status": "failed",
+                      "duration": 16386,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n\n    at flagCitizen (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:62:51)\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/03-flag-submission.spec.ts:155:7",
+                        "location": {
+                          "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                          "column": 51,
+                          "line": 62
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mhelpers/citizen-actions.ts:62\n\n  60 |\n  61 |   // Wait for dashboard to be visible again\n> 62 |   await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 3000 });\n     |                                                   ^\n  63 | }\n  64 |\n  65 | /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                            "column": 51,
+                            "line": 62
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n\n\n   at helpers/citizen-actions.ts:62\n\n  60 |\n  61 |   // Wait for dashboard to be visible again\n> 62 |   await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 3000 });\n     |                                                   ^\n  63 | }\n  64 |\n  65 | /**\n    at flagCitizen (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:62:51)\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/03-flag-submission.spec.ts:155:7"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-23T10:48:49.735Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/03-flag-submission-Flag-Su-3f6cc--multiple-flags-in-sequence-critical/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/03-flag-submission-Flag-Su-3f6cc--multiple-flags-in-sequence-critical/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/03-flag-submission-Flag-Su-3f6cc--multiple-flags-in-sequence-critical/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                        "column": 51,
+                        "line": 62
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "eeb8630768e8ef98716f-debe082a62ea93a40355",
+              "file": "critical-path/03-flag-submission.spec.ts",
+              "line": 153,
+              "column": 3
+            },
+            {
+              "title": "should not allow empty justification",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "critical",
+                  "projectName": "critical",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 13645,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Flag submitted without justification: false\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-23T10:48:51.292Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "eeb8630768e8ef98716f-ae567bab95f573b37aee",
+              "file": "critical-path/03-flag-submission.spec.ts",
+              "line": 169,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "critical-path/04-time-progression.spec.ts",
+      "file": "critical-path/04-time-progression.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Time Progression",
+          "file": "critical-path/04-time-progression.spec.ts",
+          "line": 17,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should complete Week 1 quota",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "critical",
+                  "projectName": "critical",
+                  "results": [
+                    {
+                      "workerIndex": 10,
+                      "parallelIndex": 2,
+                      "status": "failed",
+                      "duration": 16420,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n\n    at flagCitizen (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:62:51)\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/04-time-progression.spec.ts:39:7",
+                        "location": {
+                          "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                          "column": 51,
+                          "line": 62
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mhelpers/citizen-actions.ts:62\n\n  60 |\n  61 |   // Wait for dashboard to be visible again\n> 62 |   await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 3000 });\n     |                                                   ^\n  63 | }\n  64 |\n  65 | /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                            "column": 51,
+                            "line": 62
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n\n\n   at helpers/citizen-actions.ts:62\n\n  60 |\n  61 |   // Wait for dashboard to be visible again\n> 62 |   await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 3000 });\n     |                                                   ^\n  63 | }\n  64 |\n  65 | /**\n    at flagCitizen (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:62:51)\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/04-time-progression.spec.ts:39:7"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Week 1 quota: 0/3\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-23T10:48:51.340Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/04-time-progression-Time-P-9cdf7-hould-complete-Week-1-quota-critical/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/04-time-progression-Time-P-9cdf7-hould-complete-Week-1-quota-critical/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/04-time-progression-Time-P-9cdf7-hould-complete-Week-1-quota-critical/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                        "column": 51,
+                        "line": 62
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "47b34e168d1324fc3835-0f8eeb85f6a8f85efaba",
+              "file": "critical-path/04-time-progression.spec.ts",
+              "line": 25,
+              "column": 3
+            },
+            {
+              "title": "should show weekly outcomes cinematic after quota met",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "critical",
+                  "projectName": "critical",
+                  "results": [
+                    {
+                      "workerIndex": 11,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 17108,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n\n    at flagCitizen (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:62:51)\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/04-time-progression.spec.ts:55:7",
+                        "location": {
+                          "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                          "column": 51,
+                          "line": 62
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mhelpers/citizen-actions.ts:62\n\n  60 |\n  61 |   // Wait for dashboard to be visible again\n> 62 |   await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 3000 });\n     |                                                   ^\n  63 | }\n  64 |\n  65 | /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                            "column": 51,
+                            "line": 62
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n\n\n   at helpers/citizen-actions.ts:62\n\n  60 |\n  61 |   // Wait for dashboard to be visible again\n> 62 |   await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 3000 });\n     |                                                   ^\n  63 | }\n  64 |\n  65 | /**\n    at flagCitizen (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:62:51)\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/04-time-progression.spec.ts:55:7"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-23T10:48:51.456Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/04-time-progression-Time-P-f6611-s-cinematic-after-quota-met-critical/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/04-time-progression-Time-P-f6611-s-cinematic-after-quota-met-critical/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/04-time-progression-Time-P-f6611-s-cinematic-after-quota-met-critical/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                        "column": 51,
+                        "line": 62
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "47b34e168d1324fc3835-a2772bc21516b10b63c4",
+              "file": "critical-path/04-time-progression.spec.ts",
+              "line": 43,
+              "column": 3
+            },
+            {
+              "title": "should show Week 2 directive after Week 1 complete",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "critical",
+                  "projectName": "critical",
+                  "results": [
+                    {
+                      "workerIndex": 12,
+                      "parallelIndex": 4,
+                      "status": "failed",
+                      "duration": 16459,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n\n    at flagCitizen (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:62:51)\n    at completeWeek (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:204:5)\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/04-time-progression.spec.ts:86:5",
+                        "location": {
+                          "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                          "column": 51,
+                          "line": 62
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mhelpers/citizen-actions.ts:62\n\n  60 |\n  61 |   // Wait for dashboard to be visible again\n> 62 |   await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 3000 });\n     |                                                   ^\n  63 | }\n  64 |\n  65 | /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                            "column": 51,
+                            "line": 62
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n\n\n   at helpers/citizen-actions.ts:62\n\n  60 |\n  61 |   // Wait for dashboard to be visible again\n> 62 |   await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 3000 });\n     |                                                   ^\n  63 | }\n  64 |\n  65 | /**\n    at flagCitizen (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:62:51)\n    at completeWeek (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:204:5)\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/04-time-progression.spec.ts:86:5"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-23T10:48:52.500Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/04-time-progression-Time-P-706c9-ctive-after-Week-1-complete-critical/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/04-time-progression-Time-P-706c9-ctive-after-Week-1-complete-critical/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/04-time-progression-Time-P-706c9-ctive-after-Week-1-complete-critical/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                        "column": 51,
+                        "line": 62
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "47b34e168d1324fc3835-ef2c372df4d2b3066dee",
+              "file": "critical-path/04-time-progression.spec.ts",
+              "line": 77,
+              "column": 3
+            },
+            {
+              "title": "should reset quota to 0/3 after week advancement",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "critical",
+                  "projectName": "critical",
+                  "results": [
+                    {
+                      "workerIndex": 13,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 16894,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n\n    at flagCitizen (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:62:51)\n    at completeWeek (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:204:5)\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/04-time-progression.spec.ts:111:5",
+                        "location": {
+                          "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                          "column": 51,
+                          "line": 62
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mhelpers/citizen-actions.ts:62\n\n  60 |\n  61 |   // Wait for dashboard to be visible again\n> 62 |   await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 3000 });\n     |                                                   ^\n  63 | }\n  64 |\n  65 | /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                            "column": 51,
+                            "line": 62
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n\n\n   at helpers/citizen-actions.ts:62\n\n  60 |\n  61 |   // Wait for dashboard to be visible again\n> 62 |   await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 3000 });\n     |                                                   ^\n  63 | }\n  64 |\n  65 | /**\n    at flagCitizen (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:62:51)\n    at completeWeek (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:204:5)\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/04-time-progression.spec.ts:111:5"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-23T10:48:54.850Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/04-time-progression-Time-P-6c126--0-3-after-week-advancement-critical/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/04-time-progression-Time-P-6c126--0-3-after-week-advancement-critical/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/04-time-progression-Time-P-6c126--0-3-after-week-advancement-critical/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                        "column": 51,
+                        "line": 62
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "47b34e168d1324fc3835-e4bee06005e513ff90c6",
+              "file": "critical-path/04-time-progression.spec.ts",
+              "line": 100,
+              "column": 3
+            },
+            {
+              "title": "should progress through Weeks 1-3",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "critical",
+                  "projectName": "critical",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 3,
+                      "status": "failed",
+                      "duration": 16096,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n\n    at flagCitizen (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:62:51)\n    at completeWeek (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:204:5)\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/04-time-progression.spec.ts:127:5",
+                        "location": {
+                          "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                          "column": 51,
+                          "line": 62
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mhelpers/citizen-actions.ts:62\n\n  60 |\n  61 |   // Wait for dashboard to be visible again\n> 62 |   await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 3000 });\n     |                                                   ^\n  63 | }\n  64 |\n  65 | /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                            "column": 51,
+                            "line": 62
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n\n\n   at helpers/citizen-actions.ts:62\n\n  60 |\n  61 |   // Wait for dashboard to be visible again\n> 62 |   await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 3000 });\n     |                                                   ^\n  63 | }\n  64 |\n  65 | /**\n    at flagCitizen (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:62:51)\n    at completeWeek (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:204:5)\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/04-time-progression.spec.ts:127:5"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Completing Week 1...\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-23T10:49:03.753Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/04-time-progression-Time-P-dc4a2--progress-through-Weeks-1-3-critical/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/04-time-progression-Time-P-dc4a2--progress-through-Weeks-1-3-critical/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/04-time-progression-Time-P-dc4a2--progress-through-Weeks-1-3-critical/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                        "column": 51,
+                        "line": 62
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "47b34e168d1324fc3835-7730820257393c00e25b",
+              "file": "critical-path/04-time-progression.spec.ts",
+              "line": 115,
+              "column": 3
+            },
+            {
+              "title": "should track cumulative flags across weeks",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "critical",
+                  "projectName": "critical",
+                  "results": [
+                    {
+                      "workerIndex": 14,
+                      "parallelIndex": 5,
+                      "status": "failed",
+                      "duration": 15850,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n\n    at flagCitizen (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:62:51)\n    at completeWeek (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:204:5)\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/04-time-progression.spec.ts:149:5",
+                        "location": {
+                          "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                          "column": 51,
+                          "line": 62
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mhelpers/citizen-actions.ts:62\n\n  60 |\n  61 |   // Wait for dashboard to be visible again\n> 62 |   await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 3000 });\n     |                                                   ^\n  63 | }\n  64 |\n  65 | /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                            "column": 51,
+                            "line": 62
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n\n\n   at helpers/citizen-actions.ts:62\n\n  60 |\n  61 |   // Wait for dashboard to be visible again\n> 62 |   await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 3000 });\n     |                                                   ^\n  63 | }\n  64 |\n  65 | /**\n    at flagCitizen (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:62:51)\n    at completeWeek (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:204:5)\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/04-time-progression.spec.ts:149:5"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-23T10:49:06.919Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/04-time-progression-Time-P-9dbfc-mulative-flags-across-weeks-critical/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/04-time-progression-Time-P-9dbfc-mulative-flags-across-weeks-critical/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/04-time-progression-Time-P-9dbfc-mulative-flags-across-weeks-critical/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                        "column": 51,
+                        "line": 62
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "47b34e168d1324fc3835-36d6833bca1f4f3e9294",
+              "file": "critical-path/04-time-progression.spec.ts",
+              "line": 137,
+              "column": 3
+            },
+            {
+              "title": "should display different directives each week",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "critical",
+                  "projectName": "critical",
+                  "results": [
+                    {
+                      "workerIndex": 15,
+                      "parallelIndex": 2,
+                      "status": "failed",
+                      "duration": 15409,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n\n    at flagCitizen (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:62:51)\n    at completeWeek (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:204:5)\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/04-time-progression.spec.ts:179:5",
+                        "location": {
+                          "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                          "column": 51,
+                          "line": 62
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mhelpers/citizen-actions.ts:62\n\n  60 |\n  61 |   // Wait for dashboard to be visible again\n> 62 |   await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 3000 });\n     |                                                   ^\n  63 | }\n  64 |\n  65 | /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                            "column": 51,
+                            "line": 62
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n\n\n   at helpers/citizen-actions.ts:62\n\n  60 |\n  61 |   // Wait for dashboard to be visible again\n> 62 |   await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 3000 });\n     |                                                   ^\n  63 | }\n  64 |\n  65 | /**\n    at flagCitizen (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:62:51)\n    at completeWeek (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:204:5)\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/04-time-progression.spec.ts:179:5"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-23T10:49:08.557Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/04-time-progression-Time-P-1b524-ferent-directives-each-week-critical/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/04-time-progression-Time-P-1b524-ferent-directives-each-week-critical/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/04-time-progression-Time-P-1b524-ferent-directives-each-week-critical/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                        "column": 51,
+                        "line": 62
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "47b34e168d1324fc3835-3c3020b98192ad8fe88d",
+              "file": "critical-path/04-time-progression.spec.ts",
+              "line": 158,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "critical-path/05-endings.spec.ts",
+      "file": "critical-path/05-endings.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Game Endings",
+          "file": "critical-path/05-endings.spec.ts",
+          "line": 17,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should trigger high compliance ending after 6 weeks",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/05-endings.spec.ts",
+                        "line": 24,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "critical",
+                  "projectName": "critical",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-23T10:49:08.930Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/05-endings.spec.ts",
+                            "line": 24,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7d3e2f967aa43a93bf62-c766df404a5497bf3f74",
+              "file": "critical-path/05-endings.spec.ts",
+              "line": 24,
+              "column": 8
+            },
+            {
+              "title": "should trigger high reluctance ending with many no-actions",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/05-endings.spec.ts",
+                        "line": 58,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "critical",
+                  "projectName": "critical",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-23T10:49:08.931Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/05-endings.spec.ts",
+                            "line": 58,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7d3e2f967aa43a93bf62-a16b4c26cad4e029e658",
+              "file": "critical-path/05-endings.spec.ts",
+              "line": 58,
+              "column": 8
+            },
+            {
+              "title": "should display statistics on ending screen",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "critical",
+                  "projectName": "critical",
+                  "results": [
+                    {
+                      "workerIndex": 16,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 15156,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n\n    at flagCitizen (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:62:51)\n    at completeWeek (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:204:5)\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/05-endings.spec.ts:88:5",
+                        "location": {
+                          "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                          "column": 51,
+                          "line": 62
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mhelpers/citizen-actions.ts:62\n\n  60 |\n  61 |   // Wait for dashboard to be visible again\n> 62 |   await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 3000 });\n     |                                                   ^\n  63 | }\n  64 |\n  65 | /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                            "column": 51,
+                            "line": 62
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.system-dashboard')\nExpected: visible\nTimeout: 3000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('.system-dashboard')\u001b[22m\n\n\n   at helpers/citizen-actions.ts:62\n\n  60 |\n  61 |   // Wait for dashboard to be visible again\n> 62 |   await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 3000 });\n     |                                                   ^\n  63 | }\n  64 |\n  65 | /**\n    at flagCitizen (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:62:51)\n    at completeWeek (/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts:204:5)\n    at /home/selim/data_privacy_distopia/frontend/tests/e2e/critical-path/05-endings.spec.ts:88:5"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-23T10:49:10.619Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/05-endings-Game-Endings-sh-2d512-statistics-on-ending-screen-critical/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/05-endings-Game-Endings-sh-2d512-statistics-on-ending-screen-critical/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/selim/data_privacy_distopia/frontend/test-results/05-endings-Game-Endings-sh-2d512-statistics-on-ending-screen-critical/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/selim/data_privacy_distopia/frontend/tests/e2e/helpers/citizen-actions.ts",
+                        "column": 51,
+                        "line": 62
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "7d3e2f967aa43a93bf62-aa25790449f7fa798485",
+              "file": "critical-path/05-endings.spec.ts",
+              "line": 91,
+              "column": 3
+            },
+            {
+              "title": "should have educational links on ending screen",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "critical",
+                  "projectName": "critical",
+                  "results": [
+                    {
+                      "workerIndex": 17,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 8467,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Educational links test - requires full playthrough to verify\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-23T10:49:10.913Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7d3e2f967aa43a93bf62-e0ab15c2c47f139aef96",
+              "file": "critical-path/05-endings.spec.ts",
+              "line": 112,
+              "column": 3
+            },
+            {
+              "title": "should show different ending text based on compliance score",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "critical",
+                  "projectName": "critical",
+                  "results": [
+                    {
+                      "workerIndex": 18,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 10230,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Different endings based on compliance:\n"
+                        },
+                        {
+                          "text": "  - High compliance: Authoritarian ending\n"
+                        },
+                        {
+                          "text": "  - High reluctance: Termination/whistleblower ending\n"
+                        },
+                        {
+                          "text": "  - Balanced: Neutral ending\n"
+                        },
+                        {
+                          "text": "  - Exposure: System exposure ending\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-23T10:49:13.769Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7d3e2f967aa43a93bf62-b78a24464cebec9cd171",
+              "file": "critical-path/05-endings.spec.ts",
+              "line": 124,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-01-23T10:48:14.721Z",
+    "duration": 74323.39600000001,
+    "expected": 13,
+    "skipped": 2,
+    "unexpected": 17,
+    "flaky": 0
+  }
+}
