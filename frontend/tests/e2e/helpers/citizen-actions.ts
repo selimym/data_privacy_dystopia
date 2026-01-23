@@ -50,22 +50,29 @@ export async function flagCitizen(
   await expect(submitButton).toBeEnabled({ timeout: 1000 });
   await submitButton.click();
 
-  // Wait for submission to process - DecisionResultModal should appear
-  await page.waitForTimeout(500);
+  // Wait for scene transition to WorldScene with cinematic
+  await page.waitForTimeout(1500);
 
-  // Look for the decision result modal
-  const decisionModal = page.locator('.decision-result-modal');
-  const modalAppeared = await decisionModal.isVisible({ timeout: 3000 }).catch(() => false);
+  // Wait for cinematic to appear (scene switches to WorldScene)
+  const cinematicTextBox = page.locator('.cinematic-text-box');
+  try {
+    await cinematicTextBox.waitFor({ state: 'visible', timeout: 5000 });
+    console.log('[Test] Cinematic appeared, waiting briefly before skipping');
+    await page.waitForTimeout(500);
 
-  if (modalAppeared) {
-    console.log('[Test] Decision result modal appeared, clicking return button');
-    const returnButton = page.locator('.btn-return');
-    await returnButton.click();
+    // Click skip button
+    const skipButton = page.locator('.cinematic-skip-button');
+    await skipButton.click();
+    console.log('[Test] Clicked cinematic skip button');
+    await page.waitForTimeout(500);
+  } catch (e) {
+    console.log('[Test] No cinematic appeared, trying ESC');
+    await page.keyboard.press('Escape');
     await page.waitForTimeout(500);
   }
 
-  // Wait for dashboard to return
-  await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 5000 });
+  // Wait for dashboard to return (scene switches back to SystemDashboardScene)
+  await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 10000 });
 }
 
 /**
