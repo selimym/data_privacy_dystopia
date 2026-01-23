@@ -50,16 +50,22 @@ export async function flagCitizen(
   await expect(submitButton).toBeEnabled({ timeout: 1000 });
   await submitButton.click();
 
-  // Wait for cinematic to appear and skip it immediately
-  await page.waitForTimeout(800);
-  const skipButton = page.locator('.cinematic-skip-button');
-  if (await skipButton.isVisible({ timeout: 1000 }).catch(() => false)) {
-    await skipButton.click();
+  // Wait for submission to process - DecisionResultModal should appear
+  await page.waitForTimeout(500);
+
+  // Look for the decision result modal
+  const decisionModal = page.locator('.decision-result-modal');
+  const modalAppeared = await decisionModal.isVisible({ timeout: 3000 }).catch(() => false);
+
+  if (modalAppeared) {
+    console.log('[Test] Decision result modal appeared, clicking return button');
+    const returnButton = page.locator('.btn-return');
+    await returnButton.click();
     await page.waitForTimeout(500);
   }
 
-  // Wait for dashboard to be visible again
-  await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 3000 });
+  // Wait for dashboard to return
+  await expect(page.locator('.system-dashboard')).toBeVisible({ timeout: 5000 });
 }
 
 /**
@@ -85,11 +91,29 @@ export async function submitNoAction(page: Page, justification: string): Promise
  * Wait for week advancement
  */
 export async function waitForWeekAdvancement(page: Page): Promise<void> {
-  // Look for week indicator change or outcomes cinematic
-  const weekIndicator = page.locator('[data-testid="week-indicator"], .week-number');
+  // Wait for either:
+  // 1. Cinematic to appear (outcomes screen)
+  // 2. Or a reasonable delay if no cinematic
 
-  // Wait for cinematic or week change (generous timeout)
-  await page.waitForTimeout(3000);
+  const cinematic = page.locator('.cinematic-text-box, .outcome-viewer-overlay, .weekly-outcomes');
+
+  try {
+    // Try to wait for cinematic to appear (5s timeout)
+    await cinematic.waitFor({ state: 'visible', timeout: 5000 });
+    console.log('[waitForWeekAdvancement] Cinematic appeared');
+
+    // Immediately skip it to speed up tests
+    await page.waitForTimeout(500); // Brief delay for cinematic to fully render
+    await skipCinematic(page);
+    console.log('[waitForWeekAdvancement] Cinematic skipped');
+
+    // Extra delay for UI to update
+    await page.waitForTimeout(1000);
+  } catch (e) {
+    // No cinematic appeared - just wait a bit for week to update
+    console.log('[waitForWeekAdvancement] No cinematic, waiting for week update');
+    await page.waitForTimeout(2000);
+  }
 }
 
 /**
@@ -181,10 +205,29 @@ export async function waitForCinematicComplete(page: Page, timeout = 30000): Pro
  * Skip cinematic (if skip button exists)
  */
 export async function skipCinematic(page: Page): Promise<void> {
+  // Try cinematic skip button
   const skipButton = page.locator('.cinematic-skip-button');
 
-  if (await skipButton.isVisible()) {
+  if (await skipButton.isVisible({ timeout: 1000 }).catch(() => false)) {
     await skipButton.click();
+    await page.waitForTimeout(500);
+    return;
+  }
+
+  // Try outcome viewer close button
+  const closeButton = page.locator('.btn-close-viewer');
+
+  if (await closeButton.isVisible({ timeout: 1000 }).catch(() => false)) {
+    await closeButton.click();
+    await page.waitForTimeout(500);
+    return;
+  }
+
+  // Try decision result modal return button
+  const returnButton = page.locator('.btn-return');
+
+  if (await returnButton.isVisible({ timeout: 1000 }).catch(() => false)) {
+    await returnButton.click();
     await page.waitForTimeout(500);
   }
 }

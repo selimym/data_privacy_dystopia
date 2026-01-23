@@ -80,5 +80,6 @@ build/
 docs_archive/
 
 # Tests
-frontend/test-results/*
-frontend/playwright-report/*
+frontend/test-results/
+frontend/test-results.json
+frontend/playwright-report/

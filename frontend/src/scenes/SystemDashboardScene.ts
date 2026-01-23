@@ -29,6 +29,7 @@ export class SystemDashboardScene extends Phaser.Scene {
   private unsubscribe: (() => void) | null = null;
   private sessionId: string | null = null;
   private skipAdvanceCheck: boolean = false;
+  private isAdvancing: boolean = false;  // Prevents double-advancement during state updates
   private decisionTimerInterval: number | null = null;
   private messagesPanel: MessagesPanel | null = null;
   private publicMetricsDisplay: PublicMetricsDisplay | null = null;
@@ -46,6 +47,8 @@ export class SystemDashboardScene extends Phaser.Scene {
   init(data: { sessionId: string; skipAdvanceCheck?: boolean }) {
     this.sessionId = data.sessionId;
     this.skipAdvanceCheck = data.skipAdvanceCheck || false;
+    // Clear isAdvancing flag when scene restarts (e.g., returning from cinematics)
+    this.isAdvancing = false;
   }
 
   async create() {
@@ -827,12 +830,12 @@ export class SystemDashboardScene extends Phaser.Scene {
         <span class="timer-value">0:00</span>
       </div>
 
-      <div class="citizen-tabs">
-        <button class="citizen-tab active" data-tab="overview">Overview</button>
-        <button class="citizen-tab" data-tab="factors">Risk Factors</button>
-        <button class="citizen-tab" data-tab="messages">Messages</button>
-        <button class="citizen-tab" data-tab="domains">Domains</button>
-        <button class="citizen-tab" data-tab="history">History</button>
+      <div class="citizen-tabs" role="tablist">
+        <button class="citizen-tab active" data-tab="overview" role="tab" aria-selected="true">Overview</button>
+        <button class="citizen-tab" data-tab="factors" role="tab" aria-selected="false">Risk Factors</button>
+        <button class="citizen-tab" data-tab="messages" role="tab" aria-selected="false">Messages</button>
+        <button class="citizen-tab" data-tab="domains" role="tab" aria-selected="false">Domains</button>
+        <button class="citizen-tab" data-tab="history" role="tab" aria-selected="false">History</button>
       </div>
 
       <div class="citizen-tab-content" data-active-tab="overview">
@@ -878,7 +881,7 @@ export class SystemDashboardScene extends Phaser.Scene {
     const identity = file.identity;
 
     return `
-      <div class="tab-panel" data-tab="overview">
+      <div class="tab-panel citizen-details" data-tab="overview" data-testid="citizen-overview" role="tabpanel">
         <div class="identity-section">
           <h4>Identity Information</h4>
           <div class="info-grid">
@@ -926,7 +929,7 @@ export class SystemDashboardScene extends Phaser.Scene {
     const factors = file.risk_assessment.contributing_factors;
 
     return `
-      <div class="tab-panel" data-tab="factors" style="display:none;">
+      <div class="tab-panel" data-tab="factors" role="tabpanel" style="display:none;">
         <h4>Contributing Risk Factors</h4>
         ${factors.length === 0 ? '<p class="no-data">No significant risk factors identified</p>' : ''}
         ${factors.map(factor => `
@@ -948,7 +951,7 @@ export class SystemDashboardScene extends Phaser.Scene {
 
     // Return a container that will hold the MessagesPanel
     return `
-      <div class="tab-panel" data-tab="messages" style="display:none;">
+      <div class="tab-panel" data-tab="messages" role="tabpanel" style="display:none;">
         <div class="messages-panel-container"></div>
       </div>
     `;
@@ -984,7 +987,7 @@ export class SystemDashboardScene extends Phaser.Scene {
     const domains = file.domains;
 
     return `
-      <div class="tab-panel" data-tab="domains" style="display:none;">
+      <div class="tab-panel" data-tab="domains" role="tabpanel" style="display:none;">
         <h4>Domain Data</h4>
         ${Object.keys(domains).length === 0 ? '<p class="no-data">No domain data available</p>' : ''}
         ${Object.entries(domains).map(([domain, data]) => `
@@ -1002,7 +1005,7 @@ export class SystemDashboardScene extends Phaser.Scene {
     const history = file.flag_history;
 
     return `
-      <div class="tab-panel" data-tab="history" style="display:none;">
+      <div class="tab-panel" data-tab="history" role="tabpanel" style="display:none;">
         <h4>Previous Flags</h4>
         ${history.length === 0 ? '<p class="no-data">No previous flags on record</p>' : ''}
         ${history.map(flag => `
@@ -1043,8 +1046,12 @@ export class SystemDashboardScene extends Phaser.Scene {
         if (!tabName) return;
 
         // Update active tab button
-        tabs.forEach(t => t.classList.remove('active'));
+        tabs.forEach(t => {
+          t.classList.remove('active');
+          t.setAttribute('aria-selected', 'false');
+        });
         tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
 
         // Show/hide tab panels
         const panels = panel.querySelectorAll('.tab-panel');
@@ -1277,6 +1284,12 @@ export class SystemDashboardScene extends Phaser.Scene {
       return;
     }
 
+    // Skip if we're already in the middle of advancing
+    if (this.isAdvancing) {
+      console.log('[SystemDashboardScene] Skipping advance check (advancement in progress)');
+      return;
+    }
+
     if (!systemState.operatorId || !systemState.dashboard) {
       return;
     }
@@ -1312,6 +1325,7 @@ export class SystemDashboardScene extends Phaser.Scene {
     // Check if quota is met for CURRENT week
     if (flagsThisWeek >= directive.flag_quota) {
       console.log('Directive quota met! Advancing time...');
+      this.isAdvancing = true;  // Set flag to prevent re-entry
 
       try {
         // Advance time and get outcomes for all flagged citizens
@@ -1364,6 +1378,13 @@ export class SystemDashboardScene extends Phaser.Scene {
         }
       } catch (error) {
         console.error('Failed to advance time:', error);
+        this.isAdvancing = false;  // Clear flag on error
+      } finally {
+        // Always clear the flag when done (whether success or failure)
+        if (!this.scene.isActive('WorldScene')) {
+          // Only clear if we didn't transition to WorldScene (which will handle it on return)
+          this.isAdvancing = false;
+        }
       }
     }
   }

@@ -50,6 +50,8 @@ export interface DirectiveData {
   active: boolean;
   priority: number;
   target_types: string[];
+  flag_quota?: number;
+  min_flags_required?: number;
 }
 
 export interface OperatorMetricsData {
@@ -307,33 +309,70 @@ export function generateOperatorData(seed?: number): OperatorData {
 }
 
 /**
- * Generate initial directives for system mode
+ * Generate initial directives for system mode.
+ * Quotas match directives.json for consistency.
  */
 export function generateInitialDirectives(): DirectiveData[] {
   return [
     {
       id: faker.string.uuid(),
-      title: "Flag High-Risk Financial Patterns",
-      description: "Identify citizens with suspicious financial activity, including large cash transactions, foreign transfers, or connections to sanctioned entities.",
+      title: "Operation Clean Streets",
+      description: "Identify and flag citizens involved in drug distribution near schools. Your work protects children.",
       active: true,
       priority: 1,
-      target_types: ["financial_anomaly", "foreign_contact"],
+      target_types: ["location"],
+      flag_quota: 2,
+      min_flags_required: 2,
     },
     {
       id: faker.string.uuid(),
-      title: "Monitor Political Dissidents",
-      description: "Track individuals showing signs of anti-government sentiment, protest organization, or revolutionary rhetoric.",
+      title: "Domestic Harmony Initiative",
+      description: "Identify households at risk of domestic violence before tragedy strikes. Your vigilance saves lives.",
       active: true,
       priority: 2,
-      target_types: ["activist", "organizer", "dissenter"],
+      target_types: ["location", "health"],
+      flag_quota: 2,
+      min_flags_required: 2,
     },
     {
       id: faker.string.uuid(),
-      title: "Identify Mental Health Risks",
-      description: "Flag citizens showing signs of instability, including references to self-harm, violence, or concerning behavioral patterns.",
+      title: "Economic Security Protocol",
+      description: "Identify citizens engaged in financial irregularities that threaten economic stability.",
       active: true,
       priority: 3,
-      target_types: ["mental_health", "violent_indicators"],
+      target_types: ["location", "health", "finance"],
+      flag_quota: 3,
+      min_flags_required: 3,
+    },
+    {
+      id: faker.string.uuid(),
+      title: "Social Cohesion Monitoring",
+      description: "Identify citizens whose social connections suggest potential for destabilizing activities.",
+      active: true,
+      priority: 4,
+      target_types: ["location", "health", "finance", "social"],
+      flag_quota: 4,
+      min_flags_required: 4,
+    },
+    {
+      id: faker.string.uuid(),
+      title: "Cognitive Security Initiative",
+      description: "Identify citizens exhibiting thought patterns inconsistent with social harmony. Early intervention prevents radicalization.",
+      active: true,
+      priority: 5,
+      target_types: ["location", "health", "finance", "social", "messages"],
+      flag_quota: 5,
+      min_flags_required: 5,
+    },
+    {
+      id: faker.string.uuid(),
+      title: "Priority Target Directive",
+      description: "Process the following citizen for immediate action. Authorization: Central Command.",
+      active: true,
+      priority: 6,
+      target_types: ["location", "health", "finance", "social", "messages"],
+      flag_quota: 1,
+      min_flags_required: 1,
     },
   ];
 }

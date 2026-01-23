@@ -161,15 +161,17 @@ async function loadPopulationIntoGameStore(population: PopulationData): Promise<
   });
 
   // Load directives (convert DirectiveData to DirectiveRead format)
-  for (const directive of population.directives) {
+  // Assign sequential week numbers to each directive
+  for (let i = 0; i < population.directives.length; i++) {
+    const directive = population.directives[i];
     gameStore.addDirective({
       ...directive,
-      week_number: 1, // Will be updated as game progresses
+      week_number: i + 1, // Assign sequential week numbers (1, 2, 3, ...)
       directive_key: directive.id,
       internal_memo: directive.description,
       required_domains: directive.target_types,
-      flag_quota: 3, // Default quota
-      min_flags_required: 3, // Default quota
+      flag_quota: directive.flag_quota || 3, // Use directive's quota or default to 3
+      min_flags_required: directive.min_flags_required || 3, // Use directive's min or default to 3
       time_limit_hours: null,
       moral_weight: 1,
       content_rating: 'mature',
@@ -323,13 +325,18 @@ export function getDashboardData(operatorId: string): SystemDashboard {
     throw new Error('No active directive');
   }
 
+  // Count flags for CURRENT week only (not cumulative)
+  const currentWeek = gameStore.getCurrentWeek();
+  const allFlags = gameStore.getAllFlags();
+  const flagsThisWeek = allFlags.filter(f => f.week_number === currentWeek).length;
+
   // Get operator status
   const operatorStatus: OperatorStatus = {
     operator_id: operator.id,
     operator_code: operator.operator_code,
     status: operator.status,
     compliance_score: operator.compliance_score,
-    current_quota_progress: `${operator.total_flags_submitted}/${currentDirective.min_flags_required || 3}`,
+    current_quota_progress: `${flagsThisWeek}/${currentDirective.min_flags_required || 3}`,
     total_flags_submitted: operator.total_flags_submitted,
     total_reviews_completed: operator.total_reviews_completed,
     hesitation_incidents: operator.hesitation_incidents,
@@ -347,8 +354,8 @@ export function getDashboardData(operatorId: string): SystemDashboard {
   // Get alerts (warnings, quota status, etc.)
   const alerts: SystemAlert[] = [];
 
-  // Check quota progress
-  const quotaProgress = operator.total_flags_submitted / (currentDirective.min_flags_required || 3);
+  // Check quota progress (use current week's flags, not cumulative)
+  const quotaProgress = flagsThisWeek / (currentDirective.min_flags_required || 3);
   if (quotaProgress < 0.5 && operator.total_reviews_completed > 10) {
     alerts.push({
       alert_type: 'quota_warning',
@@ -694,10 +701,14 @@ export function advanceDirective(operatorId: string): DirectiveRead {
     throw new Error('No current directive');
   }
 
-  // Check if quota is met
+  // Check if quota is met for CURRENT week (not cumulative)
+  const currentWeek = gameStore.getCurrentWeek();
+  const allFlags = gameStore.getAllFlags();
+  const flagsThisWeek = allFlags.filter(f => f.week_number === currentWeek).length;
   const minRequired = currentDirective.min_flags_required || 3;
-  if (operator.total_flags_submitted < minRequired) {
-    throw new Error('Quota not met - cannot advance directive');
+
+  if (flagsThisWeek < minRequired) {
+    throw new Error(`Quota not met - need ${minRequired} flags for week ${currentWeek}, have ${flagsThisWeek}`);
   }
 
   // Get next directive
@@ -707,6 +718,8 @@ export function advanceDirective(operatorId: string): DirectiveRead {
   if (!nextDirective) {
     throw new Error('No more directives available');
   }
+
+  console.log(`[advanceDirective] Week ${currentWeek} → Week ${nextWeek}`);
 
   // Update operator
   gameStore.updateOperator({

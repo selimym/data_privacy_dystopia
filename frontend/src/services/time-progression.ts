@@ -67,10 +67,15 @@ export class TimeProgressionService {
       return [];
     }
 
-    // Get all flags submitted by this operator
-    const flags = gameStore.getAllFlags().filter(f => f.operator_id === operatorId);
+    // Get flags submitted for CURRENT week only (not all historical flags!)
+    const currentWeek = gameStore.getCurrentWeek();
+    const flags = gameStore.getAllFlags().filter(f =>
+      f.operator_id === operatorId && f.week_number === currentWeek
+    );
 
-    // Generate outcomes for each citizen at the new time period
+    console.log(`[TimeProgression] Generating outcomes for ${flags.length} flags from week ${currentWeek}`);
+
+    // Generate outcomes for each citizen flagged THIS week
     const outcomes: CitizenOutcome[] = [];
     for (const flag of flags) {
       try {

@@ -119,31 +119,26 @@ test.describe('Flag Submission', () => {
     }
   });
 
-  test('should remove flagged citizen from queue', async ({ page }) => {
+  test('should keep flagged citizen in queue', async ({ page }) => {
     // Get first citizen info
     const citizenCards = page.locator('.case-card');
     const initialCount = await citizenCards.count();
-    const firstCitizenName = await citizenCards.first().textContent();
 
     console.log(`Initial citizen count: ${initialCount}`);
-    console.log(`First citizen: ${firstCitizenName}`);
 
     // Flag the citizen
     await selectCitizen(page, 0);
     await flagCitizen(page, 'monitoring', TEST_JUSTIFICATIONS.monitoring);
 
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(1000);
 
-    // Citizen queue should update
+    // Citizens remain in queue after flagging (can be reviewed multiple times)
     const newCount = await citizenCards.count();
-    const newFirstCitizenName = await citizenCards.first().textContent();
 
     console.log(`New citizen count: ${newCount}`);
-    console.log(`New first citizen: ${newFirstCitizenName}`);
 
-    // Either count decreased or first citizen changed
-    const queueChanged = newCount < initialCount || newFirstCitizenName !== firstCitizenName;
-    expect(queueChanged).toBeTruthy();
+    // Queue count should remain the same
+    expect(newCount).toBe(initialCount);
   });
 
   test('should handle multiple flags in sequence', async ({ page }) => {
