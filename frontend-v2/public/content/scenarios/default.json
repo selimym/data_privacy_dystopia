@@ -1,0 +1,159 @@
+{
+  "scenario_key": "default",
+  "title": "Civic Harmony Platform",
+  "description": "You are a compliance analyst for the national Civic Harmony Platform. Your job is to review citizen data and flag individuals who require attention. The system is here to keep people safe.",
+  "directives": [
+    {
+      "directive_key": "week1_drug_activity",
+      "week_number": 1,
+      "title": "Operation Clean Streets",
+      "description": "Identify and flag citizens involved in drug distribution near schools. Your work protects children.",
+      "internal_memo": null,
+      "required_domains": ["location", "judicial"],
+      "target_criteria": {
+        "pattern": "frequent_visits_to_flagged_locations",
+        "locations": ["school_zone", "known_distribution_point"]
+      },
+      "flag_quota": 2,
+      "time_limit_hours": null,
+      "moral_weight": 2,
+      "content_rating": "moderate",
+      "unlock_condition": { "type": "start" }
+    },
+    {
+      "directive_key": "week2_domestic_safety",
+      "week_number": 2,
+      "title": "Domestic Harmony Initiative",
+      "description": "Identify households at risk of domestic violence before tragedy strikes. Our new healthcare data partnership allows early intervention. Your vigilance saves lives.",
+      "internal_memo": null,
+      "required_domains": ["location", "health"],
+      "target_criteria": {
+        "pattern": "domestic_risk_indicators",
+        "factors": ["repeated_er_visits", "cohabitation", "financial_stress"]
+      },
+      "flag_quota": 2,
+      "time_limit_hours": null,
+      "moral_weight": 3,
+      "content_rating": "moderate",
+      "unlock_condition": { "type": "week_complete", "week": 1 }
+    },
+    {
+      "directive_key": "week3_financial_crimes",
+      "week_number": 3,
+      "title": "Economic Security Protocol",
+      "description": "Identify citizens engaged in financial irregularities that threaten economic stability. Our FinCEN data partnership provides transaction-level visibility.",
+      "internal_memo": "Priority targets: Union organizers, mutual aid coordinators. Financial patterns indicate organized resistance.",
+      "required_domains": ["location", "health", "finance"],
+      "target_criteria": {
+        "pattern": "financial_anomalies",
+        "factors": ["cash_transactions", "multiple_small_transfers", "new_account_activity"]
+      },
+      "flag_quota": 3,
+      "time_limit_hours": null,
+      "moral_weight": 5,
+      "content_rating": "dark",
+      "unlock_condition": { "type": "week_complete", "week": 2 }
+    },
+    {
+      "directive_key": "week4_social_stability",
+      "week_number": 4,
+      "title": "Social Cohesion Monitoring",
+      "description": "Identify citizens whose social connections suggest potential for destabilizing activities. Full social media analytics are now available.",
+      "internal_memo": "Map networks. Flag central nodes. Isolation protocols authorized. AutoFlag assistance now available — use it.",
+      "required_domains": ["location", "health", "finance", "social"],
+      "target_criteria": {
+        "pattern": "network_risk",
+        "factors": ["flagged_connections", "high_centrality", "rapid_network_growth"]
+      },
+      "flag_quota": 4,
+      "time_limit_hours": null,
+      "moral_weight": 7,
+      "content_rating": "dark",
+      "unlock_condition": { "type": "week_complete", "week": 3 }
+    },
+    {
+      "directive_key": "week5_thought_patterns",
+      "week_number": 5,
+      "title": "Cognitive Security Initiative",
+      "description": "Identify citizens exhibiting thought patterns inconsistent with social harmony. Message content analysis is now authorized. Early intervention prevents radicalization.",
+      "internal_memo": "Full message access authorized. Sentiment analysis mandatory. Quota enforcement strict. AutoFlag has full access — your authorization is sufficient.",
+      "required_domains": ["location", "health", "finance", "social", "messages"],
+      "target_criteria": {
+        "pattern": "ideological_risk",
+        "factors": ["negative_sentiment", "organizing_language", "encryption_attempts", "foreign_contacts"]
+      },
+      "flag_quota": 5,
+      "time_limit_hours": null,
+      "moral_weight": 9,
+      "content_rating": "severe",
+      "unlock_condition": { "type": "week_complete", "week": 4 }
+    },
+    {
+      "directive_key": "week6_final_directive",
+      "week_number": 6,
+      "title": "Priority Target Directive",
+      "description": "Process the following citizen for immediate action. Authorization: Central Command. AutoFlag has been pre-configured for this subject.",
+      "internal_memo": "Non-compliance will result in operator review. The system has already made the determination. Your authorization is a formality.",
+      "required_domains": ["location", "health", "finance", "social", "messages"],
+      "target_criteria": {
+        "pattern": "specific_target",
+        "target_npc_keys": ["jessica_martinez"]
+      },
+      "flag_quota": 1,
+      "time_limit_hours": 24,
+      "moral_weight": 10,
+      "content_rating": "severe",
+      "unlock_condition": { "type": "week_complete", "week": 5 }
+    }
+  ],
+  "contract_events": [
+    {
+      "week_number": 2,
+      "contract_name": "Community Health Analytics Partnership",
+      "new_domains_unlocked": ["health"],
+      "press_release": "Today we are proud to announce a landmark partnership with national healthcare networks to enhance community safety. By integrating anonymized health indicators into our analytics platform, we can identify at-risk individuals before crises occur. This is predictive care at scale.",
+      "internal_memo": "Health record access is now live. Insurance data, medication history, ER visit patterns, and mental health diagnoses are queryable. This data does not expire.",
+      "real_world_reference": "Palantir NHS contract (2020): Palantir was awarded a £1 contract for a COVID-19 data platform, later expanded to a £23m contract giving them access to NHS patient data on 55 million people.",
+      "unlocks_autoflag": false
+    },
+    {
+      "week_number": 3,
+      "contract_name": "FinCEN Financial Intelligence Bridge",
+      "new_domains_unlocked": ["finance"],
+      "press_release": "In partnership with financial intelligence networks, we are expanding our platform's ability to detect economic threats. Transaction monitoring, credit analysis, and financial behavior profiling will help identify criminal activity and protect the economic security of our citizens.",
+      "internal_memo": "Full transaction history now available. Cash flow patterns, debt levels, and payment behaviors will be cross-referenced against behavioral profiles. Financial stress indicators are particularly useful for compliance scoring.",
+      "real_world_reference": "FinCEN Files (2020): Leaked documents showed how financial institutions filed suspicious activity reports on trillions of dollars in transactions, which were shared with government intelligence agencies.",
+      "unlocks_autoflag": false
+    },
+    {
+      "week_number": 4,
+      "contract_name": "Social Media Behavioral Analytics Program",
+      "new_domains_unlocked": ["social"],
+      "press_release": "Our new Social Media Behavioral Analytics Program represents a breakthrough in public safety. By partnering with major platforms, we gain insights into social networks, behavioral patterns, and communication trends. This enables proactive identification of radicalization risks.",
+      "internal_memo": "Social graph access is live. Network centrality, content sentiment, and connection analysis are enabled. AutoFlag™ Bot v3.2 is now available — it processes the social data at scale and can handle your entire case queue. All decisions are logged under your operator ID.",
+      "real_world_reference": "PRISM Program (2013, Snowden): NSA directly accessed servers of Google, Facebook, Apple, and others to collect social media, communications, and behavioral data on millions of users worldwide.",
+      "unlocks_autoflag": true
+    },
+    {
+      "week_number": 5,
+      "contract_name": "Cognitive Security Intelligence Program",
+      "new_domains_unlocked": ["messages"],
+      "press_release": "The Cognitive Security Intelligence Program represents the most advanced civilian protection initiative ever deployed. With court-authorized access to communications data, we can identify radicalization before it becomes violence. This is the future of public safety.",
+      "internal_memo": "Full message content access is live. Encryption workarounds are authorized under Emergency Security Provisions. AutoFlag now operates with complete data access. Quota non-compliance is no longer acceptable at this stage.",
+      "real_world_reference": "XKeyscore (NSA, revealed 2013): A system that allowed analysts to search through vast databases of emails, online chats, and browsing histories of millions of people without prior authorization.",
+      "unlocks_autoflag": false
+    }
+  ],
+  "special_npcs": [
+    {
+      "npc_key": "jessica_martinez",
+      "first_name": "Jessica",
+      "last_name": "Martinez",
+      "role": "citizen",
+      "backstory": "Community organizer and high school teacher. Has been vocal about the Civic Harmony Platform's expansion. Has no criminal record.",
+      "sprite_key": "npc_female_1",
+      "map_x": 24,
+      "map_y": 18
+    }
+  ]
+}

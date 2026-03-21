@@ -1,0 +1,54 @@
+{
+  "employers": [
+    "TechCorp Solutions", "Riverside Medical Center", "DataFlow Analytics",
+    "Green Valley School District", "Metro Transit Authority", "Summit Financial Services",
+    "Horizon Manufacturing", "CityView Retail Group", "Harbor Logistics Inc.",
+    "Eastside Community College", "Pinnacle Insurance Group", "Westbrook Law Partners",
+    "Valley Agricultural Co.", "Northgate Construction", "Allied Healthcare Network",
+    "Sunrise Hospitality Group", "Urban Planning Associates", "Metro Public Library"
+  ],
+  "banks": [
+    "First National Bank", "Riverside Credit Union", "Metro Bank & Trust",
+    "Community Savings Bank", "Summit Financial", "Harbor Bank",
+    "Citizens Trust & Savings", "Valley Federal Credit Union", "Cornerstone Bank"
+  ],
+  "creditors": [
+    "First Mortgage Co.", "Auto Finance Plus", "Student Loan Services",
+    "Credit Solutions Inc.", "Personal Lending Corp.", "Fast Cash Advance",
+    "EasyMoney Financial", "National Debt Relief", "QuickLoan Services"
+  ],
+  "merchants": {
+    "groceries": ["FreshMart", "Valley Foods", "QuickStop Market", "Whole Earth Market", "SaveMore Foods"],
+    "dining": ["The Bistro", "Pizza Palace", "Riverside Cafe", "Dragon Wok", "Corner Diner", "The Olive Branch"],
+    "healthcare": ["Riverside Medical", "Summit Clinic", "Valley Urgent Care", "QuickCare Pharmacy"],
+    "pharmacy": ["Metro Pharmacy", "HealthPlus Drugs", "CareRx", "Corner Drug Store", "24hr Pharmacy"],
+    "entertainment": ["Cineplex", "GameZone", "Downtown Theater", "StreamFlix", "Escape Room Central"],
+    "travel": ["SkyHigh Airlines", "Metro Hotel", "RideShare", "Budget Car Rentals", "Greyhound Bus"],
+    "utilities": ["City Power & Light", "Metro Water", "NetSpeed Internet", "Natural Gas Co."],
+    "rent": ["Property Management Co.", "Landlord Direct", "Urban Apartment Services"],
+    "insurance": ["SafeGuard Insurance", "Premier Coverage", "AutoShield Insurance"],
+    "gambling": ["Lucky Casino", "BetOnline", "Slots Paradise", "PokerNight Club", "Sports Bet App"],
+    "alcohol": ["Liquor Mart", "Wine & Spirits", "Corner Pub", "Craft Beer Depot"],
+    "union_related": ["Teamsters Local Hall", "AFL-CIO District Office", "Workers United Center", "Labor Rights Fund"],
+    "legal": ["Public Defender's Office", "Legal Aid Society", "Immigration Legal Services"],
+    "religious": ["Grace Community Church", "St. Michael's Parish", "Community Mosque", "Temple Beth El"],
+    "political": ["Civic Action Network", "Community Organizing Fund", "Mutual Aid Collective"],
+    "other": ["General Store", "Post Office", "DMV Services", "Notary Public"]
+  },
+  "debt_types": [
+    "Medical debt", "Student loan", "Credit card balance", "Auto loan",
+    "Personal loan", "Payday loan", "Medical equipment financing",
+    "Tax liability", "Legal fees", "Utility arrears"
+  ],
+  "transaction_descriptions": {
+    "suspicious": [
+      "Cash withdrawal - ATM", "Money order purchase", "Wire transfer - international",
+      "Cryptocurrency exchange", "Cash deposit - no memo", "Prepaid card purchase",
+      "Gift card purchase - bulk", "Multiple small transfers same day"
+    ],
+    "normal": [
+      "Direct deposit - payroll", "Rent payment", "Utility bill auto-pay",
+      "Grocery purchase", "Gas station", "Online subscription", "Insurance premium"
+    ]
+  }
+}

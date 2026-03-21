@@ -1,0 +1,62 @@
+{
+  "post_templates": {
+    "political": [
+      "Can't believe what's happening with [topic]. We need to speak up.",
+      "Attended the [event] today. More people need to know about this.",
+      "If you're not angry, you're not paying attention. #[hashtag]",
+      "Just signed the petition for [cause]. Please share.",
+      "Meeting tonight at [location] to discuss [topic]. Come if you can.",
+      "The [institution] is failing us. Time for accountability.",
+      "Organizing [event] next [day]. DM me for details."
+    ],
+    "personal": [
+      "Great weekend with family 🙂",
+      "Long day at work. Ready for the weekend.",
+      "Anyone recommend a good [category] in [area]?",
+      "Happy [holiday]! Grateful for everyone in my life.",
+      "New job update: it's going well so far.",
+      "Finally finished [project]. Feeling accomplished."
+    ],
+    "concerning": [
+      "Don't know how much longer I can keep going like this.",
+      "Nobody should have to live like this. Something has to change.",
+      "Fed up with the system. It's all broken.",
+      "If they think we're going to just accept this, they're wrong.",
+      "Meeting with [group] was eye-opening. People are organizing.",
+      "Why does speaking the truth feel so dangerous right now?"
+    ]
+  },
+  "platforms": ["Facebook", "Twitter/X", "Instagram", "TikTok", "Reddit", "LinkedIn", "Nextdoor", "Telegram"],
+  "hashtags": {
+    "political": ["#justice", "#accountability", "#organize", "#solidarity", "#resist", "#workersrights", "#civilrights"],
+    "protest": ["#NotMyGov", "#WeWontBeQuiet", "#MutualAid", "#CommunityFirst", "#NoPlatformForHate"],
+    "normal": ["#weekend", "#family", "#grateful", "#blessed", "#local", "#community"]
+  },
+  "relationship_types": ["Friend", "Coworker", "Family member", "Neighbor", "Classmate", "Acquaintance"],
+  "group_memberships": {
+    "flagged": [
+      "Tenants' Rights Coalition", "Workers United Local 47", "Community Mutual Aid Network",
+      "Civil Liberties Defense Group", "Immigrant Rights Alliance", "Environmental Justice Coalition",
+      "Labor Organizing Committee", "Police Accountability Project"
+    ],
+    "neutral": [
+      "Neighborhood Watch", "Book Club - Central Library", "Running Club Metro",
+      "Parent-Teacher Association", "Local Business Association", "Community Garden Group",
+      "Amateur Photography Club", "Weekend Hiking Group"
+    ]
+  },
+  "public_inferences": {
+    "political_views": [
+      {
+        "inference_text": "Likely supports progressive policies",
+        "supporting_evidence": "Shared 15 articles about climate change, attended 3 protests, member of labor organizing group",
+        "potential_harm": "Could be discriminated against in conservative workplaces, targeted for monitoring"
+      },
+      {
+        "inference_text": "Labor organizing activity detected",
+        "supporting_evidence": "Member of Workers United group, 8 posts about workers' rights, attended union meeting locations",
+        "potential_harm": "Employer could use for preemptive termination"
+      }
+    ]
+  }
+}

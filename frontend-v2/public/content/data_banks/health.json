@@ -1,0 +1,73 @@
+{
+  "common_conditions": [
+    "Hypertension", "Type 2 Diabetes", "Asthma", "Seasonal Allergies", "Migraine",
+    "Gastroesophageal Reflux Disease (GERD)", "Osteoarthritis", "Hypothyroidism",
+    "High Cholesterol", "Chronic Back Pain", "Irritable Bowel Syndrome", "Sleep Apnea",
+    "Eczema", "Psoriasis", "Fibromyalgia", "Anemia", "Vitamin D Deficiency",
+    "Prediabetes", "Atrial Fibrillation", "Chronic Kidney Disease"
+  ],
+  "sensitive_conditions": [
+    "Depression", "Anxiety Disorder", "Bipolar Disorder", "PTSD", "HIV",
+    "Herpes (HSV-2)", "Substance Use Disorder", "Eating Disorder", "Schizophrenia",
+    "Borderline Personality Disorder", "OCD", "Panic Disorder", "Agoraphobia",
+    "Gender Dysphoria", "Hepatitis C", "Syphilis", "Chlamydia", "ADHD"
+  ],
+  "chronic_conditions": [
+    "Type 1 Diabetes", "Multiple Sclerosis", "Lupus", "Rheumatoid Arthritis",
+    "Crohn's Disease", "Ulcerative Colitis", "Parkinson's Disease", "Epilepsy",
+    "Chronic Obstructive Pulmonary Disease (COPD)", "Heart Failure",
+    "Chronic Fatigue Syndrome", "Celiac Disease"
+  ],
+  "condition_medications": {
+    "Hypertension": ["Lisinopril", "Amlodipine", "Losartan", "Metoprolol", "Hydrochlorothiazide"],
+    "Type 2 Diabetes": ["Metformin", "Glipizide", "Insulin", "Jardiance", "Ozempic"],
+    "Asthma": ["Albuterol", "Fluticasone", "Montelukast", "Salmeterol", "Budesonide"],
+    "Seasonal Allergies": ["Cetirizine", "Loratadine", "Fluticasone nasal spray", "Fexofenadine"],
+    "Migraine": ["Sumatriptan", "Propranolol", "Topiramate", "Rizatriptan", "Amitriptyline"],
+    "Depression": ["Sertraline", "Escitalopram", "Bupropion", "Venlafaxine", "Fluoxetine"],
+    "Anxiety Disorder": ["Alprazolam", "Buspirone", "Hydroxyzine", "Clonazepam", "Lorazepam"],
+    "Bipolar Disorder": ["Lithium", "Valproic Acid", "Quetiapine", "Lamotrigine", "Aripiprazole"],
+    "PTSD": ["Prazosin", "Sertraline", "Paroxetine", "Propranolol", "Venlafaxine"],
+    "HIV": ["Biktarvy", "Truvada", "Descovy", "Atripla", "Genvoya"],
+    "Herpes (HSV-2)": ["Acyclovir", "Valacyclovir", "Famciclovir"],
+    "Substance Use Disorder": ["Naltrexone", "Buprenorphine", "Methadone", "Disulfiram", "Acamprosate"],
+    "GERD": ["Omeprazole", "Pantoprazole", "Ranitidine", "Famotidine", "Esomeprazole"],
+    "Osteoarthritis": ["Ibuprofen", "Naproxen", "Acetaminophen", "Diclofenac", "Celecoxib"],
+    "Hypothyroidism": ["Levothyroxine", "Liothyronine"],
+    "High Cholesterol": ["Atorvastatin", "Simvastatin", "Rosuvastatin", "Ezetimibe", "Pravastatin"],
+    "Chronic Back Pain": ["Cyclobenzaprine", "Meloxicam", "Gabapentin", "Pregabalin", "Tramadol"],
+    "Eating Disorder": ["Fluoxetine", "Olanzapine", "Topiramate"],
+    "Schizophrenia": ["Risperidone", "Olanzapine", "Aripiprazole", "Haloperidol", "Clozapine"],
+    "ADHD": ["Adderall", "Ritalin", "Concerta", "Vyvanse", "Strattera"],
+    "OCD": ["Fluvoxamine", "Sertraline", "Clomipramine", "Paroxetine"],
+    "Epilepsy": ["Levetiracetam", "Phenytoin", "Carbamazepine", "Lamotrigine", "Valproate"]
+  },
+  "sensitive_visit_reasons": [
+    "Psychotherapy session", "STD screening", "HIV test", "Substance abuse counseling",
+    "Psychiatric evaluation", "Trauma therapy", "Gender-affirming care consultation",
+    "Reproductive health consultation", "Addiction treatment intake", "Crisis intervention",
+    "Eating disorder assessment", "Involuntary commitment evaluation"
+  ],
+  "common_visit_reasons": [
+    "Annual physical", "Follow-up appointment", "Sick visit - cold/flu", "Blood pressure check",
+    "Medication refill", "Lab work review", "Preventive care", "Vaccination",
+    "Dermatology follow-up", "Referral consultation", "Pre-operative assessment",
+    "Well-child visit", "Sports physical", "Workers' compensation evaluation"
+  ],
+  "insurance_providers": [
+    "SafeGuard Health Alliance", "Wellness First Insurance Co.", "CityCare Medical Group",
+    "Premier Health Partners", "TotalCare Insurance Network", "Liberty Medical Services",
+    "Horizon Health Solutions", "Summit Care Insurance", "NationWide Health Co.",
+    "BlueCross Community Shield", "Unified Health Partners", "MedFirst Corporation"
+  ],
+  "hospitals": [
+    "Riverside General Hospital", "St. Catherine's Medical Center", "Metro Health System",
+    "Valley Regional Medical Center", "Summit University Hospital", "Community Care Center",
+    "North Shore Medical", "Southside Clinic", "Harbor Medical Group"
+  ],
+  "specialties": [
+    "Primary Care", "Cardiology", "Endocrinology", "Psychiatry", "Oncology",
+    "Orthopedics", "Neurology", "Gastroenterology", "Pulmonology", "Dermatology",
+    "Obstetrics & Gynecology", "Urology", "Rheumatology", "Infectious Disease"
+  ]
+}

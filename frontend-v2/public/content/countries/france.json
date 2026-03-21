@@ -1,0 +1,30 @@
+{
+  "country_key": "france",
+  "display_name": "France",
+  "flag_emoji": "🇫🇷",
+  "surveillance_depth": 2,
+  "available_domains": ["location", "judicial", "health", "finance", "social"],
+  "legal_framework": {
+    "surveillance_law": "Loi sur le renseignement (2015) / SILT Law (2017)",
+    "data_retention": "12 months (connection data), 5 years (intelligence files)",
+    "oversight_body": "Commission nationale de contrôle des techniques de renseignement (CNCTR)"
+  },
+  "ui_flavor": {
+    "agency_name": "Direction de la Sécurité Sociale Numérique",
+    "operator_title": "Analyste de Conformité",
+    "platform_version": "PLATEFORME HARMONIE CIVIQUE v2.4.1",
+    "flag_labels": {
+      "monitoring": "Surveillance Renforcée",
+      "restriction": "Restriction de Déplacement",
+      "intervention": "Intervention Sociale",
+      "detention": "Rétention Administrative"
+    },
+    "no_action_label": "Éléments Insuffisants — Aucune Mesure"
+  },
+  "real_world_references": [
+    "Loi renseignement 2015: authorizes bulk collection of metadata and 'black box' algorithms to detect suspicious patterns",
+    "Fichier des personnes recherchées: national watchlist database with over 500,000 entries",
+    "Paris 2024 Olympics AI surveillance: law passed allowing algorithmic video surveillance of public spaces",
+    "OCLCTIC: France's cybercrime unit granted broad internet surveillance powers under anti-terrorism legislation"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "country_key": "uk",
+  "display_name": "United Kingdom",
+  "flag_emoji": "🇬🇧",
+  "surveillance_depth": 3,
+  "available_domains": ["location", "judicial", "health", "finance", "social", "messages"],
+  "legal_framework": {
+    "surveillance_law": "Investigatory Powers Act 2016 (\"Snoopers' Charter\")",
+    "data_retention": "12 months (communications data), indefinite (national security)",
+    "oversight_body": "Investigatory Powers Commissioner's Office (IPCO)"
+  },
+  "ui_flavor": {
+    "agency_name": "National Security Analytics Centre",
+    "operator_title": "Intelligence Analyst",
+    "platform_version": "CIVIC HARMONY PLATFORM v2.4.1",
+    "flag_labels": {
+      "monitoring": "Covert Surveillance Order",
+      "restriction": "Movement Control Notice",
+      "intervention": "Community Safety Assessment",
+      "detention": "Schedule 7 Detention"
+    },
+    "no_action_label": "Insufficient Grounds — No Further Action"
+  },
+  "real_world_references": [
+    "Palantir NHS contract: £23M contract giving Palantir access to patient data for 55 million people across England",
+    "Investigatory Powers Act: requires ISPs to store browsing history for 12 months, available to 48 government bodies",
+    "Metropolitan Police facial recognition: live facial recognition cameras deployed in public spaces since 2020",
+    "COVID-19 NHS data: Palantir's Foundry processed NHS data; contract extended beyond pandemic"
+  ]
+}

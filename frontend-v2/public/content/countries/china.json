@@ -1,0 +1,30 @@
+{
+  "country_key": "china",
+  "display_name": "China",
+  "flag_emoji": "🇨🇳",
+  "surveillance_depth": 3,
+  "available_domains": ["location", "judicial", "health", "finance", "social", "messages"],
+  "legal_framework": {
+    "surveillance_law": "National Intelligence Law (2017) / Cybersecurity Law (2017)",
+    "data_retention": "Indefinite — no statutory limit",
+    "oversight_body": "Ministry of State Security (MSS)"
+  },
+  "ui_flavor": {
+    "agency_name": "Social Harmony Coordination Bureau",
+    "operator_title": "Compliance Coordinator",
+    "platform_version": "社会和谐平台 v2.4.1",
+    "flag_labels": {
+      "monitoring": "Enhanced Social Credit Monitoring",
+      "restriction": "Freedom of Movement Restriction",
+      "intervention": "Re-education Counselling",
+      "detention": "Administrative Re-education Detention"
+    },
+    "no_action_label": "Insufficient Indicators — Continue Passive Monitoring"
+  },
+  "real_world_references": [
+    "Social Credit System: nationwide scoring of citizens and corporations on compliance and behavior",
+    "Xinjiang surveillance: 1 in 6 surveillance cameras globally located in Xinjiang; biometric data collection at checkpoints",
+    "Golden Shield Project (Great Firewall): nationwide internet censorship and monitoring infrastructure",
+    "COVID Health Code: QR code app tracking citizens' health status and movement; used to restrict protests"
+  ]
+}

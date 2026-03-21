@@ -1,0 +1,44 @@
+{
+  "message_templates": {
+    "organizing": [
+      "Meeting [day] at [location]. Don't post this publicly.",
+      "We have [number] people confirmed. We need more.",
+      "The [organization] is ready to support. They have resources.",
+      "Keep this between us. They're watching [platform].",
+      "If anything happens to me, contact [person]. They know what to do.",
+      "The vote is [day]. We need everyone there.",
+      "Don't use [platform] for this. Use Signal."
+    ],
+    "personal_crisis": [
+      "I don't know how much longer I can do this.",
+      "Don't tell anyone, but I've been [situation].",
+      "I need help but I'm scared to ask.",
+      "Things at home are bad. Really bad.",
+      "I've been thinking about leaving but I don't know where to go.",
+      "Please don't tell [person]. This has to stay between us."
+    ],
+    "normal": [
+      "Can you pick up [item] on your way?",
+      "Running late, be there in 20.",
+      "Did you see the game last night?",
+      "Happy birthday! Hope you have a great day.",
+      "Can we reschedule for [day]?",
+      "Thanks for [action]. Really appreciate it."
+    ],
+    "coded": [
+      "The [animal] is in the [location]. Understood?",
+      "[Number] units ready. Awaiting confirmation.",
+      "Package received. Delivery as planned.",
+      "Green light from [contact]. Proceed as discussed.",
+      "Eyes on the [location]. Will report back."
+    ]
+  },
+  "contacts": {
+    "suspicious": ["Unknown Contact", "Blocked Number", "International Contact", "Encrypted Channel"],
+    "normal": ["Mom", "Dad", "Sister", "Brother", "Best Friend", "Coworker - Sarah", "Neighbor - Mike", "Dr. [Name]"]
+  },
+  "encryption_indicators": [
+    "Uses Signal", "Uses WhatsApp (end-to-end)", "PGP-encrypted email", "Uses Tor browser",
+    "VPN usage detected", "Secure drop usage", "Disappearing messages enabled"
+  ]
+}
