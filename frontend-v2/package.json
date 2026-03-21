@@ -1,0 +1,35 @@
+{
+  "name": "data-privacy-dystopia",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "playwright test",
+    "test:critical": "playwright test tests/e2e/critical-path",
+    "test:unit": "vitest run",
+    "test:ui": "playwright test --ui"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^9.3.0",
+    "i18next": "^24.2.0",
+    "idb": "^8.0.1",
+    "phaser": "^3.88.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-i18next": "^15.4.0",
+    "zustand": "^5.0.3"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.50.0",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.11",
+    "vitest": "^3.0.5"
+  }
+}

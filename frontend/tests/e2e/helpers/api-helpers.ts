@@ -1,77 +1,43 @@
-import { request, APIRequestContext } from '@playwright/test';
-
 /**
- * Helper utilities for direct API interactions during tests.
+ * Helper utilities for storage and state management during tests.
+ *
+ * NOTE: This is a fat client application - all game logic runs in the browser.
+ * No backend API calls are needed. Use indexeddb-helpers.ts for storage operations.
  */
 
-const API_BASE_URL = process.env.API_URL || 'http://localhost:8000';
+import { Page } from '@playwright/test';
 
 /**
- * Create an API request context
+ * Wait for game to initialize
  */
-export async function createAPIContext(): Promise<APIRequestContext> {
-  return await request.newContext({
-    baseURL: API_BASE_URL,
+export async function waitForGameInit(page: Page, timeout = 10000): Promise<void> {
+  await page.waitForSelector('canvas', { timeout });
+  await page.waitForTimeout(1000);
+}
+
+/**
+ * Check if game is in test mode
+ */
+export async function isTestMode(page: Page): Promise<boolean> {
+  return await page.evaluate(() => {
+    return localStorage.getItem('test_mode') === 'true';
   });
 }
 
 /**
- * Start a new System Mode session via API
+ * Enable test mode
  */
-export async function startSystemModeSession(api: APIRequestContext): Promise<string> {
-  const response = await api.post('/api/system/start', {
-    data: {
-      scenario_name: 'default',
-    },
+export async function enableTestMode(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    localStorage.setItem('test_mode', 'true');
   });
-
-  if (!response.ok()) {
-    throw new Error(`Failed to start System Mode session: ${response.status()}`);
-  }
-
-  const data = await response.json();
-  return data.operator_id;
 }
 
 /**
- * Get dashboard and cases data
+ * Disable test mode
  */
-export async function getDashboardWithCases(
-  api: APIRequestContext,
-  operatorId: string
-): Promise<any> {
-  const response = await api.get('/api/system/dashboard-with-cases', {
-    params: {
-      operator_id: operatorId,
-      case_limit: 20,
-      case_offset: 0,
-    },
+export async function disableTestMode(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    localStorage.removeItem('test_mode');
   });
-
-  if (!response.ok()) {
-    throw new Error(`Failed to get dashboard: ${response.status()}`);
-  }
-
-  return await response.json();
-}
-
-/**
- * Seed the database with test data via API (if endpoint exists)
- */
-export async function seedDatabase(api: APIRequestContext, population = 50): Promise<void> {
-  // This would require a seed endpoint in the backend
-  // For now, this is a placeholder
-  console.log(`Note: Database seeding should be done via 'make seed-db' before running tests`);
-}
-
-/**
- * Health check the backend API
- */
-export async function healthCheck(api: APIRequestContext): Promise<boolean> {
-  try {
-    const response = await api.get('/health');
-    return response.ok();
-  } catch (error) {
-    return false;
-  }
 }

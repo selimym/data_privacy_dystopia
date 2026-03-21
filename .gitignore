@@ -78,3 +78,8 @@ build/
 
 # Archived documentation
 docs_archive/
+
+# Tests
+frontend/test-results/
+frontend/test-results.json
+frontend/playwright-report/

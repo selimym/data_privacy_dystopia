@@ -25,7 +25,8 @@ export class MainMenuScene extends Phaser.Scene {
 
   create() {
     this.container = document.createElement('div');
-    this.container.className = 'main-menu-scene';
+    this.container.className = 'main-menu-scene main-menu';
+    this.container.setAttribute('data-testid', 'main-menu');
     this.container.innerHTML = this.getMenuHTML();
     document.body.appendChild(this.container);
     this.setupEventListeners();
@@ -218,7 +219,7 @@ export class MainMenuScene extends Phaser.Scene {
     const settings = document.createElement('div');
     settings.className = 'settings-overlay';
     settings.innerHTML = `
-      <div class="settings-modal">
+      <div class="settings-modal" data-testid="settings-modal" role="dialog">
         <div class="settings-header">
           <h2>Settings</h2>
           <button class="btn-close">×</button>

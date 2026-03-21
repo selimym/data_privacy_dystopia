@@ -23,9 +23,18 @@ export async function startSystemMode(page: Page) {
   await page.waitForTimeout(1000);
 
   // Click System Mode button (adjust selector based on actual UI)
-  const systemModeButton = page.getByRole('button', { name: /system mode/i });
-  await expect(systemModeButton).toBeVisible();
+  const systemModeButton = page.getByRole('button', { name: /the system/i });
+  await expect(systemModeButton).toBeVisible({ timeout: 10000 });
   await systemModeButton.click();
+
+  // Handle content warning if it appears
+  await page.waitForTimeout(1000);
+  const warningCheckbox = page.locator('input[type="checkbox"]').first();
+  if (await warningCheckbox.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await warningCheckbox.click();
+    const continueButton = page.getByRole('button', { name: /continue|start/i });
+    await continueButton.click();
+  }
 
   // Wait for System Mode to initialize
   await page.waitForTimeout(2000);

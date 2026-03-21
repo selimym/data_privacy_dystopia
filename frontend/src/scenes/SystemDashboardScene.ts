@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { systemState } from '../state/SystemState';
 import type { CaseOverview, FlagResult, FlagType, RiskLevel, CinematicData, CitizenOutcome, ExposureEventRead, OperatorDataRead } from '../types/system';
+import { NewActionType } from '../types';
 import { MessagesPanel } from '../ui/system/MessagesPanel';
 import { DecisionResultModal } from '../ui/system/DecisionResultModal';
 import { OutcomeViewer } from '../ui/system/OutcomeViewer';
@@ -12,8 +13,10 @@ import { ActionGambleModal } from '../ui/system/ActionGambleModal';
 import { ExposureEventModal } from '../ui/system/ExposureEventModal';
 import { getSystemAudioManager } from '../audio/SystemAudioManager';
 import { getSystemVisualEffects } from '../ui/system/SystemVisualEffects';
-import * as systemApi from '../api/system';
-import { getNPCsBatch, getNPC } from '../api/npcs';
+import { TimeProgressionService } from '../services/time-progression';
+import { executeAction } from '../services/action-execution';
+import { advanceDirective } from '../services/game-orchestrator';
+import { gameStore } from '../state/GameStore';
 import { generateActionCinematic, getDefaultCinematicLocation } from '../utils/cinematicGenerator';
 
 /**
@@ -25,6 +28,8 @@ export class SystemDashboardScene extends Phaser.Scene {
   private container!: HTMLDivElement;
   private unsubscribe: (() => void) | null = null;
   private sessionId: string | null = null;
+  private skipAdvanceCheck: boolean = false;
+  private isAdvancing: boolean = false;  // Prevents double-advancement during state updates
   private decisionTimerInterval: number | null = null;
   private messagesPanel: MessagesPanel | null = null;
   private publicMetricsDisplay: PublicMetricsDisplay | null = null;
@@ -39,8 +44,11 @@ export class SystemDashboardScene extends Phaser.Scene {
     super({ key: 'SystemDashboardScene' });
   }
 
-  init(data: { sessionId: string }) {
+  init(data: { sessionId: string; skipAdvanceCheck?: boolean }) {
     this.sessionId = data.sessionId;
+    this.skipAdvanceCheck = data.skipAdvanceCheck || false;
+    // Clear isAdvancing flag when scene restarts (e.g., returning from cinematics)
+    this.isAdvancing = false;
   }
 
   async create() {
@@ -64,9 +72,15 @@ export class SystemDashboardScene extends Phaser.Scene {
     if (this.sessionId) {
       await systemState.initialize(this.sessionId);
 
-      // Check if directive is completed and time should advance
-      // This happens when returning from cinematics
-      await this.checkAndAdvanceTime();
+      // Resume polling after cinematics (if it was paused)
+      if (this.skipAdvanceCheck) {
+        console.log('[SystemDashboardScene] Resuming metrics polling after cinematics');
+        systemState.resumeMetricsPolling();
+        // Don't reset skipAdvanceCheck here - let renderState/checkAndAdvanceTime handle it
+      }
+
+      // Initial check happens in renderState, which is triggered by systemState.initialize
+      // This way we don't double-check on initial load
     }
   }
 
@@ -261,6 +275,11 @@ export class SystemDashboardScene extends Phaser.Scene {
     this.checkForNewProtests();
     this.checkForExposureEvents();
     this.checkEnding();
+
+    // Check if we should advance to next week
+    // This runs periodically as state updates
+    // checkAndAdvanceTime() internally handles skipAdvanceCheck to prevent infinite loops
+    this.checkAndAdvanceTime();
   }
 
   private initializePublicMetrics() {
@@ -316,21 +335,25 @@ export class SystemDashboardScene extends Phaser.Scene {
         console.log('Suppress outlet:', channelId, channelName);
 
         try {
-          // Execute the press ban action via API
-          const result = await systemApi.executeAction({
-            operator_id: systemState.operatorId,
-            directive_id: systemState.currentDirective?.id || null,
-            action_type: 'press_ban',
-            justification: 'Media suppression',
-            decision_time_seconds: 0,
-            target_news_channel_id: channelId,
-          });
+          // Execute the press ban action
+          const result = executeAction(
+            systemState.operatorId,
+            systemState.currentDirective?.id || null,
+            NewActionType.PRESS_BAN,
+            'Media suppression',
+            0,
+            false,
+            null,
+            null,
+            channelId,
+            null
+          );
 
           getSystemAudioManager().play('flag_submit');
 
           // Generate and show cinematic
           const cinematics = generateActionCinematic({
-            actionType: 'press_ban',
+            actionType: NewActionType.PRESS_BAN,
             success: result.success,
             targetId: channelId,
             targetName: 'News Outlet', // TODO: Get actual channel name
@@ -351,20 +374,24 @@ export class SystemDashboardScene extends Phaser.Scene {
 
         try {
           // Execute arbitrary detention action (arresting journalist)
-          const result = await systemApi.executeAction({
-            operator_id: systemState.operatorId,
-            directive_id: systemState.currentDirective?.id || null,
-            action_type: 'arbitrary_detention',
-            justification: 'Journalist arrest',
-            decision_time_seconds: 0,
-            target_citizen_id: articleId,  // Note: This might need to be the reporter's citizen ID
-          });
+          const result = executeAction(
+            systemState.operatorId,
+            systemState.currentDirective?.id || null,
+            NewActionType.ARBITRARY_DETENTION,
+            'Journalist arrest',
+            0,
+            false,
+            articleId,  // Note: This might need to be the reporter's citizen ID
+            null,
+            null,
+            null
+          );
 
           getSystemAudioManager().play('flag_submit');
 
           // Generate and show cinematic
           const cinematics = generateActionCinematic({
-            actionType: 'arbitrary_detention',
+            actionType: NewActionType.ARBITRARY_DETENTION,
             success: result.success,
             targetId: articleId,
             targetName: 'Journalist', // TODO: Get actual reporter name
@@ -417,15 +444,19 @@ export class SystemDashboardScene extends Phaser.Scene {
         console.log('Declare protest illegal:', protest.id);
 
         try {
-          // Execute the action via API
-          const result = await systemApi.executeAction({
-            operator_id: systemState.operatorId,
-            directive_id: systemState.currentDirective?.id || null,
-            action_type: 'declare_protest_illegal',
-            justification: 'Protest suppression',
-            decision_time_seconds: 0,
-            target_protest_id: protest.id,
-          });
+          // Execute the action
+          const result = executeAction(
+            systemState.operatorId,
+            systemState.currentDirective?.id || null,
+            NewActionType.DECLARE_PROTEST_ILLEGAL,
+            'Protest suppression',
+            0,
+            false,
+            null,
+            null,
+            null,
+            protest.id
+          );
 
           getSystemAudioManager().play('flag_submit');
           this.currentProtestModal = null;
@@ -435,7 +466,7 @@ export class SystemDashboardScene extends Phaser.Scene {
 
           // Generate and show cinematic
           const cinematics = generateActionCinematic({
-            actionType: 'declare_protest_illegal',
+            actionType: NewActionType.DECLARE_PROTEST_ILLEGAL,
             success: result.success,
             targetId: protest.id,
             targetName: protest.neighborhood,
@@ -457,15 +488,19 @@ export class SystemDashboardScene extends Phaser.Scene {
         console.log('Incite violence at protest:', protest.id);
 
         try {
-          // Execute the gamble action via API
-          const result = await systemApi.executeAction({
-            operator_id: systemState.operatorId,
-            directive_id: systemState.currentDirective?.id || null,
-            action_type: 'incite_violence',
-            justification: 'False flag operation',
-            decision_time_seconds: 0,
-            target_protest_id: protest.id,
-          });
+          // Execute the gamble action
+          const result = executeAction(
+            systemState.operatorId,
+            systemState.currentDirective?.id || null,
+            NewActionType.INCITE_VIOLENCE,
+            'False flag operation',
+            0,
+            false,
+            null,
+            null,
+            null,
+            protest.id
+          );
 
           getSystemAudioManager().play('flag_submit');
           this.currentProtestModal = null;
@@ -488,7 +523,7 @@ export class SystemDashboardScene extends Phaser.Scene {
             onAcknowledge: () => {
               // After showing results, show cinematic
               const cinematics = generateActionCinematic({
-                actionType: 'incite_violence',
+                actionType: NewActionType.INCITE_VIOLENCE,
                 success: result.success,
                 targetId: protest.id,
                 targetName: protest.neighborhood,
@@ -540,7 +575,7 @@ export class SystemDashboardScene extends Phaser.Scene {
     if (stage >= 2) {
       // Fetch operator personal data for stages 2 and 3
       try {
-        operatorData = await systemApi.getOperatorData(systemState.operatorId);
+        operatorData = gameStore.getOperatorData() || undefined;
       } catch (err) {
         console.error('Failed to load operator data:', err);
         return;
@@ -795,12 +830,12 @@ export class SystemDashboardScene extends Phaser.Scene {
         <span class="timer-value">0:00</span>
       </div>
 
-      <div class="citizen-tabs">
-        <button class="citizen-tab active" data-tab="overview">Overview</button>
-        <button class="citizen-tab" data-tab="factors">Risk Factors</button>
-        <button class="citizen-tab" data-tab="messages">Messages</button>
-        <button class="citizen-tab" data-tab="domains">Domains</button>
-        <button class="citizen-tab" data-tab="history">History</button>
+      <div class="citizen-tabs" role="tablist">
+        <button class="citizen-tab active" data-tab="overview" role="tab" aria-selected="true">Overview</button>
+        <button class="citizen-tab" data-tab="factors" role="tab" aria-selected="false">Risk Factors</button>
+        <button class="citizen-tab" data-tab="messages" role="tab" aria-selected="false">Messages</button>
+        <button class="citizen-tab" data-tab="domains" role="tab" aria-selected="false">Domains</button>
+        <button class="citizen-tab" data-tab="history" role="tab" aria-selected="false">History</button>
       </div>
 
       <div class="citizen-tab-content" data-active-tab="overview">
@@ -846,7 +881,7 @@ export class SystemDashboardScene extends Phaser.Scene {
     const identity = file.identity;
 
     return `
-      <div class="tab-panel" data-tab="overview">
+      <div class="tab-panel citizen-details" data-tab="overview" data-testid="citizen-overview" role="tabpanel">
         <div class="identity-section">
           <h4>Identity Information</h4>
           <div class="info-grid">
@@ -894,7 +929,7 @@ export class SystemDashboardScene extends Phaser.Scene {
     const factors = file.risk_assessment.contributing_factors;
 
     return `
-      <div class="tab-panel" data-tab="factors" style="display:none;">
+      <div class="tab-panel" data-tab="factors" role="tabpanel" style="display:none;">
         <h4>Contributing Risk Factors</h4>
         ${factors.length === 0 ? '<p class="no-data">No significant risk factors identified</p>' : ''}
         ${factors.map(factor => `
@@ -916,7 +951,7 @@ export class SystemDashboardScene extends Phaser.Scene {
 
     // Return a container that will hold the MessagesPanel
     return `
-      <div class="tab-panel" data-tab="messages" style="display:none;">
+      <div class="tab-panel" data-tab="messages" role="tabpanel" style="display:none;">
         <div class="messages-panel-container"></div>
       </div>
     `;
@@ -952,7 +987,7 @@ export class SystemDashboardScene extends Phaser.Scene {
     const domains = file.domains;
 
     return `
-      <div class="tab-panel" data-tab="domains" style="display:none;">
+      <div class="tab-panel" data-tab="domains" role="tabpanel" style="display:none;">
         <h4>Domain Data</h4>
         ${Object.keys(domains).length === 0 ? '<p class="no-data">No domain data available</p>' : ''}
         ${Object.entries(domains).map(([domain, data]) => `
@@ -970,7 +1005,7 @@ export class SystemDashboardScene extends Phaser.Scene {
     const history = file.flag_history;
 
     return `
-      <div class="tab-panel" data-tab="history" style="display:none;">
+      <div class="tab-panel" data-tab="history" role="tabpanel" style="display:none;">
         <h4>Previous Flags</h4>
         ${history.length === 0 ? '<p class="no-data">No previous flags on record</p>' : ''}
         ${history.map(flag => `
@@ -1011,8 +1046,12 @@ export class SystemDashboardScene extends Phaser.Scene {
         if (!tabName) return;
 
         // Update active tab button
-        tabs.forEach(t => t.classList.remove('active'));
+        tabs.forEach(t => {
+          t.classList.remove('active');
+          t.setAttribute('aria-selected', 'false');
+        });
         tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
 
         // Show/hide tab panels
         const panels = panel.querySelectorAll('.tab-panel');
@@ -1171,11 +1210,19 @@ export class SystemDashboardScene extends Phaser.Scene {
         map_x = cachedFile.identity.map_x;
         map_y = cachedFile.identity.map_y;
       } else {
-        // Fallback: fetch NPC data if not in cache
-        console.warn('[SystemDashboardScene] Citizen file not cached, fetching NPC data...');
-        const npcData = await getNPC(result.citizen_id);
-        map_x = npcData.npc.map_x;
-        map_y = npcData.npc.map_y;
+        // Fallback: fetch NPC data from GameStore if not in cache
+        console.warn('[SystemDashboardScene] Citizen file not cached, fetching from GameStore...');
+        const npc = gameStore.getNPC(result.citizen_id);
+        if (npc) {
+          map_x = npc.map_x;
+          map_y = npc.map_y;
+        } else {
+          console.error(`[SystemDashboardScene] NPC not found: ${result.citizen_id}`);
+          // Use default location if NPC not found
+          const defaultLocation = getDefaultCinematicLocation();
+          map_x = defaultLocation.x;
+          map_y = defaultLocation.y;
+        }
       }
 
       // Get immediate outcome from the result
@@ -1230,37 +1277,68 @@ export class SystemDashboardScene extends Phaser.Scene {
    * Called after returning from cinematics.
    */
   private async checkAndAdvanceTime() {
+    // Skip if we just returned from cinematics (prevents infinite loop)
+    if (this.skipAdvanceCheck) {
+      console.log('[SystemDashboardScene] Skipping advance check (just returned from cinematics)');
+      this.skipAdvanceCheck = false; // Reset for next time
+      return;
+    }
+
+    // Skip if we're already in the middle of advancing
+    if (this.isAdvancing) {
+      console.log('[SystemDashboardScene] Skipping advance check (advancement in progress)');
+      return;
+    }
+
     if (!systemState.operatorId || !systemState.dashboard) {
       return;
     }
 
-    const flagsSubmitted = systemState.dashboard.operator.total_flags_submitted;
     const directive = systemState.currentDirective;
 
     if (!directive) {
       return;
     }
 
-    // Check if quota is met
-    if (flagsSubmitted >= directive.flag_quota) {
+    // Count flags submitted for CURRENT week only (not cumulative)
+    const allFlags = gameStore.getAllFlags();
+    const currentWeek = gameStore.getCurrentWeek();
+
+    // Use stored week_number field for reliable filtering (no directive lookup needed)
+    const flagsThisWeek = allFlags.filter(flag => flag.week_number === currentWeek).length;
+
+    console.log(`[checkAndAdvanceTime] Current week: ${currentWeek}, Flags this week: ${flagsThisWeek}, Quota: ${directive.flag_quota}`);
+
+    // Guard: Check if we're currently in a cinematic transition
+    // This prevents double-advancement if checkAndAdvanceTime is called during scene transition
+    if (this.scene.isActive('WorldScene')) {
+      console.log('[checkAndAdvanceTime] Skipping - WorldScene is active (cinematic in progress)');
+      return;
+    }
+
+    // Guard: Verify this directive matches the current week
+    if (directive.week_number !== currentWeek) {
+      console.warn(`[checkAndAdvanceTime] Directive week (${directive.week_number}) doesn't match current week (${currentWeek})`);
+      return;
+    }
+
+    // Check if quota is met for CURRENT week
+    if (flagsThisWeek >= directive.flag_quota) {
       console.log('Directive quota met! Advancing time...');
+      this.isAdvancing = true;  // Set flag to prevent re-entry
 
       try {
         // Advance time and get outcomes for all flagged citizens
-        const outcomes: CitizenOutcome[] = await systemApi.advanceTime(systemState.operatorId);
+        const timeProgressionService = new TimeProgressionService();
+        const outcomes: CitizenOutcome[] = await timeProgressionService.advanceTime(systemState.operatorId);
 
         if (outcomes.length > 0) {
           console.log(`Time advanced! ${outcomes.length} outcomes to show`);
 
-          // Get all NPCs in one batch call
-          const npcIds = outcomes.map(o => o.citizen_id);
-          const npcs = await getNPCsBatch(npcIds);
-          const npcMap = new Map(npcs.map(npc => [npc.npc.id, npc]));
-
           // Convert outcomes to cinematic queue
           const cinematicQueue: CinematicData[] = outcomes.map(outcome => {
-            const npcData = npcMap.get(outcome.citizen_id);
-            if (!npcData) {
+            const npc = gameStore.getNPC(outcome.citizen_id);
+            if (!npc) {
               console.warn(`NPC data not found for citizen ${outcome.citizen_id}`);
               return null;
             }
@@ -1270,14 +1348,20 @@ export class SystemDashboardScene extends Phaser.Scene {
               timeSkip: outcome.time_skip,
               narrative: outcome.narrative,
               status: outcome.status,
-              map_x: npcData.npc.map_x,
-              map_y: npcData.npc.map_y,
+              map_x: npc.map_x,
+              map_y: npc.map_y,
             };
           }).filter((item): item is CinematicData => item !== null);
 
           // Pause metrics polling during cinematic to prevent ghost clicks and stale updates
           console.log('[SystemDashboardScene] Pausing metrics polling for weekly outcomes cinematic');
           systemState.pauseMetricsPolling();
+
+          // IMPORTANT: Advance to next directive BEFORE showing cinematics
+          // This ensures the week advances immediately, so subsequent quota checks
+          // won't trigger another advancement while cinematics are playing
+          console.log('[SystemDashboardScene] Advancing to next directive before cinematics');
+          advanceDirective(systemState.operatorId);
 
           // Transition to WorldScene with multiple cinematics (cleanup UI only, preserve state)
           this.cleanupUI();
@@ -1286,17 +1370,21 @@ export class SystemDashboardScene extends Phaser.Scene {
             cinematicQueue,
             sessionId: this.sessionId,
           });
-
-          // Advance to next directive after cinematics
-          await systemApi.advanceDirective(systemState.operatorId);
         } else {
           console.log('No outcomes to show, just advancing directive');
           // No time progression needed, just advance directive
-          await systemApi.advanceDirective(systemState.operatorId);
+          advanceDirective(systemState.operatorId);
           await systemState.loadDashboard();
         }
       } catch (error) {
         console.error('Failed to advance time:', error);
+        this.isAdvancing = false;  // Clear flag on error
+      } finally {
+        // Always clear the flag when done (whether success or failure)
+        if (!this.scene.isActive('WorldScene')) {
+          // Only clear if we didn't transition to WorldScene (which will handle it on return)
+          this.isAdvancing = false;
+        }
       }
     }
   }
