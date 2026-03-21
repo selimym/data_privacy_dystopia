@@ -1,0 +1,30 @@
+{
+  "country_key": "usa",
+  "display_name": "United States",
+  "flag_emoji": "🇺🇸",
+  "surveillance_depth": 3,
+  "available_domains": ["location", "judicial", "health", "finance", "social", "messages"],
+  "legal_framework": {
+    "surveillance_law": "USA PATRIOT Act § 215 / FISA Amendments Act",
+    "data_retention": "Up to 5 years (NSL), indefinite (national security)",
+    "oversight_body": "FISA Court (classified proceedings)"
+  },
+  "ui_flavor": {
+    "agency_name": "Department of Homeland Intelligence",
+    "operator_title": "Compliance Analyst",
+    "platform_version": "CIVIC HARMONY PLATFORM v2.4.1",
+    "flag_labels": {
+      "monitoring": "Enhanced Monitoring",
+      "restriction": "Travel Restriction Order",
+      "intervention": "Welfare Intervention",
+      "detention": "Administrative Detention"
+    },
+    "no_action_label": "Insufficient Evidence — No Action"
+  },
+  "real_world_references": [
+    "NSA PRISM program (revealed 2013): collected data from Google, Apple, Facebook, Microsoft and others",
+    "Palantir ICE contract: $49M contract for 'Investigative Case Management' system tracking immigrants",
+    "Clearview AI: scraped 30 billion photos from social media, sold to 3,100 law enforcement agencies",
+    "Section 702 FISA: allows warrantless surveillance of non-US persons and incidental collection of Americans"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "country_key": "russia",
+  "display_name": "Russia",
+  "flag_emoji": "🇷🇺",
+  "surveillance_depth": 2,
+  "available_domains": ["location", "judicial", "finance", "social", "messages"],
+  "legal_framework": {
+    "surveillance_law": "SORM (System of Operative Investigative Measures) / Yarovaya Law 2016",
+    "data_retention": "3 years (communications content), 6 months (metadata) — operators must install FSB hardware",
+    "oversight_body": "Federal Security Service (FSB)"
+  },
+  "ui_flavor": {
+    "agency_name": "Federal Social Stability Directorate",
+    "operator_title": "Operational Analyst",
+    "platform_version": "ГРАЖДАНСКИЙ ПОРЯДОК v2.4.1",
+    "flag_labels": {
+      "monitoring": "Operational Surveillance",
+      "restriction": "Administrative Restriction",
+      "intervention": "Preventive Conversation",
+      "detention": "Temporary Detention"
+    },
+    "no_action_label": "Insufficient Basis — File Retained"
+  },
+  "real_world_references": [
+    "SORM-3: ISPs required to install FSB hardware giving direct wiretapping access without judicial oversight",
+    "Yarovaya Law: requires telecom providers to store all communications content for 6 months and metadata for 3 years",
+    "RuNet sovereign internet: law enabling Russia to disconnect from global internet and route all traffic through state nodes",
+    "Surveillance of protesters: facial recognition used to identify and arrest anti-war protesters within hours of protests"
+  ]
+}
