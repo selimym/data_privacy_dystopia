@@ -1,14 +1,10 @@
 import { Suspense, lazy } from 'react'
+import { useUIStore } from './stores/uiStore'
 
 // Screens — lazily loaded to keep initial bundle small
 const StartScreen = lazy(() => import('./components/StartScreen/StartScreen'))
 const SystemDashboard = lazy(() => import('./components/SystemDashboard/SystemDashboard'))
 const EndingScreen = lazy(() => import('./components/EndingScreen/EndingScreen'))
-
-// Placeholder store hook — replaced in Phase 4 with real Zustand store
-function useCurrentScreen(): 'start' | 'dashboard' | 'ending' {
-  return 'start'
-}
 
 function LoadingFallback() {
   return (
@@ -31,7 +27,7 @@ function LoadingFallback() {
 }
 
 export default function App() {
-  const screen = useCurrentScreen()
+  const screen = useUIStore(state => state.currentScreen)
 
   return (
     <Suspense fallback={<LoadingFallback />}>

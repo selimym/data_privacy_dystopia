@@ -16,7 +16,7 @@ import { create } from 'zustand'
 import type {
   CitizenFlag, NoActionRecord, OperatorState, AutoFlagState, AutoFlagDecision,
   IceRaidOrder, NewsArticle, NewsChannel, ProtestEvent, SuppressionResult,
-  ContractEvent, FlagType, TimePeriod,
+  ContractEvent, FlagType, TimePeriod, DomainKey,
 } from '@/types/game'
 import type { Directive } from '@/types/game'
 
@@ -37,6 +37,7 @@ import { useUIStore } from './uiStore'
 import { useContentStore } from './contentStore'
 import { useCitizenStore } from './citizenStore'
 import { saveGameState } from './persistence'
+import type { CaseOverview } from '@/types/citizen'
 
 // ─── Default news channels ────────────────────────────────────────────────────
 const DEFAULT_CHANNELS: NewsChannel[] = [
@@ -128,6 +129,15 @@ interface GameState {
 
   /** Mark citizen #4472's passphrase as verified → resistance path */
   activateResistancePath: () => void
+
+  /** Run the bot and immediately approve all pending bot decisions */
+  processAutoFlagBatch: () => void
+
+  /** Filtered case queue: week 6 locks to Jessica Martinez; excludes already-flagged and no-action citizens */
+  getFilteredCaseQueue: (unlockedDomains: DomainKey[]) => CaseOverview[]
+
+  /** Check whether Jessica Martinez's no-action count has reached threshold → trigger resistance path */
+  checkResistanceTrigger: (citizenId: string) => void
 
   reset: () => void
 }
@@ -397,6 +407,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     set(state => ({ noActions: [...state.noActions, noAction] }))
     ui.setSelectedCitizen(null)
 
+    get().checkResistanceTrigger(citizenId)
     _checkTerminalEnding(get)
     _persist(get)
   },
@@ -464,6 +475,9 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     // Unlock required domains for new directive
     content.unlockDomains(nextDirective.required_domains)
+
+    // Generate ICE raid if quota shortfall + low public anger + no pending raids
+    _generateIceRaidIfNeeded(get)
 
     _persist(get)
   },
@@ -641,8 +655,70 @@ export const useGameStore = create<GameState>((set, get) => ({
     _checkTerminalEnding(get, true)
   },
 
+  processAutoFlagBatch: () => {
+    get().runBotRound()
+    // Snapshot decisions after runBotRound to avoid mutating mid-iteration
+    const decisions = [...get().pendingBotDecisions]
+    for (const decision of decisions) {
+      get().approveBotDecision(decision.citizen_id)
+    }
+  },
+
+  getFilteredCaseQueue: (unlockedDomains) => {
+    const { flags, noActions, weekNumber } = get()
+    const citizens = useCitizenStore.getState()
+
+    const flaggedIds = new Set(flags.map(f => f.citizen_id))
+    const noActionIds = new Set(noActions.map(n => n.citizen_id))
+
+    const queue = citizens.getCaseQueue(unlockedDomains).map(c => ({
+      ...c,
+      already_flagged: flaggedIds.has(c.citizen_id),
+      no_action_taken: noActionIds.has(c.citizen_id),
+    }))
+
+    // Exclude already-decided citizens in all weeks
+    const undecided = queue.filter(c => !c.already_flagged && !c.no_action_taken)
+
+    if (weekNumber === 6) {
+      // Week 6: only Jessica Martinez
+      const skeletons = citizens.skeletons
+      const jessicaIds = new Set(
+        skeletons
+          .filter(s => s.scenario_key === 'jessica_martinez')
+          .map(s => s.id),
+      )
+      return undecided.filter(c => jessicaIds.has(c.citizen_id))
+    }
+
+    return undecided
+  },
+
+  checkResistanceTrigger: (citizenId) => {
+    const { noActions } = get()
+    const citizens = useCitizenStore.getState()
+
+    const skeleton = citizens.skeletons.find(s => s.id === citizenId)
+    if (!skeleton || skeleton.scenario_key !== 'jessica_martinez') return
+
+    const noActionCount = noActions.filter(n => n.citizen_id === citizenId).length
+    if (noActionCount >= 3) {
+      get().activateResistancePath()
+    }
+  },
+
   reset: () => set(initialState),
 }))
+
+// ─── ICE raid neighborhoods ───────────────────────────────────────────────────
+
+const ICE_RAID_NEIGHBORHOODS = [
+  'Riverside District',
+  'Eastside',
+  'Northgate',
+  'Millbrook',
+  'Harbor View',
+] as const
 
 // ─── Private helpers ──────────────────────────────────────────────────────────
 
@@ -728,6 +804,54 @@ function _fireContractEvent(
     real_world_reference: event.real_world_reference,
     operator: get().operator,
   })
+}
+
+function _generateIceRaidIfNeeded(get: () => GameState): void {
+  const { currentDirective, flags, pendingRaids } = get()
+  if (!currentDirective) return
+
+  // Only generate if there are no pending raids already
+  if (pendingRaids.length > 0) return
+
+  const metrics = useMetricsStore.getState()
+  const publicAnger = metrics.public_metrics.public_anger
+
+  // Only generate if there is a quota shortfall
+  const flaggedThisDirective = flags.filter(f => f.directive_key === currentDirective.directive_key).length
+  const hasShortfall = flaggedThisDirective < currentDirective.flag_quota
+
+  if (!hasShortfall) return
+
+  // Only generate if public anger is below 30 (state feels safe acting)
+  if (publicAnger >= 30) return
+
+  const neighborhood = ICE_RAID_NEIGHBORHOODS[Math.floor(Math.random() * ICE_RAID_NEIGHBORHOODS.length)]!
+  const estimatedArrests = Math.floor(Math.random() * (45 - 15 + 1)) + 15
+
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+
+  const raid: IceRaidOrder = {
+    id: crypto.randomUUID(),
+    neighborhood,
+    estimated_arrests: estimatedArrests,
+    directive_key: currentDirective.directive_key,
+    quota_satisfaction: Math.min(estimatedArrests, currentDirective.flag_quota - flaggedThisDirective),
+    expires_at: expiresAt,
+    status: 'pending',
+    generated_at: new Date().toISOString(),
+  }
+
+  // We need to use the store's set function — access it via useGameStore
+  useGameStore.setState(state => ({
+    pendingRaids: [...state.pendingRaids, raid],
+  }))
+
+  useUIStore.getState().addNotification(
+    'warning',
+    'ICE RAID ORDER',
+    'A raid order requires your authorization.',
+    { auto_dismiss_ms: null },
+  )
 }
 
 async function _persist(get: () => GameState): Promise<void> {
