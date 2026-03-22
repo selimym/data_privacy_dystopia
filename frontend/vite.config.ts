@@ -1,25 +1,34 @@
-import { defineConfig } from 'vite';
-import path from 'path';
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import { resolve } from 'path'
 
 export default defineConfig({
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
-  },
-  server: {
-    port: 5173,
-    strictPort: true,
-    host: true,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
+  test: {
+    globals: true,
+    environment: 'node',
+    include: ['tests/unit/**/*.test.ts'],
+    resolve: {
+      alias: {
+        '@': resolve(__dirname, './src'),
       },
     },
   },
-  build: {
-    target: 'es2020',
-    outDir: 'dist',
+  plugins: [react()],
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, './src'),
+      'phaser': resolve(__dirname, 'node_modules/phaser/dist/phaser.esm.js'),
+    },
   },
-});
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          phaser: ['phaser'],
+          react: ['react', 'react-dom'],
+          i18n: ['i18next', 'react-i18next'],
+        },
+      },
+    },
+  },
+})

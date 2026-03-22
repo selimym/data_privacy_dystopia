@@ -1,127 +1,168 @@
-/* Cinematic Text Box Styles */
+/* ============================================================
+   CIVIC HARMONY PLATFORM — Cinematic Overlay Styles
+   Ported from frontend/src/styles/cinematic.css
+   Adapted to Palantir Gotham aesthetic (dark, professional)
+   ============================================================ */
+
+/* ─── Overlay backdrop ───────────────────────────────────────────────────── */
+
+.cinematic-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 40px;
+  animation: cinematic-fade-in 0.3s ease-out;
+}
+
+/* ─── Text box ───────────────────────────────────────────────────────────── */
 
 .cinematic-text-box {
-  position: fixed;
-  bottom: 40px;
-  left: 50%;
-  transform: translateX(-50%);
+  position: relative;
   width: 80%;
   max-width: 800px;
-  background: rgba(0, 0, 0, 0.95);
-  border: 2px solid #00ff00;
-  border-radius: 8px;
+  background: rgba(13, 13, 15, 0.97);
+  border: 1px solid var(--border-default);
+  border-top: 2px solid var(--color-blue);
   padding: 24px;
-  padding-top: 40px; /* Make room for skip button */
-  font-family: 'Courier New', monospace;
-  color: #00ff00;
-  z-index: 1000;
-  box-shadow: 0 4px 20px rgba(0, 255, 0, 0.3);
-  animation: fadeIn 0.3s ease-in;
+  padding-top: 40px; /* room for skip button */
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.8), 0 0 0 1px var(--border-subtle);
+  animation: cinematic-slide-up 0.3s ease-out;
 }
+
+/* ─── Header row (citizen name + time period) ────────────────────────────── */
 
 .cinematic-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 12px;
-  font-size: 14px;
-  opacity: 0.8;
+  font-size: 11px;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
-  letter-spacing: 1px;
 }
 
 .cinematic-citizen-name {
-  font-weight: bold;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.1em;
 }
 
 .cinematic-time-period {
-  opacity: 0.6;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
 }
+
+/* Time period variants — escalating urgency */
+.cinematic-time-period.immediate {
+  color: var(--color-amber);
+}
+
+.cinematic-time-period.month {
+  color: #f97316; /* orange-500 */
+}
+
+.cinematic-time-period.six-months {
+  color: var(--color-red);
+}
+
+.cinematic-time-period.year {
+  color: #9333ea; /* purple */
+}
+
+/* ─── Status line ────────────────────────────────────────────────────────── */
 
 .cinematic-status {
-  font-size: 14px;
-  font-weight: bold;
-  color: #ff3333;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-red);
   margin-bottom: 12px;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.12em;
 }
 
+/* ─── Narrative body ─────────────────────────────────────────────────────── */
+
 .cinematic-narrative {
-  font-size: 16px;
+  font-family: var(--font-ui);
+  font-size: 14px;
   line-height: 1.8;
+  color: var(--text-secondary);
   margin-bottom: 16px;
   white-space: pre-wrap;
   word-wrap: break-word;
 }
 
+/* ─── Skip button ────────────────────────────────────────────────────────── */
+
 .cinematic-skip-button {
   position: absolute;
-  top: 12px;
+  top: 10px;
   right: 12px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid #00ff00;
-  color: #00ff00;
-  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid var(--border-default);
+  color: var(--text-muted);
+  padding: 5px 12px;
   cursor: pointer;
-  font-family: 'Courier New', monospace;
-  font-size: 12px;
-  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  transition: all 0.2s;
+  transition: border-color 0.15s ease, color 0.15s ease;
 }
 
 .cinematic-skip-button:hover {
-  background: rgba(0, 255, 0, 0.2);
-  border-color: #00ff00;
-  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
 }
 
 .cinematic-skip-button:active {
-  transform: scale(0.95);
+  transform: scale(0.97);
 }
 
-/* Fade in animation */
-@keyframes fadeIn {
+/* ─── Animations ─────────────────────────────────────────────────────────── */
+
+@keyframes cinematic-fade-in {
   from {
     opacity: 0;
-    transform: translateX(-50%) translateY(20px);
   }
   to {
     opacity: 1;
-    transform: translateX(-50%) translateY(0);
   }
 }
 
-/* Fade out animation */
-@keyframes fadeOut {
+@keyframes cinematic-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cinematic-fade-out {
   from {
     opacity: 1;
-    transform: translateX(-50%) translateY(0);
   }
   to {
     opacity: 0;
-    transform: translateX(-50%) translateY(20px);
   }
 }
 
-.cinematic-text-box.fadeOut {
-  animation: fadeOut 0.3s ease-out forwards;
-}
-
-/* Time period badges */
-.cinematic-time-period.immediate {
-  color: #ffff00;
-}
-
-.cinematic-time-period.month {
-  color: #ff9900;
-}
-
-.cinematic-time-period.six-months {
-  color: #ff6600;
-}
-
-.cinematic-time-period.year {
-  color: #ff3333;
+.cinematic-overlay.closing {
+  animation: cinematic-fade-out 0.25s ease-out forwards;
 }

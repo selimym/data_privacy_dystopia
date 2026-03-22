@@ -4,204 +4,121 @@ Guide for Claude Code when working with this repository.
 
 ## Project Overview
 
-Educational game demonstrating data privacy risks through two modes:
-1. **Rogue Employee Mode** - Hospital employee abusing data access (planned)
-2. **System Mode** - Surveillance operator flagging "risky" citizens (implemented)
+Educational browser game demonstrating data privacy risks. The player operates a surveillance intelligence platform — reviewing citizen files, submitting flags, and watching consequences unfold. The game is structured as a **boiling frog** narrative: work starts reasonable and gradually becomes authoritarian without any single obvious moral crossroads.
 
-**Architecture**: Fat client - all game logic runs in the browser, no backend required.
+**Architecture**: Fat client — all game logic runs in the browser. No backend. Static hosting.
 
 ## Tech Stack
 
-- **Frontend**: Phaser 3, TypeScript, 2D pixel art (32x32 tiles)
-- **Data Generation**: Faker.js for synthetic citizen data
-- **Storage**: IndexedDB for game state persistence
-- **Deployment**: Static hosting (Vercel, Netlify, GitHub Pages, etc.)
-
-**Archived**: Python/FastAPI backend (see BACKEND_ARCHIVE.md)
+- **React 18 + TypeScript** — UI and state
+- **Zustand 5** — 5 stores (game, citizen, metrics, ui, content)
+- **Phaser 3** — 2D world map only, mounted as a React component
+- **Faker.js 10** — deterministic citizen data generation
+- **idb** — IndexedDB persistence wrapper
+- **Vite 6** — bundler (Phaser aliased to ESM build)
+- **Playwright + Vitest** — E2E and unit tests
 
 ## Commands
 
 ```bash
-make dev                  # Run frontend dev server (port 5173)
-make install              # Install frontend dependencies
-make build                # Build for production
-make preview              # Preview production build
-make deploy-vercel        # Deploy to Vercel
-make clean                # Clean build artifacts
-```
-
-**Testing commands**:
-```bash
-make test                 # Run all E2E tests
-make test-critical        # Critical path tests (must pass)
-make test-features        # Feature coverage tests
-make test-integration     # Integration tests
-make test-performance     # Performance benchmarks
-make test-edge-cases      # Edge case validation
-make test-ui              # Playwright UI mode
-make test-report          # View test report
-```
-
-**Archived backend commands** (still available):
-```bash
-make dev-backend          # Run archived backend server
-make test-backend         # Run archived backend tests
-make seed-db              # Generate test database
+make dev              # Dev server on http://localhost:5173
+make install          # npm install
+make build            # Production build
+make test             # All E2E tests (Playwright)
+make test-critical    # Critical path E2E only
+make test-unit        # Unit tests (Vitest)
+make test-ui          # Playwright interactive UI
+make clean            # Remove node_modules + dist
 ```
 
 ## Key Directories
 
-**Frontend** (`frontend/src/`):
-- `scenes/` - Phaser scenes (MainMenuScene.ts, SystemDashboardScene.ts, SystemEndingScene.ts)
-- `services/` - All game logic (inference, risk scoring, outcomes, endings, etc.)
-- `generators/` - Synthetic data generation using Faker.js
-- `state/` - State management (GameStore.ts for IndexedDB, SystemState.ts for game state)
-- `ui/` - UI components (DOM-based, not Phaser UI)
-- `types/` - TypeScript type definitions
-- `audio/` - Audio managers
+All active code is in `frontend/`:
 
-**Data** (`frontend/public/data/`):
-- `config/` - Game configuration (risk_factors.json, keywords.json, etc.)
-- `reference/` - Reference data (health.json, finance.json, judicial.json, social.json)
-- `directives.json` - System mode directives
-- `outcomes.json` - Outcome templates
-- `inference_rules.json` - Inference rules
+```
+frontend/src/
+  components/         ← React components (StartScreen, SystemDashboard, EndingScreen)
+  services/           ← Pure TypeScript game logic (no store imports)
+  stores/             ← Zustand stores (gameStore, citizenStore, metricsStore, uiStore, contentStore)
+  phaser/             ← Phaser scenes (WorldMapGame.ts, PreloadScene.ts, WorldMapScene.ts)
+  types/              ← TypeScript type definitions (zero `any`)
+  i18n.ts             ← react-i18next setup
 
-**Archived Backend** (`backend/src/datafusion/`):
-- See BACKEND_ARCHIVE.md for structure
+frontend/public/content/
+  scenarios/          ← default.json: directives + contract events per week
+  countries/          ← 5 country profiles (usa, uk, china, russia, france)
+  inference_rules.json
+  data_banks/         ← health, finance, judicial, social, messages
+  outcomes.json
+  locales/en.json
+```
 
-## Core Patterns
+## Architecture Rules
 
-**Fat Client Architecture**:
-- All game logic runs in `frontend/src/services/`
-- Data generation uses Faker.js in `frontend/src/generators/`
-- State persists to IndexedDB via `GameStore.ts`
-- No backend API calls required
-
-**Frontend**:
-- Phaser scenes for game rendering
-- Services handle all business logic (inference, risk scoring, outcomes, etc.)
-- UI components create DOM elements
-- TypeScript strict mode
-- IndexedDB for persistence and save/load
-
-## Visual System
-
-- **2D top-down RPG** style (interior building views)
-- **Tilesets**: 32x32 tiles, 6-layer depth sorting
-- **Sprites**: 128x128, 4x4 grid (RPG Maker format), 14 NPC types
-- **Map**: Tiled JSON with layers: `1_Floor`, `2_Walls_Base`, `3_Furniture_Low`, `4_Furniture_Mid`, `5_Furniture_High`, `6_Objects`
-- NPCs have `sprite_key` and `map_x`/`map_y` coordinates
-
-**Key files**:
-- Services: `services/time-progression.ts`, `services/citizen-outcomes.ts`
-- UI: `ui/system/CinematicTextBox.ts`, `ui/system/OutcomeViewer.ts`
-- Styles: `styles/cinematic.css`, `styles/system-effects.css`
-
-### Outcome Generation
-- Templates in `services/citizen-outcomes.ts` (migrated from Python)
-- Escalating consequences: immediate → 1 month → 6 months → 1 year
-- Each flag type (monitoring/restriction/intervention/detention) has different outcomes
-- Outcomes include narrative + statistics showing degradation
-
-## Data Model
-
-All data is generated client-side and stored in IndexedDB:
-
-- **NPC** (citizen) - central entity with map position
-- **Domains**: health, finance, judicial, location, social, messages
-- **System Mode**: Operator, Directive, CitizenFlag, FlagOutcome, OperatorMetrics
-- All records use UUIDs and are stored in GameStore (IndexedDB wrapper)
+- **Stores call services. Components call stores. Phaser never touches stores.**
+- Phaser communicates with React via a one-way `EventTarget` bridge
+- All Phaser imports must use `import * as Phaser from 'phaser'` (ESM, no default export)
+- All entities use `crypto.randomUUID()` UUIDs
+- All citizen data generation uses Faker.js with deterministic seeds
+- IndexedDB via `idb` wrapper in `stores/persistence.ts`
+- `window.__stores` is exposed in development for test access
 
 ## Service Architecture
 
-**Core Services** (`frontend/src/services/`):
-- `inference-engine.ts` - Generates data fusion inferences from citizen records
-- `risk-scoring.ts` - Calculates risk scores for system mode
-- `citizen-outcomes.ts` - Generates outcome narratives
-- `ending-calculator.ts` - Determines game endings
-- `operator-tracker.ts` - Tracks operator decisions
-- `reluctance-tracking.ts` - Tracks operator reluctance
-- `public-metrics.ts` - Tracks awareness and public anger
-- `news-system.ts` - Generates dynamic news
-- `protest-system.ts` - Manages protest mechanics
-- `action-execution.ts` - Handles action execution
-- `time-progression.ts` - Manages directive progression
-- `game-orchestrator.ts` - Coordinates all systems
+```
+services/
+  GameOrchestrator.ts   ← initializes everything; only entry point for game start
+  InferenceEngine.ts    ← rule-based data fusion analysis
+  RiskScorer.ts         ← citizen risk score (pure function)
+  OutcomeGenerator.ts   ← consequence narratives (pure function)
+  AutoFlagBot.ts        ← deterministic flagging algorithm; bot decisions log under operator ID
+  EndingCalculator.ts   ← 9 endings in priority order
+  ProtestManager.ts     ← protest trigger + suppression
+  ReluctanceTracker.ts  ← warnings at 70/80/90
+  NewsGenerator.ts      ← dynamic article generation
+  CitizenGenerator.ts   ← generateSkeleton() + generateFullProfile() (lazy)
+  TimeProgression.ts    ← week/directive advancement, contract event firing
+  ContentLoader.ts      ← async JSON loaders for /content/
+```
 
-**Data Generators** (`frontend/src/generators/`):
-- `identity.ts` - Names, demographics, SSNs
-- `health.ts` - Medical visits, conditions, medications
-- `finance.ts` - Bank accounts, transactions, debts
-- `judicial.ts` - Arrests, charges, sentences
-- `location.ts` - Work, home, check-ins
-- `social.ts` - Social media posts, relationships
-- `messages.ts` - Encrypted messages
-- `system-seed.ts` - System mode setup
-- `index.ts` - Full population generation
+## Game Mechanics
 
-## State Management
+- **6 directives** across 6 weeks; player flags citizens to meet quotas
+- **Contract events** (weeks 3–4) unlock new data domains progressively
+- **AutoFlag Bot** (week 4+) can process the queue automatically; player bears responsibility
+- **Jessica Martinez** at seed slot 4472 is the narrative focal point in week 6
+- **ICE raid orders** generated under quota pressure + low anger
+- **9 endings** determined by: compliance, reluctance, bot usage, protest suppression, ICE approvals
 
-**GameStore.ts**:
-- IndexedDB wrapper for persistence
-- Stores all NPCs, records, operator data
-- Provides save/load functionality
-- Handles migrations between versions
+## Store Data Flow
 
-**SystemState.ts**:
-- In-memory game state
-- Tracks current directive, week, decisions
-- Coordinates with GameStore for persistence
+```
+submitFlag(citizenId, flagType, justification)
+  → ReluctanceTracker     → metricsStore
+  → PublicMetrics         → metricsStore
+  → NewsGenerator         → gameStore.newsArticles
+  → ProtestManager        → gameStore.activeProtests
+  → OperatorTracker       → gameStore.operator
+  → OutcomeGenerator      → uiStore.cinematicQueue
+  → EndingCalculator      → uiStore.screen (if terminal)
+  → persistence.save()
+```
 
 ## Testing
 
-**Frontend E2E Testing** (Playwright):
-
-```bash
-make test                              # Run all E2E tests
-make test-critical                     # Critical path only
-make test-features                     # Feature tests
-make test-integration                  # Integration tests
-make test-performance                  # Performance benchmarks
-make test-ui                           # Interactive UI mode
+```
+frontend/tests/
+  e2e/critical-path/    ← 4 specs; must all pass
+  unit/                 ← EndingCalculator, ProtestManager, ReluctanceTracker, AutoFlagBot
 ```
 
-**Test Structure**:
-- `frontend/tests/e2e/critical-path/` - 5 specs (must pass, no retries)
-- `frontend/tests/e2e/features/` - 6 specs (comprehensive coverage)
-- `frontend/tests/e2e/integration/` - 4 specs (state persistence, events)
-- `frontend/tests/e2e/performance/` - 3 specs (load time, FPS, memory)
-- `frontend/tests/e2e/edge-cases/` - 2 specs (extreme behaviors, validation)
-- `frontend/tests/e2e/helpers/` - Reusable test utilities
-
-**Helper Utilities**:
-- `test-data.ts` - Deterministic test data generation (Faker with fixed seeds)
-- `indexeddb-helpers.ts` - Storage management (clearGameStorage, getGameState)
-- `citizen-actions.ts` - Reusable actions (selectCitizen, flagCitizen, completeWeek)
-- `performance-helpers.ts` - Performance measurement (measureLoadTime, measureFPS, getMemoryUsage)
-
-**Performance Targets**:
-- Boot to dashboard: <3s
-- Citizen file load: <100ms (first), <10ms (cached)
-- Average FPS: ≥55, Minimum FPS: ≥30
-- Memory usage: <100MB
-
-See `frontend/tests/e2e/README.md` for detailed documentation.
-
-**Archived backend tests**:
-
-```bash
-make test-backend                              # All archived tests
-cd backend && uv run pytest                    # Same as above
-cd backend && uv run pytest -k test_name       # Specific test
-```
+Run `make test-critical` before any PR. Unit tests cover all 9 endings, protest formulas, reluctance thresholds, bot determinism.
 
 ## Important Rules
 
-- **Fat client**: All game logic in `frontend/src/services/`, never call a backend
-- **IndexedDB**: Use GameStore for all persistence
-- **Generators**: Use Faker.js with deterministic seeds for reproducible data
-- **UUIDs**: All entities use UUIDs (crypto.randomUUID())
-- **TypeScript strict mode**: Enforce strict typing throughout
-- **NPC positions**: Stored as `map_x`/`map_y` grid coordinates (0-49)
-- **Services**: Keep services pure and testable, no direct Phaser dependencies
+- Never add a backend — fat client only
+- Never use `import Phaser from 'phaser'` — use `import * as Phaser from 'phaser'`
+- TypeScript strict mode — zero `any`
+- Keep services pure and testable
+- All strings through `useTranslation()` in components
+- All interactive elements need `data-testid` attributes
