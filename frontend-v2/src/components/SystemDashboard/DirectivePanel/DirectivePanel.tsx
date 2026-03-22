@@ -1,18 +1,50 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useGameStore } from '@/stores/gameStore'
 import { useContentStore } from '@/stores/contentStore'
 import { QuotaBar } from './QuotaBar'
 import { IceRaidAlert } from './IceRaidAlert'
 
+const WEEK6_TOTAL_SECONDS = 24 * 3600
+
+function formatCountdown(secondsRemaining: number): string {
+  const s = Math.max(0, secondsRemaining)
+  const h = Math.floor(s / 3600)
+  const m = Math.floor((s % 3600) / 60)
+  const sec = Math.floor(s % 60)
+  return [h, m, sec].map(v => String(v).padStart(2, '0')).join(':')
+}
+
 export function DirectivePanel() {
   const { t } = useTranslation()
   const [memoRevealed, setMemoRevealed] = useState(false)
+  const [countdown, setCountdown] = useState(WEEK6_TOTAL_SECONDS)
+  const week6StartRef = useRef<number | null>(null)
 
   const directive = useGameStore(s => s.currentDirective)
   const weekNumber = useGameStore(s => s.weekNumber)
   const flags = useGameStore(s => s.flags)
   const scenario = useContentStore(s => s.scenario)
+
+  // Week 6 countdown timer
+  useEffect(() => {
+    if (weekNumber !== 6) return
+
+    // Capture start time once when week 6 first renders
+    if (week6StartRef.current === null) {
+      week6StartRef.current = Date.now()
+    }
+
+    const tick = () => {
+      const elapsed = (Date.now() - (week6StartRef.current ?? Date.now())) / 1000
+      const remaining = Math.floor(WEEK6_TOTAL_SECONDS - elapsed)
+      setCountdown(remaining)
+    }
+
+    tick()
+    const intervalId = setInterval(tick, 1000)
+    return () => clearInterval(intervalId)
+  }, [weekNumber])
 
   const completedForDirective = directive
     ? flags.filter(f => f.directive_key === directive.directive_key).length
@@ -52,6 +84,62 @@ export function DirectivePanel() {
         >
           {t('directive.week_label', { week: weekNumber })}
         </div>
+
+        {/* Week 6 countdown timer */}
+        {weekNumber === 6 && (
+          <div
+            data-testid="week6-timer"
+            style={{
+              marginBottom: 10,
+              padding: '8px 10px',
+              background: countdown <= 0
+                ? 'rgba(239, 68, 68, 0.12)'
+                : countdown <= 4 * 3600
+                  ? 'rgba(239, 68, 68, 0.08)'
+                  : 'rgba(217, 119, 6, 0.08)',
+              border: `1px solid ${countdown <= 4 * 3600 ? 'var(--color-red)' : 'var(--color-amber)'}`,
+              borderRadius: 2,
+            }}
+          >
+            <div
+              style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: 9,
+                color: 'var(--text-muted)',
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                marginBottom: 4,
+              }}
+            >
+              OPERATION DEADLINE:
+            </div>
+            {countdown <= 0 ? (
+              <div
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: 11,
+                  color: 'var(--color-red)',
+                  fontWeight: 600,
+                  letterSpacing: '0.06em',
+                }}
+              >
+                TIME EXPIRED — MANDATORY PROCESSING
+              </div>
+            ) : (
+              <div
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: 18,
+                  fontWeight: 700,
+                  color: countdown <= 4 * 3600 ? 'var(--color-red)' : 'var(--color-amber)',
+                  letterSpacing: '0.06em',
+                }}
+              >
+                {formatCountdown(countdown)}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Directive title */}
         <div
