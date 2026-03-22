@@ -1,0 +1,143 @@
+/* ============================================================
+   CIVIC HARMONY PLATFORM — Dashboard Layout
+   Import in SystemDashboard.tsx
+   ============================================================ */
+
+/* ─── Main 3-column grid ─────────────────────────────────────────────────── */
+
+.dashboard-layout {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  grid-template-columns: 280px 1fr 260px;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background: var(--bg-primary);
+}
+
+/* Header spans all 3 columns */
+.dashboard-header {
+  grid-column: 1 / -1;
+  grid-row: 1;
+}
+
+/* Left panel: directive + queue */
+.dashboard-left {
+  grid-column: 1;
+  grid-row: 2;
+  overflow-y: auto;
+  border-right: 1px solid var(--border-subtle);
+}
+
+/* Center panel: citizen file */
+.dashboard-center {
+  grid-column: 2;
+  grid-row: 2;
+  overflow-y: auto;
+}
+
+/* Right panel: metrics + news */
+.dashboard-right {
+  grid-column: 3;
+  grid-row: 2;
+  overflow-y: auto;
+  border-left: 1px solid var(--border-subtle);
+}
+
+/* World map row spans all 3 columns */
+.dashboard-worldmap {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  height: 220px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* ─── Panel utilities ────────────────────────────────────────────────────── */
+
+.panel {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.panel-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.panel-body {
+  padding: 0;
+}
+
+/* ─── Data tables ────────────────────────────────────────────────────────── */
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.data-table th {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  padding: 6px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.data-table td {
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+}
+
+.data-table tr:hover td {
+  background: var(--bg-tertiary);
+}
+
+.data-table tr.selected td {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+/* ─── Risk badges ────────────────────────────────────────────────────────── */
+
+.risk-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 2px;
+  letter-spacing: 0.05em;
+}
+
+.risk-badge.low {
+  background: var(--color-green-dim);
+  color: var(--color-green);
+}
+
+.risk-badge.moderate {
+  background: var(--color-amber-dim);
+  color: var(--color-amber);
+}
+
+.risk-badge.elevated {
+  background: rgba(234, 88, 12, 0.15);
+  color: #ea580c;
+}
+
+.risk-badge.high {
+  background: var(--color-red-dim);
+  color: var(--color-red);
+}
+
+.risk-badge.severe {
+  background: rgba(147, 51, 234, 0.15);
+  color: #9333ea;
+}
