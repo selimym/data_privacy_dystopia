@@ -1,0 +1,100 @@
+import { useTranslation } from 'react-i18next'
+import type { CitizenProfile } from '@/types/citizen'
+import type { DomainKey } from '@/types/game'
+import { HealthTab } from './HealthTab'
+import { FinanceTab } from './FinanceTab'
+import { JudicialTab } from './JudicialTab'
+import { LocationTab } from './LocationTab'
+import { SocialTab } from './SocialTab'
+import { MessagesTab } from './MessagesTab'
+import { IdentitySection } from './IdentitySection'
+
+interface DataDomainTabsProps {
+  profile: CitizenProfile
+  unlockedDomains: DomainKey[]
+  activeTab: DomainKey | 'identity'
+  onTabChange: (tab: DomainKey | 'identity') => void
+}
+
+const ALL_DOMAINS: DomainKey[] = ['health', 'finance', 'judicial', 'location', 'social', 'messages']
+
+export function DataDomainTabs({ profile, unlockedDomains, activeTab, onTabChange }: DataDomainTabsProps) {
+  const { t } = useTranslation()
+
+  const tabButtonStyle = (isActive: boolean, isLocked: boolean): React.CSSProperties => ({
+    padding: '4px 10px',
+    fontFamily: 'var(--font-mono)',
+    fontSize: 9,
+    letterSpacing: '0.08em',
+    textTransform: 'uppercase',
+    cursor: isLocked ? 'not-allowed' : 'pointer',
+    border: 'none',
+    borderBottom: isActive ? '2px solid var(--color-amber)' : '2px solid transparent',
+    background: isActive ? 'var(--bg-surface)' : 'transparent',
+    color: isLocked ? 'var(--text-disabled)' : isActive ? 'var(--color-amber)' : 'var(--text-muted)',
+    whiteSpace: 'nowrap',
+    opacity: isLocked ? 0.5 : 1,
+  })
+
+  return (
+    <div data-testid="domain-tabs">
+      <div
+        style={{
+          display: 'flex',
+          gap: 0,
+          borderBottom: '1px solid var(--border-subtle)',
+          marginBottom: 12,
+          overflowX: 'auto',
+        }}
+      >
+        {/* Identity tab — always visible */}
+        <button
+          data-testid="tab-identity"
+          style={tabButtonStyle(activeTab === 'identity', false)}
+          onClick={() => onTabChange('identity')}
+        >
+          Identity
+        </button>
+
+        {ALL_DOMAINS.map(domain => {
+          const isUnlocked = unlockedDomains.includes(domain)
+          return (
+            <button
+              key={domain}
+              data-testid={`tab-${domain}`}
+              style={tabButtonStyle(activeTab === domain, !isUnlocked)}
+              onClick={() => isUnlocked && onTabChange(domain)}
+              title={!isUnlocked ? t('citizen.domains.locked') : undefined}
+            >
+              {isUnlocked ? t(`citizen.domains.${domain}`) : `🔒 ${t(`citizen.domains.${domain}`)}`}
+            </button>
+          )
+        })}
+      </div>
+
+      <div style={{ minHeight: 120 }}>
+        {activeTab === 'identity' && (
+          <IdentitySection skeleton={profile} />
+        )}
+        {activeTab === 'health' && profile.health && (
+          <HealthTab health={profile.health} />
+        )}
+        {activeTab === 'finance' && profile.finance && (
+          <FinanceTab finance={profile.finance} />
+        )}
+        {activeTab === 'judicial' && profile.judicial && (
+          <JudicialTab judicial={profile.judicial} />
+        )}
+        {activeTab === 'location' && profile.location && (
+          <LocationTab location={profile.location} />
+        )}
+        {activeTab === 'social' && profile.social && (
+          <SocialTab social={profile.social} />
+        )}
+        {activeTab === 'messages' && profile.messages && (
+          <MessagesTab messages={profile.messages} />
+        )}
+      </div>
+    </div>
+  )
+}
