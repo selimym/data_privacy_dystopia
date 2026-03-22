@@ -1,0 +1,168 @@
+/* ============================================================
+   CIVIC HARMONY PLATFORM — Cinematic Overlay Styles
+   Ported from frontend/src/styles/cinematic.css
+   Adapted to Palantir Gotham aesthetic (dark, professional)
+   ============================================================ */
+
+/* ─── Overlay backdrop ───────────────────────────────────────────────────── */
+
+.cinematic-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 40px;
+  animation: cinematic-fade-in 0.3s ease-out;
+}
+
+/* ─── Text box ───────────────────────────────────────────────────────────── */
+
+.cinematic-text-box {
+  position: relative;
+  width: 80%;
+  max-width: 800px;
+  background: rgba(13, 13, 15, 0.97);
+  border: 1px solid var(--border-default);
+  border-top: 2px solid var(--color-blue);
+  padding: 24px;
+  padding-top: 40px; /* room for skip button */
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.8), 0 0 0 1px var(--border-subtle);
+  animation: cinematic-slide-up 0.3s ease-out;
+}
+
+/* ─── Header row (citizen name + time period) ────────────────────────────── */
+
+.cinematic-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.cinematic-citizen-name {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.1em;
+}
+
+.cinematic-time-period {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+}
+
+/* Time period variants — escalating urgency */
+.cinematic-time-period.immediate {
+  color: var(--color-amber);
+}
+
+.cinematic-time-period.month {
+  color: #f97316; /* orange-500 */
+}
+
+.cinematic-time-period.six-months {
+  color: var(--color-red);
+}
+
+.cinematic-time-period.year {
+  color: #9333ea; /* purple */
+}
+
+/* ─── Status line ────────────────────────────────────────────────────────── */
+
+.cinematic-status {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-red);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+/* ─── Narrative body ─────────────────────────────────────────────────────── */
+
+.cinematic-narrative {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* ─── Skip button ────────────────────────────────────────────────────────── */
+
+.cinematic-skip-button {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: transparent;
+  border: 1px solid var(--border-default);
+  color: var(--text-muted);
+  padding: 5px 12px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.cinematic-skip-button:hover {
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
+}
+
+.cinematic-skip-button:active {
+  transform: scale(0.97);
+}
+
+/* ─── Animations ─────────────────────────────────────────────────────────── */
+
+@keyframes cinematic-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes cinematic-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cinematic-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.cinematic-overlay.closing {
+  animation: cinematic-fade-out 0.25s ease-out forwards;
+}

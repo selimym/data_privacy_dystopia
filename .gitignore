@@ -83,3 +83,8 @@ docs_archive/
 frontend/test-results/
 frontend/test-results.json
 frontend/playwright-report/
+frontend-v2/test-results/
+frontend-v2/playwright-report/
+
+# Tooling
+.serena/

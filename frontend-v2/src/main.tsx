@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom/client'
 import App from './App'
 import './i18n'
 import './styles/global.css'
+import './styles/cinematic.css'
+import './styles/system-effects.css'
 
 // Expose initializeGame on window in DEV for Playwright E2E tests
 if (import.meta.env.DEV) {
