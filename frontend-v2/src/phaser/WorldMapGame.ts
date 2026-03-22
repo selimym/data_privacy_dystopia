@@ -1,4 +1,4 @@
-import Phaser from 'phaser'
+import * as Phaser from 'phaser'
 import { PreloadScene } from './scenes/PreloadScene'
 import { WorldMapScene } from './scenes/WorldMapScene'
 

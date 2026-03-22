@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import type Phaser from 'phaser'
+import type * as Phaser from 'phaser'
 import { useCitizenStore } from '@/stores/citizenStore'
 import { useGameStore } from '@/stores/gameStore'
 import { useUIStore } from '@/stores/uiStore'
