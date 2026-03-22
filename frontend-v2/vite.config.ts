@@ -17,6 +17,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
+      'phaser': resolve(__dirname, 'node_modules/phaser/dist/phaser.esm.js'),
     },
   },
   build: {
@@ -29,8 +30,5 @@ export default defineConfig({
         },
       },
     },
-  },
-  optimizeDeps: {
-    exclude: ['phaser'],
   },
 })
