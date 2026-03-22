@@ -1,13 +1,11 @@
-/**
- * System Mode Visual Effects
- *
- * CRT effects, animations, color progression, and data visualizations
- * that reinforce the oppressive surveillance atmosphere.
- */
+/* ============================================================
+   CIVIC HARMONY PLATFORM — System Visual Effects
+   Ported from frontend/src/styles/system-effects.css
+   CRT scanlines, data-flow backgrounds, risk animations,
+   and atmospheric effects for the surveillance aesthetic.
+   ============================================================ */
 
-/* =========================================
-   CSS Custom Properties for Week Progression
-   ========================================= */
+/* ─── Week Progression — accent color shifts ─────────────────────────────── */
 
 /* Week 1-2: Legitimate feeling (cyan/blue) */
 .system-week-1,
@@ -31,7 +29,7 @@
   --system-glow: rgba(255, 136, 0, 0.2);
 }
 
-/* Week 5-6: Red/oppressive */
+/* Week 5-6: Red / oppressive */
 .system-week-5,
 .system-week-6 {
   --system-accent: #cc6600;
@@ -42,9 +40,7 @@
   --system-glow: rgba(255, 68, 0, 0.3);
 }
 
-/* =========================================
-   CRT / Scanline Effect
-   ========================================= */
+/* ─── CRT / Scanline overlay ─────────────────────────────────────────────── */
 
 .crt-overlay {
   position: fixed;
@@ -56,6 +52,7 @@
   z-index: 9999;
 }
 
+/* Horizontal scanlines — subtle, barely visible */
 .crt-overlay::before {
   content: '';
   position: absolute;
@@ -74,6 +71,7 @@
   opacity: 0.15;
 }
 
+/* Vignette */
 .crt-overlay::after {
   content: '';
   position: absolute;
@@ -107,9 +105,7 @@
   opacity: 0.08;
 }
 
-/* =========================================
-   Screen Flicker Effect (subtle)
-   ========================================= */
+/* ─── Subtle screen flicker ──────────────────────────────────────────────── */
 
 @keyframes screen-flicker {
   0%,
@@ -128,9 +124,7 @@
   animation: screen-flicker 4s infinite;
 }
 
-/* =========================================
-   Risk Score Bar Animation
-   ========================================= */
+/* ─── Risk score bar animations ──────────────────────────────────────────── */
 
 .risk-bar-fill {
   transition: width 1s ease-out, background-color 0.5s ease;
@@ -152,7 +146,6 @@
   }
 }
 
-/* Risk level color classes */
 .risk-bar-fill.risk-low {
   background: linear-gradient(90deg, #22c55e, #4ade80);
 }
@@ -184,9 +177,7 @@
   }
 }
 
-/* =========================================
-   Citizen Dot Pulse Animation
-   ========================================= */
+/* ─── Citizen dot pulse animations ──────────────────────────────────────── */
 
 .citizen-dot {
   transition: all 0.3s ease;
@@ -240,9 +231,7 @@
   }
 }
 
-/* =========================================
-   Alert Panel Slide Animation
-   ========================================= */
+/* ─── Alert panel slide animation ───────────────────────────────────────── */
 
 .alert-panel {
   transform: translateX(100%);
@@ -260,7 +249,6 @@
   opacity: 0;
 }
 
-/* Shake effect for urgent alerts */
 .alert-panel.urgent {
   animation: alert-shake 0.5s ease-in-out;
 }
@@ -285,9 +273,7 @@
   }
 }
 
-/* =========================================
-   Decision Timer Animation
-   ========================================= */
+/* ─── Decision timer animations ─────────────────────────────────────────── */
 
 .decision-timer {
   transition: all 0.3s ease;
@@ -325,10 +311,9 @@
   }
 }
 
-/* Timer progress bar */
 .timer-progress {
   height: 3px;
-  background: var(--system-border);
+  background: var(--border-default);
   border-radius: 2px;
   overflow: hidden;
   margin-top: 4px;
@@ -336,16 +321,16 @@
 
 .timer-progress-bar {
   height: 100%;
-  background: var(--system-accent);
+  background: var(--color-blue);
   transition: width 1s linear, background-color 0.3s ease;
 }
 
 .timer-progress-bar.warning {
-  background: var(--system-warning);
+  background: var(--color-amber);
 }
 
 .timer-progress-bar.critical {
-  background: var(--system-danger);
+  background: var(--color-red);
   animation: timer-bar-pulse 0.5s infinite;
 }
 
@@ -359,9 +344,7 @@
   }
 }
 
-/* =========================================
-   Data Flow Background Animation
-   ========================================= */
+/* ─── Data-flow background animation (barely visible) ────────────────────── */
 
 .data-flow-bg {
   position: absolute;
@@ -427,9 +410,7 @@
   }
 }
 
-/* =========================================
-   Network Graph Visualization
-   ========================================= */
+/* ─── Network graph visualization ────────────────────────────────────────── */
 
 .network-graph {
   position: relative;
@@ -442,36 +423,36 @@
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: var(--system-accent);
-  box-shadow: 0 0 8px var(--system-glow);
+  background: var(--color-blue);
+  box-shadow: 0 0 8px rgba(37, 99, 235, 0.3);
   transition: all 0.3s ease;
 }
 
 .network-node:hover {
   transform: scale(1.5);
-  box-shadow: 0 0 15px var(--system-accent);
+  box-shadow: 0 0 15px var(--color-blue);
 }
 
 .network-node.flagged {
-  background: var(--system-danger);
-  box-shadow: 0 0 8px rgba(255, 68, 68, 0.5);
+  background: var(--color-red);
+  box-shadow: 0 0 8px rgba(220, 38, 38, 0.5);
   animation: node-flagged 1s infinite;
 }
 
 @keyframes node-flagged {
   0%,
   100% {
-    box-shadow: 0 0 8px rgba(255, 68, 68, 0.5);
+    box-shadow: 0 0 8px rgba(220, 38, 38, 0.5);
   }
   50% {
-    box-shadow: 0 0 20px rgba(255, 68, 68, 0.8);
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.8);
   }
 }
 
 .network-edge {
   position: absolute;
   height: 1px;
-  background: linear-gradient(90deg, var(--system-accent-dim), transparent);
+  background: linear-gradient(90deg, var(--border-default), transparent);
   transform-origin: left center;
   opacity: 0.4;
 }
@@ -491,9 +472,7 @@
   }
 }
 
-/* =========================================
-   Heat Map Overlay
-   ========================================= */
+/* ─── Heat map overlay ───────────────────────────────────────────────────── */
 
 .heat-map-overlay {
   position: absolute;
@@ -514,38 +493,34 @@
 }
 
 .heat-spot.low {
-  background: radial-gradient(circle, rgba(34, 197, 94, 0.5), transparent 70%);
+  background: radial-gradient(circle, rgba(5, 150, 105, 0.5), transparent 70%);
 }
 
 .heat-spot.moderate {
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.5), transparent 70%);
+  background: radial-gradient(circle, rgba(217, 119, 6, 0.5), transparent 70%);
 }
 
 .heat-spot.high {
-  background: radial-gradient(circle, rgba(239, 68, 68, 0.5), transparent 70%);
+  background: radial-gradient(circle, rgba(220, 38, 38, 0.5), transparent 70%);
 }
 
-/* =========================================
-   Typography
-   ========================================= */
+/* ─── Typography utilities ───────────────────────────────────────────────── */
 
-/* Monospace for data/technical elements */
 .data-text,
 .code-text,
 .id-text,
 .timestamp-text {
-  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+  font-family: var(--font-mono);
   letter-spacing: 0.02em;
 }
 
-/* Sans-serif for interface text */
 .ui-text,
 .label-text {
-  font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-ui);
   letter-spacing: 0.01em;
 }
 
-/* Redacted text effect */
+/* Redacted / classified text effects */
 .redacted {
   position: relative;
   color: transparent;
@@ -568,9 +543,8 @@
   );
 }
 
-/* Classified text styling */
 .classified {
-  color: var(--system-danger);
+  color: var(--color-red);
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -587,9 +561,7 @@
   }
 }
 
-/* =========================================
-   Glitch Effect (for errors/warnings)
-   ========================================= */
+/* ─── Glitch effect ──────────────────────────────────────────────────────── */
 
 .glitch {
   animation: glitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
@@ -632,14 +604,14 @@
 
 .glitch-text::before {
   left: 2px;
-  text-shadow: -2px 0 #ff0000;
+  text-shadow: -2px 0 var(--color-red);
   clip: rect(24px, 550px, 90px, 0);
   animation: glitch-anim-1 2s infinite linear alternate-reverse;
 }
 
 .glitch-text::after {
   left: -2px;
-  text-shadow: -2px 0 #00ff00;
+  text-shadow: -2px 0 var(--color-green);
   clip: rect(85px, 550px, 140px, 0);
   animation: glitch-anim-2 2s infinite linear alternate-reverse;
 }
@@ -680,20 +652,18 @@
   }
 }
 
-/* =========================================
-   Loading States
-   ========================================= */
+/* ─── Loading states ─────────────────────────────────────────────────────── */
 
 .loading-bar {
   height: 4px;
-  background: var(--system-bg-secondary);
+  background: var(--bg-secondary);
   border-radius: 2px;
   overflow: hidden;
 }
 
 .loading-bar-progress {
   height: 100%;
-  background: linear-gradient(90deg, var(--system-accent), var(--system-accent-dim));
+  background: linear-gradient(90deg, var(--color-blue), var(--color-blue-dim));
   animation: loading-progress 2s ease-in-out infinite;
 }
 
@@ -735,9 +705,7 @@
   }
 }
 
-/* =========================================
-   Transition Effects
-   ========================================= */
+/* ─── Transition utilities ───────────────────────────────────────────────── */
 
 .fade-in {
   animation: fade-in 0.3s ease-out forwards;
@@ -795,12 +763,10 @@
   }
 }
 
-/* =========================================
-   Focus States for Keyboard Navigation
-   ========================================= */
+/* ─── Focus states for keyboard navigation ───────────────────────────────── */
 
 .system-focus:focus {
-  outline: 2px solid var(--system-accent);
+  outline: 2px solid var(--color-blue);
   outline-offset: 2px;
 }
 
@@ -808,12 +774,10 @@
   outline: none;
 }
 
-/* =========================================
-   Hover Effects
-   ========================================= */
+/* ─── Hover effects ──────────────────────────────────────────────────────── */
 
 .hover-glow:hover {
-  box-shadow: 0 0 15px var(--system-glow);
+  box-shadow: 0 0 15px rgba(37, 99, 235, 0.3);
   transition: box-shadow 0.3s ease;
 }
 
@@ -823,9 +787,7 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* =========================================
-   Accessibility: Reduced Motion
-   ========================================= */
+/* ─── Accessibility: reduced motion ──────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
   *,

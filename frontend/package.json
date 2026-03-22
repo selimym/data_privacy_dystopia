@@ -1,32 +1,36 @@
 {
-  "name": "datafusion-world-frontend",
-  "version": "0.1.0",
+  "name": "data-privacy-dystopia",
+  "version": "2.0.0",
+  "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui",
-    "test:e2e:headed": "playwright test --headed",
-    "test:e2e:debug": "playwright test --debug",
-    "test:e2e:critical": "playwright test --project=critical",
-    "test:e2e:features": "playwright test --project=features",
-    "test:e2e:integration": "playwright test --project=integration",
-    "test:e2e:performance": "playwright test --project=performance",
-    "test:e2e:edge-cases": "playwright test --project=edge-cases",
-    "test:e2e:legacy": "playwright test --project=legacy",
-    "test:e2e:report": "playwright show-report"
+    "typecheck": "tsc --noEmit",
+    "test": "playwright test",
+    "test:critical": "playwright test tests/e2e/critical-path",
+    "test:unit": "vitest run",
+    "test:ui": "playwright test --ui",
+    "validate:content": "node tests/validate-content.mjs"
   },
   "dependencies": {
-    "@faker-js/faker": "^10.2.0",
-    "phaser": "^3.70.0"
+    "@faker-js/faker": "^9.3.0",
+    "i18next": "^24.2.0",
+    "idb": "^8.0.1",
+    "phaser": "^3.88.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-i18next": "^15.4.0",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
-    "@playwright/test": "^1.57.0",
-    "@types/node": "^20.11.5",
-    "typescript": "^5.3.3",
-    "vite": "^5.0.11"
+    "@playwright/test": "^1.50.0",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.11",
+    "vitest": "^3.0.5"
   }
 }
