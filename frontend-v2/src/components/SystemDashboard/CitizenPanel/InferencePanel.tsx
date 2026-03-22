@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { InferenceResult } from '@/types/citizen'
 import { Badge } from '@/components/shared/Badge'
+import { useUIStore } from '@/stores/uiStore'
 
 interface InferencePanelProps {
   results: InferenceResult[]
@@ -49,6 +50,25 @@ export function InferencePanel({ results, isLoading }: InferencePanelProps) {
         {isLoading && (
           <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>...</span>
         )}
+        <button
+          data-testid="open-inference-rules-editor"
+          onClick={() => useUIStore.getState().openModal('inference_rules_editor')}
+          style={{
+            marginLeft: 'auto',
+            padding: '2px 7px',
+            background: 'transparent',
+            border: '1px solid var(--border-subtle)',
+            color: 'var(--text-muted)',
+            fontFamily: 'var(--font-mono)',
+            fontSize: 9,
+            letterSpacing: '0.06em',
+            cursor: 'pointer',
+            borderRadius: 2,
+            whiteSpace: 'nowrap',
+          }}
+        >
+          Edit Inference Rules
+        </button>
       </div>
 
       {results.length === 0 && !isLoading ? (
