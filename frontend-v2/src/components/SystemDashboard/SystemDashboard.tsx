@@ -1,5 +1,5 @@
 import '@/styles/dashboard.css'
-import { CinematicOverlay } from '@/components/shared'
+import { CinematicOverlay, InferenceRulesEditor } from '@/components/shared'
 import DashboardHeader from './Header/DashboardHeader'
 import ContractBanner from './Header/ContractBanner'
 import AutoFlagBanner from './Header/AutoFlagBanner'
@@ -41,6 +41,7 @@ export default function SystemDashboard() {
       </div>
 
       <CinematicOverlay />
+      <InferenceRulesEditor />
     </div>
   )
 }

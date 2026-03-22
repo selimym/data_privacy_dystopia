@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { ComplianceGauge } from './ComplianceGauge'
 import { ReluctanceGauge } from './ReluctanceGauge'
 import { PublicMetricsDisplay } from './PublicMetricsDisplay'
+import { OperatorProfilePanel } from '@/components/shared/OperatorProfilePanel'
 
 export function MetricsPanel() {
   const { t } = useTranslation()
@@ -13,6 +14,7 @@ export function MetricsPanel() {
       <div style={{ padding: '10px 12px' }}>
         <ComplianceGauge />
         <ReluctanceGauge />
+        <OperatorProfilePanel />
       </div>
 
       <div

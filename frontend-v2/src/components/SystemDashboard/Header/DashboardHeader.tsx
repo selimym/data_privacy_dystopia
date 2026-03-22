@@ -1,12 +1,18 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useGameStore } from '@/stores/gameStore'
 import { useMetricsStore } from '@/stores/metricsStore'
+import { useContentStore } from '@/stores/contentStore'
+import { Modal } from '@/components/shared/Modal'
+import { SaveLoadPanel } from '@/components/shared/SaveLoadPanel'
 
 export default function DashboardHeader() {
   const { t } = useTranslation()
   const operator = useGameStore((s) => s.operator)
   const weekNumber = useGameStore((s) => s.weekNumber)
   const reluctance = useMetricsStore((s) => s.reluctance)
+  const country = useContentStore((s) => s.country)
+  const [saveModalOpen, setSaveModalOpen] = useState(false)
 
   const status = operator?.status ?? 'active'
 
@@ -65,6 +71,21 @@ export default function DashboardHeader() {
         >
           {t('app.version')}
         </span>
+        {country?.ui_flavor.agency_name && (
+          <span
+            data-testid="agency-name"
+            style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: '9px',
+              color: 'var(--color-blue)',
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              opacity: 0.8,
+            }}
+          >
+            — {country.ui_flavor.agency_name}
+          </span>
+        )}
       </div>
 
       {/* Right: operator, week, status */}
@@ -122,7 +143,36 @@ export default function DashboardHeader() {
         >
           {statusText}
         </span>
+
+        {/* SAVE/LOAD link */}
+        <button
+          data-testid="save-load-link"
+          onClick={() => setSaveModalOpen(true)}
+          style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: '9px',
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            color: 'var(--text-muted)',
+            background: 'transparent',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: '2px',
+            padding: '2px 7px',
+            cursor: 'pointer',
+          }}
+        >
+          {t('save.title')}
+        </button>
       </div>
+
+      <Modal
+        isOpen={saveModalOpen}
+        onClose={() => setSaveModalOpen(false)}
+        title={t('save.title')}
+        data-testid="save-load-modal"
+      >
+        <SaveLoadPanel />
+      </Modal>
     </div>
   )
 }

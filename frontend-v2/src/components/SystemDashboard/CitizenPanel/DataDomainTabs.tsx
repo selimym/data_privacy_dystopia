@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import type { CitizenProfile } from '@/types/citizen'
 import type { DomainKey } from '@/types/game'
+import { useContentStore } from '@/stores/contentStore'
 import { HealthTab } from './HealthTab'
 import { FinanceTab } from './FinanceTab'
 import { JudicialTab } from './JudicialTab'
@@ -20,6 +21,7 @@ const ALL_DOMAINS: DomainKey[] = ['health', 'finance', 'judicial', 'location', '
 
 export function DataDomainTabs({ profile, unlockedDomains, activeTab, onTabChange }: DataDomainTabsProps) {
   const { t } = useTranslation()
+  const country = useContentStore((s) => s.country)
 
   const tabButtonStyle = (isActive: boolean, isLocked: boolean): React.CSSProperties => ({
     padding: '4px 10px',
@@ -58,15 +60,26 @@ export function DataDomainTabs({ profile, unlockedDomains, activeTab, onTabChang
 
         {ALL_DOMAINS.map(domain => {
           const isUnlocked = unlockedDomains.includes(domain)
+          // If country defines available_domains, domains NOT in that list are regionally unavailable
+          const isRegionallyAvailable = country === null
+            || country.available_domains.includes(domain)
+          const isEffectivelyLocked = !isUnlocked
+          const tooltipText = !isRegionallyAvailable
+            ? 'NOT AVAILABLE IN THIS REGION'
+            : !isUnlocked ? t('citizen.domains.locked') : undefined
           return (
             <button
               key={domain}
               data-testid={`tab-${domain}`}
-              style={tabButtonStyle(activeTab === domain, !isUnlocked)}
+              style={tabButtonStyle(activeTab === domain, isEffectivelyLocked)}
               onClick={() => isUnlocked && onTabChange(domain)}
-              title={!isUnlocked ? t('citizen.domains.locked') : undefined}
+              title={tooltipText}
             >
-              {isUnlocked ? t(`citizen.domains.${domain}`) : `🔒 ${t(`citizen.domains.${domain}`)}`}
+              {isUnlocked
+                ? t(`citizen.domains.${domain}`)
+                : !isRegionallyAvailable
+                  ? `— ${t(`citizen.domains.${domain}`)}`
+                  : `🔒 ${t(`citizen.domains.${domain}`)}`}
             </button>
           )
         })}

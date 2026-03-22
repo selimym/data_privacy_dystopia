@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import type { FlagType } from '@/types/game'
 import { useUIStore } from '@/stores/uiStore'
 import { useGameStore } from '@/stores/gameStore'
+import { useContentStore } from '@/stores/contentStore'
 
 interface FlagSubmissionProps {
   citizenId: string
@@ -21,6 +22,7 @@ export function FlagSubmission({ citizenId, isVisible }: FlagSubmissionProps) {
   const getDecisionElapsedSecs = useUIStore(s => s.getDecisionElapsedSecs)
   const submitFlag = useGameStore(s => s.submitFlag)
   const submitNoAction = useGameStore(s => s.submitNoAction)
+  const country = useContentStore(s => s.country)
 
   // Update timer every second
   useEffect(() => {
@@ -131,7 +133,7 @@ export function FlagSubmission({ citizenId, isVisible }: FlagSubmissionProps) {
                 data-testid={`flag-type-${type}`}
                 style={{ accentColor: 'var(--color-amber)' }}
               />
-              {t(`flag.type.${type}`)}
+              {country?.ui_flavor.flag_labels[type] ?? t(`flag.type.${type}`)}
             </label>
           ))}
         </div>

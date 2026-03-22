@@ -30,6 +30,7 @@ import { generateOutcome } from '@/services/OutcomeGenerator'
 import { getTimePeriodForWeek } from '@/services/TimeProgression'
 import { runAutoFlagBot } from '@/services/AutoFlagBot'
 import { calculateEnding, generateEndingResult } from '@/services/EndingCalculator'
+import { generateExposureArticle } from '@/services/NewsGenerator'
 
 // ─── Store imports ────────────────────────────────────────────────────────────
 import { useMetricsStore } from './metricsStore'
@@ -84,6 +85,9 @@ interface GameState {
 
   // Resistance path
   resistancePath: boolean
+
+  // Exposure article flag (once generated at reluctance >= 80, don't repeat)
+  exposureArticleGenerated: boolean
 
   // ─── Actions ─────────────────────────────────────────────────────────────
 
@@ -188,6 +192,7 @@ const initialState = {
   completedRaids: [] as IceRaidOrder[],
   firedContractKeys: [] as string[],
   resistancePath: false,
+  exposureArticleGenerated: false,
 }
 
 // ─── Store ────────────────────────────────────────────────────────────────────
@@ -349,6 +354,29 @@ export const useGameStore = create<GameState>((set, get) => ({
     if (newReluctance.reluctance_score >= 50) {
       const riskProfile = generateOperatorRiskProfile(get().operator!, newReluctance)
       metrics.setOperatorRisk(riskProfile)
+    }
+
+    // ── 9b. Exposure article (if reluctance ≥ 80 and not yet generated) ───────
+    if (newReluctance.reluctance_score >= 80 && !get().exposureArticleGenerated) {
+      const { newsChannels: channels } = get()
+      const criticalChannel = channels.find(c => c.stance === 'critical' && !c.is_banned)
+      if (criticalChannel) {
+        const exposureArticle = generateExposureArticle(criticalChannel, 1)
+        const overrideArticle = {
+          ...exposureArticle,
+          headline: 'WHISTLEBLOWER: Analyst Suspected of Compliance Obstruction',
+        }
+        set(state => ({
+          newsArticles: [overrideArticle, ...state.newsArticles].slice(0, 100),
+          exposureArticleGenerated: true,
+        }))
+        ui.addNotification(
+          'warning',
+          'EXPOSURE RISK',
+          'Internal behavioral data suggests compliance obstruction. Investigation initiated.',
+          { auto_dismiss_ms: null },
+        )
+      }
     }
 
     // ── 10. Persist ───────────────────────────────────────────────────────────
@@ -878,6 +906,7 @@ async function _persist(get: () => GameState): Promise<void> {
       completedRaids: state.completedRaids,
       firedContractKeys: state.firedContractKeys,
       resistancePath: state.resistancePath,
+      exposureArticleGenerated: state.exposureArticleGenerated,
     },
     citizens: {
       skeletons: citizens.skeletons,
