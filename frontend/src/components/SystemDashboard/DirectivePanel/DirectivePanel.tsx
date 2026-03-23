@@ -5,23 +5,169 @@ import { useContentStore } from '@/stores/contentStore'
 import { useMetricsStore } from '@/stores/metricsStore'
 import { useUIStore } from '@/stores/uiStore'
 import { QuotaBar } from './QuotaBar'
-import { IceRaidAlert } from './IceRaidAlert'
 import type { ShiftMemoData } from '@/types/ui'
+import type { Directive } from '@/types/game'
 
-function buildShiftMemo(week: number, compliance: number, reluctance: number): Pick<ShiftMemoData, 'memoText' | 'tone'> {
-  if (reluctance < 30 && compliance > 60) {
-    return {
-      tone: 'positive',
-      memoText: `Operator performance for Directive Cycle ${week} is within acceptable parameters. Compliance metrics are satisfactory. Continue processing at current pace. Your commitment to the mission is noted.`,
+// ─── Colleague-voice memo generator ──────────────────────────────────────────
+
+interface ColleagueSender {
+  name: string
+  title: string
+}
+
+const SARAH: ColleagueSender = { name: 'Sarah K.', title: 'Senior Analyst' }
+const MARCUS: ColleagueSender = { name: 'Marcus D.', title: 'Field Coordinator' }
+const DIRECTOR: ColleagueSender = { name: 'Director Chen', title: 'Division Chief' }
+const ALEX: ColleagueSender = { name: 'Alex R.', title: 'Compliance Officer' }
+
+function pick<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)]!
+}
+
+function buildColleagueMemo(
+  week: number,
+  compliance: number,
+  reluctance: number,
+  hasProtests: boolean,
+): Pick<ShiftMemoData, 'memoText' | 'tone' | 'sender'> {
+  // Exploration week — special templates
+  if (week === 5) {
+    if (Math.random() < 0.5) {
+      return {
+        tone: 'positive',
+        sender: MARCUS,
+        memoText: pick([
+          `Okay did you look at the message logs? Because I've been reading through some of these and — buddy. Case #4 alone is worth it. These people have NO idea we're watching.`,
+          `Full access is wild. I spent an hour on one subject's grocery delivery history. You should dig in before we're back to quota grind.`,
+        ]),
+      }
+    } else {
+      return {
+        tone: 'positive',
+        sender: SARAH,
+        memoText: pick([
+          `Make sure you've explored the new social and message tabs! There's so much in there. I found someone planning a meetup — flagged immediately. This is exactly the kind of intelligence work that makes a difference.`,
+          `The message intercepts are incredible. I flagged three cases just based on what they were texting their therapists. Take your time this week — there's a lot to find.`,
+        ]),
+      }
     }
   }
-  return {
-    tone: 'warning',
-    memoText: `Operator metrics for Directive Cycle ${week} require attention. Elevated hesitation patterns and/or suboptimal compliance rates have been logged. Review your processing efficiency. Continued deviations will be escalated to supervisory review.`,
+
+  // Protest condition → Marcus (70%) or Sarah-in-denial (30%)
+  if (hasProtests) {
+    if (Math.random() < 0.7) {
+      return {
+        tone: 'warning',
+        sender: MARCUS,
+        memoText: pick([
+          `Ha. Saw the news. Guess we ruffled some feathers out there. Anyway, onto the next cycle — try not to start a second one.`,
+          `People are upset. Good. Means we're doing something. See you tomorrow.`,
+          `Riot in the streets. Classic. You flag 'em, they march. We flag more. Circle of life.`,
+        ]),
+      }
+    } else {
+      return {
+        tone: 'positive',
+        sender: SARAH,
+        memoText: pick([
+          `There's some noise out there but don't let it distract you. The work we're doing matters. Stay focused.`,
+          `I know the news looks bad but remember why we're here. Keep your head down and keep processing.`,
+        ]),
+      }
+    }
+  }
+
+  // Bad metrics → Director Chen (60%) or Alex (40%)
+  if (compliance < 45 || reluctance > 60) {
+    if (Math.random() < 0.6) {
+      return {
+        tone: 'warning',
+        sender: DIRECTOR,
+        memoText: pick([
+          `Your reluctance indicators for Cycle ${week} are outside acceptable parameters. A formal review may be initiated if this continues. This is your advisory notice.`,
+          `Compliance at ${compliance.toFixed(0)}%. The division expects above 60. I trust you understand the implications.`,
+          `I'll be direct: your numbers are not where they need to be. This is a performance matter.`,
+        ]),
+      }
+    } else {
+      return {
+        tone: 'warning',
+        sender: ALEX,
+        memoText: pick([
+          `Hey — just wanted to say, watch your numbers. Not trying to pressure you, just... people are paying attention.`,
+          `Cycle ${week} done. Your hesitation flags are ticking up. Nothing critical yet, but be careful.`,
+          `Between us — some of these directives are getting heavy. Just... do what you can and keep your head down.`,
+        ]),
+      }
+    }
+  }
+
+  // Moderate reluctance → Alex (70%) or Director (30%)
+  if (reluctance > 30) {
+    if (Math.random() < 0.7) {
+      return {
+        tone: 'warning',
+        sender: ALEX,
+        memoText: pick([
+          `Hey — just wanted to say, watch your numbers. Not trying to pressure you, just... people are paying attention.`,
+          `Cycle ${week} done. You're doing fine, but your hesitation flags are ticking up. Nothing critical yet.`,
+          `Between us — some of these directives are getting heavy. Just... do what you can and keep your head down.`,
+        ]),
+      }
+    } else {
+      return {
+        tone: 'warning',
+        sender: DIRECTOR,
+        memoText: pick([
+          `Cycle ${week} performance noted. Numbers are within range but trending in the wrong direction. Monitor accordingly.`,
+          `I trust you're aware of your metrics. The division tracks everything. That's all.`,
+        ]),
+      }
+    }
+  }
+
+  // Clean shift → Sarah (70%) or Alex (30%)
+  if (Math.random() < 0.7) {
+    return {
+      tone: 'positive',
+      sender: SARAH,
+      memoText: pick([
+        `Week ${week} complete. You've been consistent and reliable. The team appreciates operators who don't need reminders.`,
+        `Clean numbers this cycle. Keep this up and you'll be on the fast track.`,
+        `You're doing exactly what this unit needs. Keep it up.`,
+      ]),
+    }
+  } else {
+    return {
+      tone: 'positive',
+      sender: ALEX,
+      memoText: pick([
+        `Good work on Cycle ${week}. Quietly supportive from over here. Stay steady.`,
+        `Numbers look solid. Just... stay steady out there.`,
+      ]),
+    }
   }
 }
 
-const WEEK6_TOTAL_SECONDS = 24 * 3600
+function buildBriefingMemo(directive: Directive, prevWeek: number, newDomains: string[]): ShiftMemoData {
+  let body = `${directive.title}\n\n${directive.description}`
+
+  if (newDomains.length > 0) {
+    body += `\n\nNEW DATA ACCESS UNLOCKED:\n${newDomains.map(d => `• ${d.toUpperCase()}`).join('\n')}`
+  }
+
+  body += `\n\nQuota: ${directive.flag_quota} ${(directive.directive_type ?? 'review') === 'sweep' ? 'arrests' : 'flags'} required.`
+
+  return {
+    weekNumber: prevWeek,
+    memoText: body,
+    tone: 'briefing',
+    nextDirective: directive,
+    isBriefing: true,
+  }
+}
+
+const WEEK8_TOTAL_SECONDS = 24 * 3600
 
 function formatCountdown(secondsRemaining: number): string {
   const s = Math.max(0, secondsRemaining)
@@ -34,13 +180,16 @@ function formatCountdown(secondsRemaining: number): string {
 export function DirectivePanel() {
   const { t } = useTranslation()
   const [memoRevealed, setMemoRevealed] = useState(false)
-  const [countdown, setCountdown] = useState(WEEK6_TOTAL_SECONDS)
-  const week6StartRef = useRef<number | null>(null)
+  const [countdown, setCountdown] = useState(WEEK8_TOTAL_SECONDS)
+  const week8StartRef = useRef<number | null>(null)
   const memoShownRef = useRef<string | null>(null)
+  const briefingShownRef = useRef<string | null>(null)
 
   const directive = useGameStore(s => s.currentDirective)
   const weekNumber = useGameStore(s => s.weekNumber)
   const flags = useGameStore(s => s.flags)
+  const raidRecords = useGameStore(s => s.raidRecords)
+  const activeProtests = useGameStore(s => s.activeProtests)
   const scenario = useContentStore(s => s.scenario)
   const compliance = useMetricsStore(s => s.compliance_score)
   const reluctance = useMetricsStore(s => s.reluctance.reluctance_score)
@@ -48,19 +197,19 @@ export function DirectivePanel() {
   const pendingShiftMemo = useUIStore(s => s.pendingShiftMemo)
 
   const isAutomated = typeof navigator !== 'undefined' && navigator.webdriver
+  const isSweep = (directive?.directive_type ?? 'review') === 'sweep'
 
-  // Week 6 countdown timer
+  // Week 8 countdown timer (final directive)
   useEffect(() => {
-    if (weekNumber !== 6) return
+    if (weekNumber !== 8) return
 
-    // Capture start time once when week 6 first renders
-    if (week6StartRef.current === null) {
-      week6StartRef.current = Date.now()
+    if (week8StartRef.current === null) {
+      week8StartRef.current = Date.now()
     }
 
     const tick = () => {
-      const elapsed = (Date.now() - (week6StartRef.current ?? Date.now())) / 1000
-      const remaining = Math.floor(WEEK6_TOTAL_SECONDS - elapsed)
+      const elapsed = (Date.now() - (week8StartRef.current ?? Date.now())) / 1000
+      const remaining = Math.floor(WEEK8_TOTAL_SECONDS - elapsed)
       setCountdown(remaining)
     }
 
@@ -69,21 +218,58 @@ export function DirectivePanel() {
     return () => clearInterval(intervalId)
   }, [weekNumber])
 
-  // Auto-trigger shift memo when quota is met (production only; tests keep the button)
+  // Briefing memo: show at start of each week from week 2 onward (production only)
+  useEffect(() => {
+    if (isAutomated || !directive || weekNumber < 2) return
+    if (briefingShownRef.current === directive.directive_key) return
+    if (pendingShiftMemo !== null) return
+
+    briefingShownRef.current = directive.directive_key
+
+    // Determine newly unlocked domains for this directive
+    const prevDirective = scenario?.directives.find(d => d.week_number === weekNumber - 1)
+    const prevDomains = new Set(prevDirective?.required_domains ?? [])
+    const newDomains = directive.required_domains.filter(d => !prevDomains.has(d))
+
+    // Also include contract event domains for this week
+    const contractEvent = scenario?.contract_events.find(ce => ce.week_number === weekNumber)
+    if (contractEvent) {
+      contractEvent.new_domains_unlocked.forEach(d => {
+        if (!newDomains.includes(d)) newDomains.push(d)
+      })
+    }
+
+    const briefing = buildBriefingMemo(directive, weekNumber - 1, newDomains)
+    showShiftMemo(briefing)
+  }, [isAutomated, directive, weekNumber, pendingShiftMemo, scenario, showShiftMemo])
+
+  // Auto-trigger end-of-shift memo when quota is met (production only)
   useEffect(() => {
     if (isAutomated || !directive) return
-    const completedCount = flags.filter(f => f.directive_key === directive.directive_key).length
+
+    const completedCount = isSweep
+      ? raidRecords
+          .filter(r => r.directive_key === directive.directive_key)
+          .reduce((sum, r) => sum + r.actual_arrests, 0)
+      : flags.filter(f => f.directive_key === directive.directive_key).length
+
     const met = completedCount >= directive.flag_quota
     if (!met || memoShownRef.current === directive.directive_key || pendingShiftMemo !== null) return
 
     memoShownRef.current = directive.directive_key
     const next = scenario?.directives.find(d => d.week_number === weekNumber + 1) ?? null
-    const { memoText, tone } = buildShiftMemo(weekNumber, compliance, reluctance)
-    showShiftMemo({ weekNumber, memoText, tone, nextDirective: next })
-  }, [isAutomated, directive, flags, weekNumber, compliance, reluctance, pendingShiftMemo, scenario, showShiftMemo])
+
+    const hasProtests = activeProtests.some(p => p.status === 'active' || p.status === 'forming' || p.status === 'violent')
+    const { memoText, tone, sender } = buildColleagueMemo(weekNumber, compliance, reluctance, hasProtests)
+    showShiftMemo({ weekNumber, memoText, tone, nextDirective: next, sender })
+  }, [isAutomated, directive, flags, raidRecords, isSweep, weekNumber, compliance, reluctance, pendingShiftMemo, scenario, showShiftMemo, activeProtests])
 
   const completedForDirective = directive
-    ? flags.filter(f => f.directive_key === directive.directive_key).length
+    ? isSweep
+      ? raidRecords
+          .filter(r => r.directive_key === directive.directive_key)
+          .reduce((sum, r) => sum + r.actual_arrests, 0)
+      : flags.filter(f => f.directive_key === directive.directive_key).length
     : 0
 
   const quotaMet = directive !== null && completedForDirective >= directive.flag_quota
@@ -121,8 +307,8 @@ export function DirectivePanel() {
           {t('directive.week_label', { week: weekNumber })}
         </div>
 
-        {/* Week 6 countdown timer */}
-        {weekNumber === 6 && (
+        {/* Week 8 countdown timer */}
+        {weekNumber === 8 && (
           <div
             data-testid="week6-timer"
             style={{
@@ -318,9 +504,6 @@ export function DirectivePanel() {
           </div>
         )}
       </div>
-
-      {/* ICE raid alerts */}
-      <IceRaidAlert />
     </div>
   )
 }

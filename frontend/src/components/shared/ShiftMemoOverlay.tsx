@@ -1,8 +1,8 @@
 /**
- * ShiftMemoOverlay — shown automatically between weeks when quota is met.
- * Delivers a short shift-report memo from the system, with tone reflecting
- * the operator's compliance/reluctance metrics.
- * Acknowledging this memo triggers the actual week advance.
+ * ShiftMemoOverlay — shown automatically between weeks when quota is met,
+ * and at the start of new shifts as a briefing.
+ * Acknowledging triggers the actual week advance (end-of-shift)
+ * or just dismisses (briefing, where advance was already done).
  */
 import { useUIStore } from '@/stores/uiStore'
 import { useGameStore } from '@/stores/gameStore'
@@ -13,13 +13,37 @@ export function ShiftMemoOverlay() {
 
   if (!memo) return null
 
-  const accentColor = memo.tone === 'positive' ? 'var(--color-green)' : 'var(--color-amber)'
+  const isBriefing = memo.isBriefing === true
+  const accentColor =
+    memo.tone === 'briefing' ? 'var(--text-primary)'
+    : memo.tone === 'positive' ? 'var(--color-green)'
+    : 'var(--color-amber)'
 
   function handleAcknowledge() {
     if (!memo) return
-    useGameStore.getState().advanceDirective(memo.nextDirective)
+    if (!isBriefing) {
+      useGameStore.getState().advanceDirective(memo.nextDirective)
+    }
     dismissShiftMemo()
   }
+
+  const headerLeft = memo.sender
+    ? `${memo.sender.name.toUpperCase()} · ${memo.sender.title.toUpperCase()}`
+    : isBriefing
+      ? 'DIRECTIVE BRIEFING'
+      : 'CIVIC HARMONY OS · SHIFT REPORT'
+
+  const headerRight = isBriefing
+    ? `CYCLE ${memo.weekNumber}`
+    : `WEEK ${memo.weekNumber} COMPLETE`
+
+  const subheading = isBriefing
+    ? `DIRECTIVE BRIEFING — CYCLE ${memo.weekNumber}`
+    : `OPERATOR PERFORMANCE SUMMARY · DIRECTIVE CYCLE ${memo.weekNumber}`
+
+  const btnLabel = isBriefing
+    ? 'ACKNOWLEDGE & BEGIN SHIFT →'
+    : 'ACKNOWLEDGE & BEGIN NEXT SHIFT →'
 
   return (
     <div
@@ -67,10 +91,10 @@ export function ShiftMemoOverlay() {
             }}
           />
           <span style={{ color: 'var(--text-muted)', fontSize: 9, letterSpacing: '0.2em' }}>
-            CIVIC HARMONY OS · SHIFT REPORT
+            {headerLeft}
           </span>
           <span style={{ marginLeft: 'auto', color: accentColor, fontSize: 9, letterSpacing: '0.12em' }}>
-            WEEK {memo.weekNumber} COMPLETE
+            {headerRight}
           </span>
         </div>
 
@@ -84,13 +108,14 @@ export function ShiftMemoOverlay() {
               marginBottom: 16,
             }}
           >
-            OPERATOR PERFORMANCE SUMMARY · DIRECTIVE CYCLE {memo.weekNumber}
+            {subheading}
           </div>
           <div
             style={{
               fontSize: 13,
               lineHeight: 1.9,
               color: 'var(--text-secondary)',
+              whiteSpace: 'pre-line',
             }}
           >
             {memo.memoText}
@@ -122,7 +147,7 @@ export function ShiftMemoOverlay() {
               cursor: 'pointer',
             }}
           >
-            ACKNOWLEDGE &amp; BEGIN NEXT SHIFT →
+            {btnLabel}
           </button>
         </div>
       </div>
