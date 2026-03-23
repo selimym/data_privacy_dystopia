@@ -120,6 +120,27 @@ export function ShiftMemoOverlay() {
           >
             {memo.memoText}
           </div>
+          {memo.recruitmentLink && (
+            <div style={{ marginTop: 18, borderTop: '1px solid var(--border-subtle)', paddingTop: 14 }}>
+              <a
+                href={memo.recruitmentLink.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: 10,
+                  letterSpacing: '0.14em',
+                  color: 'var(--color-blue)',
+                  textDecoration: 'none',
+                  textTransform: 'uppercase',
+                  borderBottom: '1px solid var(--color-blue)',
+                  paddingBottom: 1,
+                }}
+              >
+                {memo.recruitmentLink.label} ↗
+              </a>
+            </div>
+          )}
         </div>
 
         {/* Footer */}

@@ -19,6 +19,7 @@ const SARAH: ColleagueSender = { name: 'Sarah K.', title: 'Senior Analyst' }
 const MARCUS: ColleagueSender = { name: 'Marcus D.', title: 'Field Coordinator' }
 const DIRECTOR: ColleagueSender = { name: 'Director Chen', title: 'Division Chief' }
 const ALEX: ColleagueSender = { name: 'Alex R.', title: 'Compliance Officer' }
+const PALANTIR_RECRUITER: ColleagueSender = { name: 'J. Moyer (fwd)', title: 'Talent Intelligence · Palantir Technologies' }
 
 function pick<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)]!
@@ -29,7 +30,7 @@ function buildColleagueMemo(
   compliance: number,
   reluctance: number,
   hasProtests: boolean,
-): Pick<ShiftMemoData, 'memoText' | 'tone' | 'sender'> {
+): Pick<ShiftMemoData, 'memoText' | 'tone' | 'sender' | 'recruitmentLink'> {
   // Exploration week — special templates
   if (week === 5) {
     if (Math.random() < 0.5) {
@@ -127,26 +128,47 @@ function buildColleagueMemo(
   }
 
   // Clean shift → Sarah (70%) or Alex (30%)
-  if (Math.random() < 0.7) {
+  const cleanResult: Pick<ShiftMemoData, 'memoText' | 'tone' | 'sender' | 'recruitmentLink'> =
+    Math.random() < 0.7
+      ? {
+          tone: 'positive',
+          sender: SARAH,
+          memoText: pick([
+            `Week ${week} complete. You've been consistent and reliable. The team appreciates operators who don't need reminders.`,
+            `Clean numbers this cycle. Keep this up and you'll be on the fast track.`,
+            `You're doing exactly what this unit needs. Keep it up.`,
+          ]),
+        }
+      : {
+          tone: 'positive',
+          sender: ALEX,
+          memoText: pick([
+            `Good work on Cycle ${week}. Quietly supportive from over here. Stay steady.`,
+            `Numbers look solid. Just... stay steady out there.`,
+          ]),
+        }
+
+  // Easter egg — high compliance on a morally compromised shift catches
+  // the attention of a certain data-analytics contractor.
+  if (compliance >= 70 && week >= 3) {
     return {
-      tone: 'positive',
-      sender: SARAH,
-      memoText: pick([
-        `Week ${week} complete. You've been consistent and reliable. The team appreciates operators who don't need reminders.`,
-        `Clean numbers this cycle. Keep this up and you'll be on the fast track.`,
-        `You're doing exactly what this unit needs. Keep it up.`,
-      ]),
-    }
-  } else {
-    return {
-      tone: 'positive',
-      sender: ALEX,
-      memoText: pick([
-        `Good work on Cycle ${week}. Quietly supportive from over here. Stay steady.`,
-        `Numbers look solid. Just... stay steady out there.`,
-      ]),
+      ...cleanResult,
+      sender: PALANTIR_RECRUITER,
+      memoText:
+        `Operator SYS-OP-001,\n\n` +
+        `Your performance indicators have been surfaced by our proprietary talent-identification pipeline. ` +
+        `Compliance rate, decision throughput, and hesitation frequency all fall within our preferred operator profile.\n\n` +
+        `We believe high-functioning individuals deserve opportunities that match their capabilities. ` +
+        `A pre-qualified talent file has been generated in your name.\n\n` +
+        `This message will not be re-sent.`,
+      recruitmentLink: {
+        label: 'ACCESS YOUR TALENT PROFILE',
+        href: 'https://www.youtube.com/watch?v=3iEgxLXOQBI',
+      },
     }
   }
+
+  return cleanResult
 }
 
 function buildBriefingMemo(directive: Directive, prevWeek: number, newDomains: string[]): ShiftMemoData {

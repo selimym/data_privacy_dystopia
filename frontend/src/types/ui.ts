@@ -81,6 +81,8 @@ export interface ShiftMemoData {
   nextDirective: import('./game').Directive | null
   sender?: { name: string; title: string }
   isBriefing?: boolean
+  /** Optional easter-egg / recruitment link rendered below memo body. */
+  recruitmentLink?: { label: string; href: string }
 }
 
 // ─── Modal state ──────────────────────────────────────────────────────────────
