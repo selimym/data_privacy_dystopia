@@ -198,7 +198,7 @@ export interface RiskAssessment {
 export interface CaseOverview {
   citizen_id: string
   display_name: string
-  risk_score: number
+  risk_score: number | null
   risk_level: RiskLevel
   available_domains: DomainKey[]
   already_flagged: boolean
