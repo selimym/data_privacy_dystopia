@@ -9,6 +9,7 @@ import { useGameStore } from '@/stores/gameStore'
 import { useMetricsStore } from '@/stores/metricsStore'
 import { useUIStore } from '@/stores/uiStore'
 import { generateSkeleton } from './CitizenGenerator'
+import { computeRiskForAll } from './RiskComputeWorker'
 import type { CitizenSkeleton } from '@/types/citizen'
 
 const BASE_SEED = 42000
@@ -74,6 +75,20 @@ export async function initializeGame(countryKey: string, operatorCode: string): 
   const firstDirective = scenario.directives.find(d => d.week_number === 1)
   if (!firstDirective) throw new Error('GameOrchestrator: no week-1 directive found in scenario')
   useGameStore.getState().initializeGame(operatorCode, firstDirective)
+
+  // ── 5b. Background risk computation (non-blocking) ────────────────────────
+  const { dataBanks: dbs, inferenceRules: rules } = useContentStore.getState()
+  if (dbs && rules.length > 0) {
+    const initialDomains = new Set(firstDirective.required_domains)
+    computeRiskForAll(
+      skeletons,
+      dbs,
+      country,
+      rules,
+      initialDomains,
+      (id, score) => useCitizenStore.getState().updateSkeletonCache(id, score),
+    ).catch(err => console.warn('[RiskComputeWorker] Background error:', err))
+  }
 
   // ── 6. Expose stores in DEV for Playwright tests ──────────────────────────
   if (import.meta.env.DEV) {

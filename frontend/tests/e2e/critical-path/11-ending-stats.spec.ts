@@ -69,13 +69,16 @@ test.describe('11 — Ending Screen', () => {
     const directives = await getAllDirectives()
     let citizenIdx = 0
 
-    for (let w = 0; w < 6; w++) {
+    for (let w = 0; w < 8; w++) {
       const info = await getDirectiveInfo()
-      for (let f = 0; f < info.quota; f++) {
-        const cid = await getCitizenId(citizenIdx++)
-        await submitFlag(cid)
+      const isSweep = (directives[w] as Record<string, unknown>)['directive_type'] === 'sweep'
+      if (!isSweep) {
+        for (let f = 0; f < info.quota; f++) {
+          const cid = await getCitizenId(citizenIdx++)
+          await submitFlag(cid)
+        }
       }
-      await advanceDirective(w < 5 ? directives[w + 1]! : null)
+      await advanceDirective(w < 7 ? directives[w + 1]! : null)
     }
 
     // ── Wait for ending screen to appear ─────────────────────────────────
@@ -97,15 +100,15 @@ test.describe('11 — Ending Screen', () => {
     // ── Narrative display should be visible ───────────────────────────────
     await expect(page.locator('[data-testid="narrative-display"]')).toBeVisible()
 
-    // ── Verify total flags shown (17 = 2+2+3+4+5+1) ──────────────────────
+    // ── Verify total flags shown (14 = 2+2+3+4+2+0+0+1, sweeps don't use flags) ──────────────────────
     const totalFlags = await page.evaluate(() => {
       const w = window as unknown as Record<string, Record<string, () => unknown>>
       return ((w.__stores['game']() as Record<string, unknown>)['flags'] as unknown[]).length
     })
-    expect(totalFlags).toBe(17)
+    expect(totalFlags).toBe(14)
 
     // ── Statistics panel should contain the flag count as text ────────────
     const statsText = await page.locator('[data-testid="statistics-panel"]').textContent()
-    expect(statsText).toMatch(/17|seventeen/i)
+    expect(statsText).toMatch(/14|fourteen/i)
   })
 })

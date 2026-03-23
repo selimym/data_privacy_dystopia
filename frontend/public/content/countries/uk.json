@@ -26,5 +26,13 @@
     "Investigatory Powers Act: requires ISPs to store browsing history for 12 months, available to 48 government bodies",
     "Metropolitan Police facial recognition: live facial recognition cameras deployed in public spaces since 2020",
     "COVID-19 NHS data: Palantir's Foundry processed NHS data; contract extended beyond pandemic"
+  ],
+  "neighborhoods": [
+    { "id": "east_end", "name": "East End", "description": "Historic working-class district", "population_descriptor": "Mixed immigrant and long-term resident communities", "est_arrests_min": 7, "est_arrests_max": 17, "consequence_risk": "high" },
+    { "id": "docklands", "name": "Docklands", "description": "Regenerated financial and residential zone", "population_descriptor": "Young professionals and service workers", "est_arrests_min": 2, "est_arrests_max": 7, "consequence_risk": "low" },
+    { "id": "southwark", "name": "Southwark", "description": "Mixed-use urban district south of the river", "population_descriptor": "Students, artists, and low-income families", "est_arrests_min": 5, "est_arrests_max": 13, "consequence_risk": "medium" },
+    { "id": "haringey", "name": "Haringey", "description": "Densely populated north London borough", "population_descriptor": "Diverse immigrant communities and families", "est_arrests_min": 6, "est_arrests_max": 15, "consequence_risk": "high" },
+    { "id": "chelsea", "name": "Chelsea", "description": "Affluent riverside borough", "population_descriptor": "High-income residents and diplomats", "est_arrests_min": 1, "est_arrests_max": 4, "consequence_risk": "low" },
+    { "id": "brixton", "name": "Brixton", "description": "Culturally vibrant urban neighbourhood", "population_descriptor": "Afro-Caribbean community and activists", "est_arrests_min": 4, "est_arrests_max": 12, "consequence_risk": "medium" }
   ]
 }

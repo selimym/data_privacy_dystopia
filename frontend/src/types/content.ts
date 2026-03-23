@@ -1,4 +1,4 @@
-import type { DomainKey, FlagType, ContractEvent } from './game'
+import type { DomainKey, FlagType, ContractEvent, Neighborhood } from './game'
 import type { VictimStatement } from './citizen'
 
 // ─── Scenario ────────────────────────────────────────────────────────────────
@@ -48,6 +48,7 @@ export interface CountryProfile {
   legal_framework: LegalFramework
   ui_flavor: UIFlavor
   real_world_references: string[]
+  neighborhoods?: Neighborhood[]
 }
 
 // ─── Inference rule ──────────────────────────────────────────────────────────

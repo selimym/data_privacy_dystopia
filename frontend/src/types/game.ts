@@ -11,10 +11,10 @@ export type ActionType =
   | 'PRESSURE_FIRING'
   | 'DECLARE_ILLEGAL'
   | 'INCITE_VIOLENCE'
-  | 'APPROVE_ICE_RAID'
-  | 'DECLINE_ICE_RAID'
   | 'ENABLE_AUTOFLAG'
   | 'DISABLE_AUTOFLAG'
+
+export type DirectiveType = 'review' | 'sweep'
 
 export type EndingType =
   | 'compliant_operator'
@@ -44,11 +44,34 @@ export interface Directive {
   internal_memo: string | null
   required_domains: DomainKey[]
   target_criteria: DirectiveTargetCriteria
-  flag_quota: number
+  flag_quota: number                          // for sweep: arrest quota; for review: flag quota
   time_limit_hours: number | null
   moral_weight: number                        // 1-10
   content_rating: 'moderate' | 'dark' | 'severe'
   unlock_condition: { type: 'start' } | { type: 'week_complete'; week: number }
+  directive_type?: DirectiveType              // undefined = 'review'
+}
+
+// ─── Neighborhood sweep ───────────────────────────────────────────────────────
+
+export interface Neighborhood {
+  id: string
+  name: string
+  description: string
+  population_descriptor: string
+  est_arrests_min: number
+  est_arrests_max: number
+  consequence_risk: 'low' | 'medium' | 'high'
+}
+
+export interface NeighborhoodRaidRecord {
+  id: string
+  neighborhood_id: string
+  neighborhood_name: string
+  actual_arrests: number
+  consequence_risk: 'low' | 'medium' | 'high'
+  directive_key: string
+  executed_at: string
 }
 
 // ─── Contract event (Palantir arc) ──────────────────────────────────────────

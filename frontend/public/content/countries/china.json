@@ -26,5 +26,13 @@
     "Xinjiang surveillance: 1 in 6 surveillance cameras globally located in Xinjiang; biometric data collection at checkpoints",
     "Golden Shield Project (Great Firewall): nationwide internet censorship and monitoring infrastructure",
     "COVID Health Code: QR code app tracking citizens' health status and movement; used to restrict protests"
+  ],
+  "neighborhoods": [
+    { "id": "old_town", "name": "Old Town District", "description": "Historic hutong area with concentrated migrant workers", "population_descriptor": "Migrant workers and ethnic minorities", "est_arrests_min": 9, "est_arrests_max": 20, "consequence_risk": "high" },
+    { "id": "tech_zone", "name": "Technology Development Zone", "description": "High-tech industrial park and dormitory", "population_descriptor": "Engineers and factory workers", "est_arrests_min": 2, "est_arrests_max": 8, "consequence_risk": "low" },
+    { "id": "university_quarter", "name": "University Quarter", "description": "Cluster of universities and student housing", "population_descriptor": "Students and young academics", "est_arrests_min": 5, "est_arrests_max": 14, "consequence_risk": "medium" },
+    { "id": "factory_belt", "name": "Industrial Belt", "description": "Dense factory and worker housing zone", "population_descriptor": "Manufacturing workers and their families", "est_arrests_min": 7, "est_arrests_max": 18, "consequence_risk": "high" },
+    { "id": "diplomatic_quarter", "name": "Diplomatic Quarter", "description": "Embassies, consulates, and upscale compounds", "population_descriptor": "Foreign nationals and senior officials", "est_arrests_min": 1, "est_arrests_max": 4, "consequence_risk": "low" },
+    { "id": "commercial_hub", "name": "Commercial Hub", "description": "Central business district and market areas", "population_descriptor": "Traders, vendors, and office workers", "est_arrests_min": 4, "est_arrests_max": 11, "consequence_risk": "medium" }
   ]
 }

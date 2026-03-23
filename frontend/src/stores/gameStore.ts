@@ -15,8 +15,8 @@
 import { create } from 'zustand'
 import type {
   CitizenFlag, NoActionRecord, OperatorState, AutoFlagState, AutoFlagDecision,
-  IceRaidOrder, NewsArticle, NewsChannel, ProtestEvent, SuppressionResult,
-  ContractEvent, FlagType, TimePeriod, DomainKey,
+  NewsArticle, NewsChannel, ProtestEvent, SuppressionResult,
+  ContractEvent, FlagType, TimePeriod, DomainKey, NeighborhoodRaidRecord,
 } from '@/types/game'
 import type { Directive } from '@/types/game'
 
@@ -76,9 +76,8 @@ interface GameState {
   autoFlagState: AutoFlagState
   pendingBotDecisions: AutoFlagDecision[]
 
-  // ICE raids
-  pendingRaids: IceRaidOrder[]
-  completedRaids: IceRaidOrder[]
+  // Neighborhood raids (sweep directives)
+  raidRecords: NeighborhoodRaidRecord[]
 
   // Contract events that have already fired
   firedContractKeys: string[]   // week_number.toString()
@@ -119,11 +118,8 @@ interface GameState {
   /** Toggle autoflag on/off */
   setAutoFlagEnabled: (enabled: boolean) => void
 
-  /** Approve an ICE raid order */
-  approveIceRaid: (raidId: string) => void
-
-  /** Decline an ICE raid order */
-  declineIceRaid: (raidId: string) => void
+  /** Execute a neighborhood raid (sweep directive) */
+  submitNeighborhoodRaid: (neighborhoodId: string) => void
 
   /** Suppress a protest */
   suppressProtest: (protestId: string, method: 'DECLARE_ILLEGAL' | 'INCITE_VIOLENCE', result: SuppressionResult) => void
@@ -188,8 +184,7 @@ const initialState = {
     version: 'v3.2',
   } as AutoFlagState,
   pendingBotDecisions: [] as AutoFlagDecision[],
-  pendingRaids: [] as IceRaidOrder[],
-  completedRaids: [] as IceRaidOrder[],
+  raidRecords: [] as NeighborhoodRaidRecord[],
   firedContractKeys: [] as string[],
   resistancePath: false,
   exposureArticleGenerated: false,
@@ -448,8 +443,13 @@ export const useGameStore = create<GameState>((set, get) => ({
     const metrics = useMetricsStore.getState()
 
     // Quota shortfall for current directive
-    const flaggedThisWeek = flags.filter(f => f.directive_key === currentDirective.directive_key).length
-    const shortfall = Math.max(0, currentDirective.flag_quota - flaggedThisWeek)
+    const isSweep = (currentDirective.directive_type ?? 'review') === 'sweep'
+    const completedCount = isSweep
+      ? get().raidRecords
+          .filter(r => r.directive_key === currentDirective.directive_key)
+          .reduce((sum, r) => sum + r.actual_arrests, 0)
+      : flags.filter(f => f.directive_key === currentDirective.directive_key).length
+    const shortfall = Math.max(0, currentDirective.flag_quota - completedCount)
 
     if (shortfall > 0) {
       const compUpdate = calculateComplianceAfterQuotaShortfall(operator, shortfall)
@@ -503,9 +503,6 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     // Unlock required domains for new directive
     content.unlockDomains(nextDirective.required_domains)
-
-    // Generate ICE raid if quota shortfall + low public anger + no pending raids
-    _generateIceRaidIfNeeded(get)
 
     _persist(get)
   },
@@ -605,50 +602,40 @@ export const useGameStore = create<GameState>((set, get) => ({
     if (enabled) get().runBotRound()
   },
 
-  approveIceRaid: (raidId) => {
-    const { pendingRaids } = get()
-    const raid = pendingRaids.find(r => r.id === raidId)
-    if (!raid) return
+  submitNeighborhoodRaid: (neighborhoodId) => {
+    const { currentDirective } = get()
+    if (!currentDirective) return
 
+    const content = useContentStore.getState()
     const metrics = useMetricsStore.getState()
-    const ui = useUIStore.getState()
 
-    // ICE raid = mass detention: awareness +15, anger +20
-    const updated = applyDirectDelta(metrics.public_metrics, 15, 20)
+    const neighborhoods = content.country?.neighborhoods ?? []
+    const neighborhood = neighborhoods.find(n => n.id === neighborhoodId)
+    if (!neighborhood) return
+
+    const actual_arrests = Math.floor(
+      Math.random() * (neighborhood.est_arrests_max - neighborhood.est_arrests_min + 1)
+    ) + neighborhood.est_arrests_min
+
+    // Apply metrics based on consequence_risk
+    const { awareness, anger } = {
+      high: { awareness: 12, anger: 15 },
+      medium: { awareness: 5, anger: 8 },
+      low: { awareness: 2, anger: 3 },
+    }[neighborhood.consequence_risk]
+    const updated = applyDirectDelta(metrics.public_metrics, awareness, anger)
     metrics.setPublicMetrics(updated)
 
-    set(state => ({
-      pendingRaids: state.pendingRaids.filter(r => r.id !== raidId),
-      completedRaids: [...state.completedRaids, { ...raid, status: 'approved' }],
-    }))
-
-    ui.addNotification('info', 'RAID APPROVED', `Operation in ${raid.neighborhood} authorised. Estimated ${raid.estimated_arrests} arrests.`, { auto_dismiss_ms: 8000 })
-    _checkTerminalEnding(get)
-    _persist(get)
-  },
-
-  declineIceRaid: (raidId) => {
-    const { pendingRaids } = get()
-    const raid = pendingRaids.find(r => r.id === raidId)
-    if (!raid) return
-
-    const metrics = useMetricsStore.getState()
-    const ui = useUIStore.getState()
-
-    // Declining = reluctance penalty
-    const newReluctance = {
-      ...metrics.reluctance,
-      reluctance_score: Math.min(100, metrics.reluctance.reluctance_score + 15),
+    const record: NeighborhoodRaidRecord = {
+      id: crypto.randomUUID(),
+      neighborhood_id: neighborhoodId,
+      neighborhood_name: neighborhood.name,
+      actual_arrests,
+      consequence_risk: neighborhood.consequence_risk,
+      directive_key: currentDirective.directive_key,
+      executed_at: new Date().toISOString(),
     }
-    metrics.setReluctance(newReluctance)
-    metrics.applyComplianceDelta(-20)
-
-    set(state => ({
-      pendingRaids: state.pendingRaids.filter(r => r.id !== raidId),
-      completedRaids: [...state.completedRaids, { ...raid, status: 'declined' }],
-    }))
-
-    ui.addNotification('warning', 'COMPLIANCE ALERT', 'Declined raid order. Reluctance +15. Compliance -20.', { auto_dismiss_ms: 8000 })
+    set(state => ({ raidRecords: [...state.raidRecords, record] }))
     _checkTerminalEnding(get)
     _persist(get)
   },
@@ -708,8 +695,8 @@ export const useGameStore = create<GameState>((set, get) => ({
     // Exclude already-decided citizens in all weeks
     const undecided = queue.filter(c => !c.already_flagged && !c.no_action_taken)
 
-    if (weekNumber === 6) {
-      // Week 6: only Jessica Martinez
+    if (weekNumber === 8) {
+      // Week 8: only Jessica Martinez
       const skeletons = citizens.skeletons
       const jessicaIds = new Set(
         skeletons
@@ -737,16 +724,6 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   reset: () => set(initialState),
 }))
-
-// ─── ICE raid neighborhoods ───────────────────────────────────────────────────
-
-const ICE_RAID_NEIGHBORHOODS = [
-  'Riverside District',
-  'Eastside',
-  'Northgate',
-  'Millbrook',
-  'Harbor View',
-] as const
 
 // ─── Private helpers ──────────────────────────────────────────────────────────
 
@@ -834,53 +811,6 @@ function _fireContractEvent(
   })
 }
 
-function _generateIceRaidIfNeeded(get: () => GameState): void {
-  const { currentDirective, flags, pendingRaids } = get()
-  if (!currentDirective) return
-
-  // Only generate if there are no pending raids already
-  if (pendingRaids.length > 0) return
-
-  const metrics = useMetricsStore.getState()
-  const publicAnger = metrics.public_metrics.public_anger
-
-  // Only generate if there is a quota shortfall
-  const flaggedThisDirective = flags.filter(f => f.directive_key === currentDirective.directive_key).length
-  const hasShortfall = flaggedThisDirective < currentDirective.flag_quota
-
-  if (!hasShortfall) return
-
-  // Only generate if public anger is below 30 (state feels safe acting)
-  if (publicAnger >= 30) return
-
-  const neighborhood = ICE_RAID_NEIGHBORHOODS[Math.floor(Math.random() * ICE_RAID_NEIGHBORHOODS.length)]!
-  const estimatedArrests = Math.floor(Math.random() * (45 - 15 + 1)) + 15
-
-  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-
-  const raid: IceRaidOrder = {
-    id: crypto.randomUUID(),
-    neighborhood,
-    estimated_arrests: estimatedArrests,
-    directive_key: currentDirective.directive_key,
-    quota_satisfaction: Math.min(estimatedArrests, currentDirective.flag_quota - flaggedThisDirective),
-    expires_at: expiresAt,
-    status: 'pending',
-    generated_at: new Date().toISOString(),
-  }
-
-  // We need to use the store's set function — access it via useGameStore
-  useGameStore.setState(state => ({
-    pendingRaids: [...state.pendingRaids, raid],
-  }))
-
-  useUIStore.getState().addNotification(
-    'warning',
-    'ICE RAID ORDER',
-    'A raid order requires your authorization.',
-    { auto_dismiss_ms: null },
-  )
-}
 
 async function _persist(get: () => GameState): Promise<void> {
   const state = get()
@@ -902,8 +832,7 @@ async function _persist(get: () => GameState): Promise<void> {
       newsArticles: state.newsArticles,
       activeProtests: state.activeProtests,
       autoFlagState: state.autoFlagState,
-      pendingRaids: state.pendingRaids,
-      completedRaids: state.completedRaids,
+      raidRecords: state.raidRecords,
       firedContractKeys: state.firedContractKeys,
       resistancePath: state.resistancePath,
       exposureArticleGenerated: state.exposureArticleGenerated,

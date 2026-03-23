@@ -7,28 +7,38 @@ interface CaseRowProps {
   collapsed: boolean
 }
 
-function riskLabel(score: number): 'LOW' | 'MEDIUM' | 'HIGH' {
+function riskLabel(score: number | null): 'LOW' | 'MEDIUM' | 'HIGH' | null {
+  if (score === null) return null
   if (score >= 65) return 'HIGH'
   if (score >= 35) return 'MEDIUM'
   return 'LOW'
 }
 
-function riskColor(score: number): string {
+function riskColor(score: number | null): string {
+  if (score === null) return 'var(--text-muted)'
   if (score >= 65) return 'var(--color-red)'
   if (score >= 35) return '#ea580c'
   return 'var(--color-green)'
 }
 
+const pulseStyle = `
+  @keyframes riskPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+`
+
 export function CaseRow({ caseItem, isSelected, onSelect, collapsed }: CaseRowProps) {
   const isActionable = !caseItem.already_flagged && !caseItem.no_action_taken
   const color = riskColor(caseItem.risk_score)
+  const label = riskLabel(caseItem.risk_score)
 
   // Collapsed: render a risk-colored dot with a tooltip
   if (collapsed) {
     return (
       <div
         data-testid={`view-citizen-btn-${caseItem.citizen_id}`}
-        title={`${caseItem.display_name} · Risk ${riskLabel(caseItem.risk_score)}`}
+        title={`${caseItem.display_name} · Risk ${label ?? 'computing...'}`}
         onClick={isActionable ? onSelect : undefined}
         style={{
           width: 20,
@@ -50,56 +60,60 @@ export function CaseRow({ caseItem, isSelected, onSelect, collapsed }: CaseRowPr
 
   // Expanded: name + risk score row
   return (
-    <div
-      data-testid={`view-citizen-btn-${caseItem.citizen_id}`}
-      onClick={isActionable ? onSelect : undefined}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 6,
-        padding: '5px 8px 5px 10px',
-        borderLeft: `2px solid ${isSelected ? 'var(--color-green)' : 'transparent'}`,
-        background: isSelected ? 'var(--bg-surface)' : 'transparent',
-        cursor: isActionable ? 'pointer' : 'default',
-        borderBottom: '1px solid var(--border-subtle)',
-        opacity: caseItem.already_flagged || caseItem.no_action_taken ? 0.45 : 1,
-        transition: 'background 0.1s',
-      }}
-      onMouseEnter={e => {
-        if (!isSelected && isActionable) {
-          (e.currentTarget as HTMLDivElement).style.background = 'var(--bg-tertiary)'
-        }
-      }}
-      onMouseLeave={e => {
-        if (!isSelected) {
-          (e.currentTarget as HTMLDivElement).style.background = 'transparent'
-        }
-      }}
-    >
-      <span
+    <>
+      <style>{pulseStyle}</style>
+      <div
+        data-testid={`view-citizen-btn-${caseItem.citizen_id}`}
+        onClick={isActionable ? onSelect : undefined}
         style={{
-          flex: 1,
-          fontFamily: 'var(--font-mono)',
-          fontSize: 11,
-          color: isSelected ? 'var(--text-primary)' : 'var(--text-secondary)',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+          padding: '5px 8px 5px 10px',
+          borderLeft: `2px solid ${isSelected ? 'var(--color-green)' : 'transparent'}`,
+          background: isSelected ? 'var(--bg-surface)' : 'transparent',
+          cursor: isActionable ? 'pointer' : 'default',
+          borderBottom: '1px solid var(--border-subtle)',
+          opacity: caseItem.already_flagged || caseItem.no_action_taken ? 0.45 : 1,
+          transition: 'background 0.1s',
+        }}
+        onMouseEnter={e => {
+          if (!isSelected && isActionable) {
+            (e.currentTarget as HTMLDivElement).style.background = 'var(--bg-tertiary)'
+          }
+        }}
+        onMouseLeave={e => {
+          if (!isSelected) {
+            (e.currentTarget as HTMLDivElement).style.background = 'transparent'
+          }
         }}
       >
-        {caseItem.display_name}
-      </span>
-      <span
-        style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: 11,
-          fontWeight: 600,
-          color,
-          flexShrink: 0,
-        }}
-      >
-        {riskLabel(caseItem.risk_score)}
-      </span>
-    </div>
+        <span
+          style={{
+            flex: 1,
+            fontFamily: 'var(--font-mono)',
+            fontSize: 11,
+            color: isSelected ? 'var(--text-primary)' : 'var(--text-secondary)',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {caseItem.display_name}
+        </span>
+        <span
+          style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: 11,
+            fontWeight: 600,
+            color,
+            flexShrink: 0,
+            animation: label === null ? 'riskPulse 1.2s ease-in-out infinite' : undefined,
+          }}
+        >
+          {label ?? '···'}
+        </span>
+      </div>
+    </>
   )
 }

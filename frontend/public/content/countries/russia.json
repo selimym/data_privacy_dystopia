@@ -26,5 +26,13 @@
     "Yarovaya Law: requires telecom providers to store all communications content for 6 months and metadata for 3 years",
     "RuNet sovereign internet: law enabling Russia to disconnect from global internet and route all traffic through state nodes",
     "Surveillance of protesters: facial recognition used to identify and arrest anti-war protesters within hours of protests"
+  ],
+  "neighborhoods": [
+    { "id": "arbat", "name": "Arbat District", "description": "Historic central neighbourhood near government buildings", "population_descriptor": "Artists, intellectuals, and political activists", "est_arrests_min": 5, "est_arrests_max": 13, "consequence_risk": "medium" },
+    { "id": "zamoskvorechye", "name": "Zamoskvorechye", "description": "Traditional residential district south of the river", "population_descriptor": "Working-class families and pensioners", "est_arrests_min": 3, "est_arrests_max": 9, "consequence_risk": "low" },
+    { "id": "lyublino", "name": "Lyublino", "description": "Peripheral industrial and residential zone", "population_descriptor": "Central Asian migrant workers and factory employees", "est_arrests_min": 8, "est_arrests_max": 18, "consequence_risk": "high" },
+    { "id": "taganka", "name": "Taganka", "description": "Dense urban neighbourhood with historical protest activity", "population_descriptor": "Students, journalists, and NGO workers", "est_arrests_min": 6, "est_arrests_max": 15, "consequence_risk": "high" },
+    { "id": "rublyovka", "name": "Rublyovka", "description": "Exclusive suburb of luxury estates", "population_descriptor": "Oligarchs and senior state officials", "est_arrests_min": 1, "est_arrests_max": 3, "consequence_risk": "low" },
+    { "id": "basmanny", "name": "Basmanny", "description": "Mixed commercial and residential east-central district", "population_descriptor": "Small business owners and white-collar workers", "est_arrests_min": 4, "est_arrests_max": 11, "consequence_risk": "medium" }
   ]
 }

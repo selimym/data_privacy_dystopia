@@ -77,8 +77,10 @@ export interface CinematicInstruction {
 export interface ShiftMemoData {
   weekNumber: number
   memoText: string
-  tone: 'positive' | 'warning'
+  tone: 'positive' | 'warning' | 'briefing'
   nextDirective: import('./game').Directive | null
+  sender?: { name: string; title: string }
+  isBriefing?: boolean
 }
 
 // ─── Modal state ──────────────────────────────────────────────────────────────
