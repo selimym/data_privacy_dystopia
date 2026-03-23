@@ -98,20 +98,6 @@ const FLAG_HEADLINES: Partial<Record<FlagType | ActionType, StanceMap>> = {
       'Authorities Forced to Respond to Organized Aggression',
     ],
   },
-  APPROVE_ICE_RAID: {
-    critical: [
-      'Families Torn Apart: Neighbourhood Raid Condemned Internationally',
-      'Immigration Sweep Leaves Communities Traumatized',
-    ],
-    independent: [
-      'Immigration Enforcement Operation Conducted',
-      'Residents Describe Chaos During Security Operation',
-    ],
-    state_friendly: [
-      'Successful Operation Restores Order',
-      'Law Enforcement Removes Individuals Violating Immigration Law',
-    ],
-  },
   PRESS_BAN: {
     critical: [
       'Press Freedom Under Attack as Outlet Silenced',
@@ -187,7 +173,6 @@ const FLAG_SEVERITY: Partial<Record<FlagType | ActionType, number>> = {
   restriction: 4,
   intervention: 6,
   detention: 8,
-  APPROVE_ICE_RAID: 9,
   DECLARE_ILLEGAL: 5,
   INCITE_VIOLENCE: 8,
   PRESS_BAN: 3,

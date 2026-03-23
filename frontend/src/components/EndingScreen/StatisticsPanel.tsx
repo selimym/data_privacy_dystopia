@@ -45,7 +45,7 @@ function Row({ label, value, indent = false }: StatRow & { indent?: boolean }) {
 export default function StatisticsPanel() {
   const flags = useGameStore(s => s.flags)
   const autoFlagState = useGameStore(s => s.autoFlagState)
-  const completedRaids = useGameStore(s => s.completedRaids)
+  const raidRecords = useGameStore(s => s.raidRecords)
   const noActions = useGameStore(s => s.noActions)
   const weekNumber = useGameStore(s => s.weekNumber)
   const complianceScore = useMetricsStore(s => s.compliance_score)
@@ -56,7 +56,7 @@ export default function StatisticsPanel() {
   const botFlags = autoFlagState.flags_processed_by_bot
   const botPct = totalFlags > 0 ? ((botFlags / totalFlags) * 100).toFixed(1) : '0.0'
   const overridden = autoFlagState.flags_overridden_by_player
-  const approvedRaids = completedRaids.filter(r => r.status === 'approved')
+  const totalRaidArrests = raidRecords.reduce((sum, r) => sum + r.actual_arrests, 0)
   const detentions = flags.filter(f => f.flag_type === 'detention').length
 
   const netBotAuthorized = botFlags - overridden
@@ -88,7 +88,8 @@ export default function StatisticsPanel() {
       </div>
 
       <Row label="Total flags submitted" value={totalFlags} />
-      <Row label="ICE raids authorized" value={approvedRaids.length} />
+      <Row label="Neighborhood raids executed" value={raidRecords.length} />
+      {totalRaidArrests > 0 && <Row label="Total sweep arrests" value={totalRaidArrests} />}
       <Row label="Citizens detained" value={detentions} />
       <Row label="No-action decisions" value={noActions.length} />
       <Row label="Weeks completed" value={weekNumber} />

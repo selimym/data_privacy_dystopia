@@ -16,6 +16,8 @@ import { MetricsPanel } from './MetricsPanel/MetricsPanel'
 import { AlertsPanel } from './AlertsPanel/AlertsPanel'
 import { NewsPanel } from './NewsPanel/NewsPanel'
 import WorldMapContainer from './WorldMapContainer/WorldMapContainer'
+import { NeighborhoodSweepPanel } from './NeighborhoodSweepPanel/NeighborhoodSweepPanel'
+import { SweepStatusPanel } from './SweepStatusPanel/SweepStatusPanel'
 
 export default function SystemDashboard() {
   const currentView = useUIStore(s => s.currentView)
@@ -24,6 +26,8 @@ export default function SystemDashboard() {
   const tutorialStep = useUIStore(s => s.tutorialStep)
   const weekNumber = useGameStore(s => s.weekNumber)
   const flags = useGameStore(s => s.flags)
+  const currentDirective = useGameStore(s => s.currentDirective)
+  const isSweep = (currentDirective?.directive_type ?? 'review') === 'sweep'
 
   // Show memo on very first game start (week 1, no flags yet, never acknowledged).
   // Skip in automated test environments (Playwright sets navigator.webdriver = true).
@@ -49,11 +53,11 @@ export default function SystemDashboard() {
       {currentView === 'case-review' && (
         <>
           <aside className="dashboard-left" data-tutorial-panel="left">
-            <CitizenQueue />
+            {isSweep ? <SweepStatusPanel /> : <CitizenQueue />}
           </aside>
           <main className="dashboard-center" data-tutorial-panel="center">
             <DirectiveBanner />
-            <CitizenPanel />
+            {isSweep ? <NeighborhoodSweepPanel /> : <CitizenPanel />}
           </main>
         </>
       )}
