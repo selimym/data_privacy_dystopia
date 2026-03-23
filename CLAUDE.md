@@ -46,7 +46,7 @@ frontend/src/
 
 frontend/public/content/
   scenarios/          ← default.json: directives + contract events per week
-  countries/          ← 5 country profiles (usa, uk, china, russia, france)
+  countries/          ← 3 country profiles (usa, uk, france)
   inference_rules.json
   data_banks/         ← health, finance, judicial, social, messages
   outcomes.json

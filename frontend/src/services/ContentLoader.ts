@@ -1,6 +1,9 @@
 /**
  * ContentLoader — async loaders for all /content/ JSON files.
  * Caches responses in memory after first load.
+ *
+ * Paths are relative to Vite's BASE_URL so the app works both on a
+ * plain dev server (base="/") and on GitHub Pages (base="/repo-name/").
  */
 import type { Scenario, CountryProfile, InferenceRule, DataBanks, OutcomeTemplates } from '@/types'
 
@@ -15,30 +18,35 @@ async function loadJSON<T>(path: string): Promise<T> {
   return data
 }
 
+/** Resolve a content-relative path against Vite's base URL. */
+function contentUrl(relativePath: string): string {
+  return `${import.meta.env.BASE_URL}content/${relativePath}`
+}
+
 export async function loadScenario(key: string): Promise<Scenario> {
-  return loadJSON<Scenario>(`/content/scenarios/${key}.json`)
+  return loadJSON<Scenario>(contentUrl(`scenarios/${key}.json`))
 }
 
 export async function loadCountryProfile(key: string): Promise<CountryProfile> {
-  return loadJSON<CountryProfile>(`/content/countries/${key}.json`)
+  return loadJSON<CountryProfile>(contentUrl(`countries/${key}.json`))
 }
 
 export async function loadInferenceRules(): Promise<InferenceRule[]> {
-  const data = await loadJSON<{ rules: InferenceRule[] }>('/content/inference_rules.json')
+  const data = await loadJSON<{ rules: InferenceRule[] }>(contentUrl('inference_rules.json'))
   return data.rules
 }
 
 export async function loadOutcomeTemplates(): Promise<OutcomeTemplates> {
-  return loadJSON<OutcomeTemplates>('/content/outcomes.json')
+  return loadJSON<OutcomeTemplates>(contentUrl('outcomes.json'))
 }
 
 export async function loadDataBanks(): Promise<DataBanks> {
   const [health, finance, judicial, social, messages] = await Promise.all([
-    loadJSON('/content/data_banks/health.json'),
-    loadJSON('/content/data_banks/finance.json'),
-    loadJSON('/content/data_banks/judicial.json'),
-    loadJSON('/content/data_banks/social.json'),
-    loadJSON('/content/data_banks/messages.json'),
+    loadJSON(contentUrl('data_banks/health.json')),
+    loadJSON(contentUrl('data_banks/finance.json')),
+    loadJSON(contentUrl('data_banks/judicial.json')),
+    loadJSON(contentUrl('data_banks/social.json')),
+    loadJSON(contentUrl('data_banks/messages.json')),
   ])
   return { health, finance, judicial, social, messages } as DataBanks
 }

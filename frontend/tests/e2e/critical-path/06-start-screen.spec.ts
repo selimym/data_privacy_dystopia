@@ -19,9 +19,9 @@ test.describe('06 — Start Screen UI', () => {
     const startScreen = page.locator('[data-testid="start-screen"]')
     await expect(startScreen).toBeVisible()
 
-    // ── Verify 5 country cards exist ─────────────────────────────────────────
+    // ── Verify exactly 3 country cards exist (usa, uk, france) ──────────────
     const countryCards = page.locator('[data-testid^="country-select-"]')
-    await expect(countryCards).toHaveCount(5)
+    await expect(countryCards).toHaveCount(3)
 
     // ── Click on USA card ─────────────────────────────────────────────────────
     const usaCard = page.locator('[data-testid="country-select-usa"]')

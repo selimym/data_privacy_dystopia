@@ -57,7 +57,7 @@ if (scenario) {
 
 // Countries
 console.log('\n📁 countries/')
-const countries = ['usa', 'uk', 'china', 'russia', 'france']
+const countries = ['usa', 'uk', 'france']
 countries.forEach(key => {
   const country = loadJSON(join(contentDir, `countries/${key}.json`))
   if (country) {

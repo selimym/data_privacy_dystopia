@@ -421,10 +421,10 @@ const REAL_WORLD_PARALLELS: Record<EndingType, RealWorldParallel> = {
         description: 'Revealed by Edward Snowden: mass collection of communications data from ordinary citizens worldwide.',
       },
       {
-        name: 'Palantir / ICE',
+        name: 'ICE Integration',
         country: 'United States',
         year: '2012–present',
-        description: 'Palantir Technologies built and operates the FALCON system used to identify, track, and deport immigrants. Thousands of engineers contributed without public accountability.',
+        description: 'A data analytics contractor built and operates the FALCON system used to identify, track, and deport immigrants. Thousands of engineers contributed without public accountability.',
       },
     ],
     call_to_action:
@@ -503,10 +503,10 @@ const REAL_WORLD_PARALLELS: Record<EndingType, RealWorldParallel> = {
       'Surveillance states churn through personnel. Those who show insufficient dedication are discarded without ceremony. The architects of these systems view operators as replaceable components, not people.',
     examples: [
       {
-        name: 'Palantir Employee Turnover',
+        name: 'Analyst Turnover',
         country: 'United States',
         year: '2010s–present',
-        description: "Palantir Technologies has high turnover among engineers who become uncomfortable with their work's applications — ICE deportations, predictive policing, military targeting.",
+        description: "Data analytics contractors have seen high turnover among engineers who become uncomfortable with their work's applications — ICE deportations, predictive policing, military targeting.",
       },
       {
         name: 'Cambridge Analytica Whistleblowers',
@@ -553,10 +553,10 @@ const REAL_WORLD_PARALLELS: Record<EndingType, RealWorldParallel> = {
         description: 'NSO Group sold Pegasus spyware to authoritarian regimes. Executives now face lawsuits, sanctions, and travel restrictions as their role in human rights abuses is documented.',
       },
       {
-        name: 'Palantir Executives',
+        name: 'Executive Capture',
         country: 'United States',
         year: '2010s–present',
-        description: 'Company executives face protests, boycotts, and international condemnation for enabling ICE deportations and military surveillance. Some universities refuse their funding.',
+        description: 'Executives of data analytics firms face protests, boycotts, and international condemnation for enabling ICE deportations and military surveillance. Some universities refuse their funding.',
       },
     ],
     call_to_action:
