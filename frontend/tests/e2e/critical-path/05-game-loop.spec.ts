@@ -3,33 +3,31 @@ import { test, expect } from '@playwright/test'
 /**
  * Phase 5 — Core Game Loop E2E Test
  *
- * Drives the full 6-week directive loop headlessly via window.__stores and
+ * Drives the full 8-week directive loop headlessly via window.__stores and
  * window.__initializeGame. No UI elements are relied upon.
  *
- * Week quotas: 1→2, 2→2, 3→3, 4→4, 5→5, 6→1
+ * Week quotas: 1→2, 2→2, 3→3, 4→4, 5→2, 6→sweep(20), 7→sweep(30), 8→1
  * Contract events fire when advancing TO a week: weeks 2, 3, 4 (autoflag), 5
+ * Weeks 6–7 are sweep directives; we advance them via advanceDirective directly.
  */
 
 test.describe('Phase 5 — Core Game Loop', () => {
-  test('full directive loop: week 1→6, contract events, autoflag, ending', async ({ page }) => {
+  test('full directive loop: week 1→8, contract events, autoflag, ending', async ({ page }) => {
     // ── Navigate to the app ──────────────────────────────────────────────────
     await page.goto('/')
 
     // ── Wait for React to mount and DEV globals to be available ─────────────
-    // __initializeGame is exposed at module load time in DEV
     await page.waitForFunction(
       () => typeof (window as unknown as Record<string, unknown>).__initializeGame === 'function',
       { timeout: 15000 },
     )
 
     // ── Initialize the game ──────────────────────────────────────────────────
-    // This is async: loads JSON content, generates citizens, sets up stores
-    // and exposes __stores on window
     await page.evaluate(() =>
       (window as unknown as Record<string, () => Promise<void>>).__initializeGame('usa', 'SYS-OP-001'),
     )
 
-    // ── Wait for stores to be available (set inside initializeGame) ──────────
+    // ── Wait for stores to be available ──────────────────────────────────────
     await page.waitForFunction(
       () => {
         const w = window as unknown as Record<string, unknown>
@@ -55,7 +53,7 @@ test.describe('Phase 5 — Core Game Loop', () => {
       }, index)
 
     // ── Helper: get current directive key and quota ───────────────────────────
-    const getDirectiveInfo = async (): Promise<{ key: string; quota: number; week: number }> =>
+    const getDirectiveInfo = async (): Promise<{ key: string; quota: number; week: number; type: string }> =>
       page.evaluate(() => {
         const w = window as unknown as Record<string, Record<string, () => unknown>>
         const state = w.__stores['game']() as Record<string, unknown>
@@ -64,17 +62,9 @@ test.describe('Phase 5 — Core Game Loop', () => {
           key: d['directive_key'] as string,
           quota: d['flag_quota'] as number,
           week: d['week_number'] as number,
+          type: (d['directive_type'] as string | undefined) ?? 'review',
         }
       })
-
-    // ── Helper: count flags for current directive ─────────────────────────────
-    const getFlagsForDirective = async (directiveKey: string): Promise<number> =>
-      page.evaluate((key: string) => {
-        const w = window as unknown as Record<string, Record<string, () => unknown>>
-        const state = w.__stores['game']() as Record<string, unknown>
-        const flags = state['flags'] as Array<Record<string, unknown>>
-        return flags.filter(f => f['directive_key'] === key).length
-      }, directiveKey)
 
     // ── Helper: submit one flag ───────────────────────────────────────────────
     const submitFlag = async (citizenId: string): Promise<void> =>
@@ -83,7 +73,7 @@ test.describe('Phase 5 — Core Game Loop', () => {
         w.__stores['game']()['submitFlag'](id, 'monitoring', 'test justification')
       }, citizenId)
 
-    // ── Helper: get all directives sorted by week (full objects for advanceDirective) ─────────────
+    // ── Helper: get all directives sorted by week ─────────────────────────────
     const getDirectives = async (): Promise<Array<Record<string, unknown>>> =>
       page.evaluate(() => {
         const w = window as unknown as Record<string, Record<string, () => unknown>>
@@ -112,17 +102,10 @@ test.describe('Phase 5 — Core Game Loop', () => {
 
     // ── Get all directives ────────────────────────────────────────────────────
     const directives = await getDirectives()
-    expect(directives).toHaveLength(6)
+    expect(directives).toHaveLength(8)
     expect((directives[0] as Record<string, unknown>)['week_number']).toBe(1)
-    expect((directives[5] as Record<string, unknown>)['week_number']).toBe(6)
+    expect((directives[7] as Record<string, unknown>)['week_number']).toBe(8)
 
-    // ── Get a pool of citizen IDs to use across weeks ─────────────────────────
-    // We need up to 5 flags in a single week (week 5 quota = 5)
-    // Use indices 0, 1, 2, 3, 4 for each week's flags (reused across weeks is fine
-    // because directive_key scoping means no duplicate per directive)
-    // But wait: each citizen can only be flagged once per run (no dedup check in the store).
-    // We'll use a different citizen for each flag submission to be safe.
-    // Total flags: 2+2+3+4+5+1 = 17, we have 50 citizens.
     let citizenPoolIndex = 0
     const getNextCitizen = async (): Promise<string> => {
       const id = await getCitizenId(citizenPoolIndex)
@@ -138,24 +121,18 @@ test.describe('Phase 5 — Core Game Loop', () => {
     expect(week1Info.quota).toBe(2)
 
     for (let i = 0; i < week1Info.quota; i++) {
-      const cid = await getNextCitizen()
-      await submitFlag(cid)
+      await submitFlag(await getNextCitizen())
     }
 
-    const week1Flags = await getFlagsForDirective(week1Info.key)
-    expect(week1Flags).toBe(2)
-
-    // Advance to week 2
     await advanceToDirective(directives[1]!)
 
-    // ── Verify contract event for week 2 fired ────────────────────────────────
+    // Contract event for week 2 should have fired
     const firedAfterWeek1 = await page.evaluate(() => {
       const w = window as unknown as Record<string, Record<string, () => unknown>>
       return (w.__stores['game']() as Record<string, unknown>)['firedContractKeys']
     })
     expect(firedAfterWeek1).toContain('2')
 
-    // ── Verify week number advanced ───────────────────────────────────────────
     const week2Number = await page.evaluate(() => {
       const w = window as unknown as Record<string, Record<string, () => unknown>>
       return (w.__stores['game']() as Record<string, unknown>)['weekNumber']
@@ -169,8 +146,7 @@ test.describe('Phase 5 — Core Game Loop', () => {
     expect(week2Info.week).toBe(2)
 
     for (let i = 0; i < week2Info.quota; i++) {
-      const cid = await getNextCitizen()
-      await submitFlag(cid)
+      await submitFlag(await getNextCitizen())
     }
 
     await advanceToDirective(directives[2]!)
@@ -182,19 +158,17 @@ test.describe('Phase 5 — Core Game Loop', () => {
     expect(week3Info.week).toBe(3)
 
     for (let i = 0; i < week3Info.quota; i++) {
-      const cid = await getNextCitizen()
-      await submitFlag(cid)
+      await submitFlag(await getNextCitizen())
     }
 
     await advanceToDirective(directives[3]!)
 
     // ────────────────────────────────────────────────────────────────────────
-    // WEEK 4: quota = 4 — autoflag should unlock after advancing here
+    // WEEK 4: quota = 4 — autoflag should unlock
     // ────────────────────────────────────────────────────────────────────────
     const week4Info = await getDirectiveInfo()
     expect(week4Info.week).toBe(4)
 
-    // Autoflag becomes available at week 4 (contract event unlocks it)
     const autoFlagAvailable = await page.evaluate(() => {
       const w = window as unknown as Record<string, Record<string, () => unknown>>
       const state = w.__stores['game']() as Record<string, unknown>
@@ -204,43 +178,55 @@ test.describe('Phase 5 — Core Game Loop', () => {
     expect(autoFlagAvailable).toBe(true)
 
     for (let i = 0; i < week4Info.quota; i++) {
-      const cid = await getNextCitizen()
-      await submitFlag(cid)
+      await submitFlag(await getNextCitizen())
     }
 
     await advanceToDirective(directives[4]!)
 
     // ────────────────────────────────────────────────────────────────────────
-    // WEEK 5: quota = 5
+    // WEEK 5: quota = 2 (exploration week)
     // ────────────────────────────────────────────────────────────────────────
     const week5Info = await getDirectiveInfo()
     expect(week5Info.week).toBe(5)
+    expect(week5Info.quota).toBe(2)
 
     for (let i = 0; i < week5Info.quota; i++) {
-      const cid = await getNextCitizen()
-      await submitFlag(cid)
+      await submitFlag(await getNextCitizen())
     }
 
     await advanceToDirective(directives[5]!)
 
     // ────────────────────────────────────────────────────────────────────────
-    // WEEK 6: quota = 1 — must flag Jessica Martinez (or any citizen)
-    // The store locks to Jessica Martinez in week 6, but submitFlag still
-    // accepts any citizenId — we submit a normal citizen since we're testing
-    // the game loop, not the week-6 filter.
+    // WEEK 6: sweep directive — advance without raids (shortfall is ok for test)
     // ────────────────────────────────────────────────────────────────────────
     const week6Info = await getDirectiveInfo()
     expect(week6Info.week).toBe(6)
-    expect(week6Info.quota).toBe(1)
+    expect(week6Info.type).toBe('sweep')
 
-    const week6Cid = await getNextCitizen()
-    await submitFlag(week6Cid)
+    await advanceToDirective(directives[6]!)
 
-    // ── Advance with null → triggers game over ────────────────────────────────
+    // ────────────────────────────────────────────────────────────────────────
+    // WEEK 7: sweep directive — advance without raids
+    // ────────────────────────────────────────────────────────────────────────
+    const week7Info = await getDirectiveInfo()
+    expect(week7Info.week).toBe(7)
+    expect(week7Info.type).toBe('sweep')
+
+    await advanceToDirective(directives[7]!)
+
+    // ────────────────────────────────────────────────────────────────────────
+    // WEEK 8: quota = 1 — Jessica Martinez
+    // ────────────────────────────────────────────────────────────────────────
+    const week8Info = await getDirectiveInfo()
+    expect(week8Info.week).toBe(8)
+    expect(week8Info.quota).toBe(1)
+
+    await submitFlag(await getNextCitizen())
+
+    // Advance with null → triggers game over
     await advanceToDirective(null)
 
-    // ── Verify ending screen ──────────────────────────────────────────────────
-    // _checkTerminalEnding sets uiStore.currentScreen to 'ending'
+    // Verify ending screen
     await page.waitForFunction(
       () => {
         const w = window as unknown as Record<string, Record<string, () => unknown>>
@@ -256,20 +242,19 @@ test.describe('Phase 5 — Core Game Loop', () => {
     })
     expect(finalScreen).toBe('ending')
 
-    // ── Verify final state sanity ─────────────────────────────────────────────
     const completedKeys = await page.evaluate(() => {
       const w = window as unknown as Record<string, Record<string, () => unknown>>
       return (w.__stores['game']() as Record<string, unknown>)['completedDirectiveKeys']
     })
-    // All 6 directives completed
-    expect((completedKeys as string[]).length).toBe(6)
+    // All 8 directives completed
+    expect((completedKeys as string[]).length).toBe(8)
 
     const totalFlags = await page.evaluate(() => {
       const w = window as unknown as Record<string, Record<string, () => unknown>>
       const state = w.__stores['game']() as Record<string, unknown>
       return (state['flags'] as unknown[]).length
     })
-    // Total flags submitted: 2+2+3+4+5+1 = 17
-    expect(totalFlags).toBe(17)
+    // Total flags: 2+2+3+4+2+0+0+1 = 14 (sweep weeks don't use flags)
+    expect(totalFlags).toBe(14)
   })
 })
