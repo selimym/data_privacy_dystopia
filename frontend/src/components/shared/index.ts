@@ -1,3 +1,5 @@
+export { StreamingText } from './StreamingText'
+export type { TextSegment, StreamingTextHandle } from './StreamingText'
 export { Button } from './Button'
 export { Badge } from './Badge'
 export { Modal } from './Modal'

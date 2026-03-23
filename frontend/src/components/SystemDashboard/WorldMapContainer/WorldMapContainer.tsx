@@ -1,4 +1,9 @@
-import { useEffect, useRef } from 'react'
+/**
+ * WorldMapContainer — mounts Phaser lazily on first navigation to the World Map view.
+ * The game instance persists across view switches (hidden via display:none when inactive).
+ * Auto-transitions back from world-map view happen via protest events in gameStore.
+ */
+import { useEffect, useRef, useState } from 'react'
 import type * as Phaser from 'phaser'
 import { useCitizenStore } from '@/stores/citizenStore'
 import { useGameStore } from '@/stores/gameStore'
@@ -19,34 +24,34 @@ function getOrCreateEventBus(): EventTarget {
 export function WorldMapContainer() {
   const containerRef = useRef<HTMLDivElement>(null)
   const gameRef = useRef<Phaser.Game | null>(null)
-  const startedRef = useRef(false) // StrictMode guard
+  const startedRef = useRef(false)
+  const [initialized, setInitialized] = useState(false)
 
+  const currentView = useUIStore(s => s.currentView)
   const skeletons = useCitizenStore(s => s.skeletons)
   const flags = useGameStore(s => s.flags)
   const selectedCitizenId = useUIStore(s => s.selectedCitizenId)
   const currentCinematic = useUIStore(s => s.currentCinematic)
 
-  // Mount Phaser once
+  // Lazy-init Phaser on first visit to world-map view
   useEffect(() => {
+    if (currentView !== 'world-map') return
     if (!containerRef.current || startedRef.current) return
     startedRef.current = true
-
-    // Ensure event bus exists before Phaser boots
     getOrCreateEventBus()
-
     gameRef.current = createWorldMapGame(containerRef.current)
+    setInitialized(true)
 
     return () => {
       gameRef.current?.destroy(true)
       gameRef.current = null
     }
-  }, [])
+  }, [currentView])
 
   // Sync NPCs when skeletons or flags change
   useEffect(() => {
-    if (skeletons.length === 0) return
+    if (!initialized || skeletons.length === 0) return
     const events = getOrCreateEventBus()
-
     const flaggedIds = new Set(flags.map(f => f.citizen_id))
     const npcs: NPCDisplayData[] = skeletons.map(s => ({
       citizen_id: s.id,
@@ -56,10 +61,9 @@ export function WorldMapContainer() {
       is_flagged: flaggedIds.has(s.id),
       is_highlighted: s.id === selectedCitizenId,
     }))
-
     const event = Object.assign(new Event('npcs-update'), { detail: { npcs } })
     events.dispatchEvent(event)
-  }, [skeletons, flags, selectedCitizenId])
+  }, [initialized, skeletons, flags, selectedCitizenId])
 
   // Pan camera when cinematic fires
   useEffect(() => {

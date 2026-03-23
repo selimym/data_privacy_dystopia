@@ -88,3 +88,9 @@ frontend-v2/playwright-report/
 
 # Tooling
 .serena/
+
+# Brainstorming / visual companion sessions
+.superpowers/
+
+# Test results (root level)
+test-results/

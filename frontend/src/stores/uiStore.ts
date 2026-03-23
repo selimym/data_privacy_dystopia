@@ -5,10 +5,29 @@
 import { create } from 'zustand'
 import type { Screen, Notification, NotificationType, CinematicData, ModalState, ModalType } from '@/types/ui'
 
+export type DashboardView = 'case-review' | 'news-feed' | 'world-map'
+
 interface UIState {
   // Screen
   currentScreen: Screen
   setScreen: (screen: Screen) => void
+
+  // Dashboard view (case-review | news-feed | world-map)
+  currentView: DashboardView
+  setView: (view: DashboardView) => void
+
+  // First-run memo — persisted in localStorage
+  memoAcknowledged: boolean
+  acknowledgeMemo: () => void
+
+  // Guided first-shift tutorial (null = done/skipped)
+  tutorialStep: number | null
+  advanceTutorial: () => void
+  skipTutorial: () => void
+
+  // Queue collapse state
+  queueCollapsed: boolean
+  toggleQueue: () => void
 
   // Selected citizen (case panel)
   selectedCitizenId: string | null
@@ -41,8 +60,14 @@ interface UIState {
   reset: () => void
 }
 
+const MEMO_KEY = 'civic-harmony-memo-acknowledged'
+
 const initialState = {
   currentScreen: 'start' as Screen,
+  currentView: 'case-review' as DashboardView,
+  memoAcknowledged: localStorage.getItem(MEMO_KEY) === 'true',
+  tutorialStep: null as number | null,
+  queueCollapsed: false,
   selectedCitizenId: null as string | null,
   cinematicQueue: [] as CinematicData[],
   currentCinematic: null as CinematicData | null,
@@ -55,6 +80,24 @@ export const useUIStore = create<UIState>((set, get) => ({
   ...initialState,
 
   setScreen: (screen) => set({ currentScreen: screen }),
+
+  setView: (view) => set({ currentView: view }),
+
+  acknowledgeMemo: () => {
+    localStorage.setItem(MEMO_KEY, 'true')
+    set({ memoAcknowledged: true, tutorialStep: 0 })
+  },
+
+  advanceTutorial: () => {
+    const { tutorialStep } = get()
+    if (tutorialStep === null) return
+    const next = tutorialStep + 1
+    set({ tutorialStep: next > 3 ? null : next })
+  },
+
+  skipTutorial: () => set({ tutorialStep: null }),
+
+  toggleQueue: () => set(state => ({ queueCollapsed: !state.queueCollapsed })),
 
   setSelectedCitizen: (id) => {
     set({ selectedCitizenId: id })
@@ -123,5 +166,5 @@ export const useUIStore = create<UIState>((set, get) => ({
     return (Date.now() - decisionTimerStart) / 1000
   },
 
-  reset: () => set(initialState),
+  reset: () => set({ ...initialState, memoAcknowledged: localStorage.getItem(MEMO_KEY) === 'true' }),
 }))
