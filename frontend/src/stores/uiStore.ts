@@ -3,7 +3,7 @@
  * notifications, modals, and the decision timer.
  */
 import { create } from 'zustand'
-import type { Screen, Notification, NotificationType, CinematicData, ModalState, ModalType } from '@/types/ui'
+import type { Screen, Notification, NotificationType, CinematicData, ModalState, ModalType, ShiftMemoData } from '@/types/ui'
 
 export type DashboardView = 'case-review' | 'news-feed' | 'world-map'
 
@@ -56,6 +56,11 @@ interface UIState {
   startDecisionTimer: () => void
   getDecisionElapsedSecs: () => number
 
+  // Shift memo (shown between weeks)
+  pendingShiftMemo: ShiftMemoData | null
+  showShiftMemo: (data: ShiftMemoData) => void
+  dismissShiftMemo: () => void
+
   // Reset
   reset: () => void
 }
@@ -74,6 +79,7 @@ const initialState = {
   notifications: [] as Notification[],
   modal: { type: null } as ModalState,
   decisionTimerStart: null as number | null,
+  pendingShiftMemo: null as ShiftMemoData | null,
 }
 
 export const useUIStore = create<UIState>((set, get) => ({
@@ -165,6 +171,9 @@ export const useUIStore = create<UIState>((set, get) => ({
     if (decisionTimerStart === null) return 0
     return (Date.now() - decisionTimerStart) / 1000
   },
+
+  showShiftMemo: (data) => set({ pendingShiftMemo: data }),
+  dismissShiftMemo: () => set({ pendingShiftMemo: null }),
 
   reset: () => set({ ...initialState, memoAcknowledged: localStorage.getItem(MEMO_KEY) === 'true' }),
 }))
