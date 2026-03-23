@@ -79,7 +79,7 @@ export const useCitizenStore = create<CitizenState>((set, get) => ({
     return skeletons.map(s => ({
       citizen_id: s.id,
       display_name: `${s.last_name}, ${s.first_name}`,
-      risk_score: s.risk_score_cache ?? 0,
+      risk_score: s.risk_score_cache,
       risk_level:
         (s.risk_score_cache ?? 0) >= 80 ? 'severe'
         : (s.risk_score_cache ?? 0) >= 60 ? 'high'

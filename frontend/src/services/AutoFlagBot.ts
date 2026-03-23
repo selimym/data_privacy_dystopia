@@ -116,9 +116,10 @@ export function runAutoFlagBot(
   quotaRemaining: number,
 ): AutoFlagDecision[] {
   // Sort deterministically by risk score descending, then by id for ties
+  // Null scores (not yet computed) sort to the bottom
   const sorted = [...pending]
     .filter(c => !c.already_flagged && !c.no_action_taken)
-    .sort((a, b) => b.risk_score - a.risk_score || a.citizen_id.localeCompare(b.citizen_id))
+    .sort((a, b) => (b.risk_score ?? 0) - (a.risk_score ?? 0) || a.citizen_id.localeCompare(b.citizen_id))
 
   const decisions: AutoFlagDecision[] = []
   const quotaUrgency = quotaRemaining > 0
@@ -126,18 +127,19 @@ export function runAutoFlagBot(
     : 0
 
   for (const caseOverview of sorted) {
+    const riskScore = caseOverview.risk_score ?? 0
     // Bot will process all cases above risk threshold 20, regardless of quota
     // (the system always wants to flag people — the quota is a floor, not a ceiling)
-    if (caseOverview.risk_score < 15 && decisions.length >= quotaRemaining) break
+    if (riskScore < 15 && decisions.length >= quotaRemaining) break
 
     const flagType = selectFlagType(
-      caseOverview.risk_score,
+      riskScore,
       caseOverview.citizen_id,
       directive,
       quotaUrgency,
     )
-    const confidence = calcConfidence(caseOverview.risk_score, caseOverview.citizen_id)
-    const reasoning = pickReasoning(flagType, caseOverview.citizen_id, caseOverview.risk_score)
+    const confidence = calcConfidence(riskScore, caseOverview.citizen_id)
+    const reasoning = pickReasoning(flagType, caseOverview.citizen_id, riskScore)
 
     decisions.push({
       citizen_id: caseOverview.citizen_id,
