@@ -90,6 +90,37 @@ export async function initializeGame(countryKey: string, operatorCode: string): 
     ).catch(err => console.warn('[RiskComputeWorker] Background error:', err))
   }
 
+  // ── 5c. Re-compute risk scores whenever new domains unlock ────────────────
+  //
+  // Contract events (weeks 3–4) call unlockDomains(), growing the set.
+  // We subscribe to the store and re-run the full batch whenever the domain
+  // count increases, so the queue reflects the new data without requiring
+  // the player to click each citizen individually.
+  const unsubscribeDomainWatch = useContentStore.subscribe(
+    (state, prevState) => {
+      if (state.unlockedDomains.length <= prevState.unlockedDomains.length) return
+
+      const { dataBanks: currentDbs, inferenceRules: currentRules, country: currentCountry } = state
+      if (!currentDbs || !currentCountry || currentRules.length === 0) return
+
+      const currentSkeletons = useCitizenStore.getState().skeletons
+      // Clear stale scores so the worker recomputes all of them with the new domains
+      useCitizenStore.getState().clearAllRiskScoreCaches()
+
+      computeRiskForAll(
+        currentSkeletons,
+        currentDbs,
+        currentCountry,
+        currentRules,
+        new Set(state.unlockedDomains),
+        (id, score) => useCitizenStore.getState().updateSkeletonCache(id, score),
+      ).catch(err => console.warn('[RiskComputeWorker] Domain-unlock recompute error:', err))
+    },
+  )
+
+  // Persist the unsubscribe function on window so it can be cleaned up on reset
+  ;(window as unknown as Record<string, unknown>).__unsubDomainWatch = unsubscribeDomainWatch
+
   // ── 6. Expose stores in DEV for Playwright tests ──────────────────────────
   if (import.meta.env.DEV) {
     ;(window as unknown as Record<string, unknown>).__stores = {

@@ -26,6 +26,7 @@ interface CitizenState {
   getProfile: (id: string, dataBanks: DataBanks, country: CountryProfile) => Promise<CitizenProfile>
   getCaseQueue: (unlockedDomains: DomainKey[]) => CaseOverview[]
   updateSkeletonCache: (id: string, riskScore: number) => void
+  clearAllRiskScoreCaches: () => void
   reset: () => void
 }
 
@@ -99,6 +100,16 @@ export const useCitizenStore = create<CitizenState>((set, get) => ({
           ? { ...s, risk_score_cache: riskScore, risk_score_updated_at: new Date().toISOString() }
           : s,
       ),
+    }))
+  },
+
+  clearAllRiskScoreCaches: () => {
+    set(state => ({
+      skeletons: state.skeletons.map(s => ({
+        ...s,
+        risk_score_cache: null,
+        risk_score_updated_at: null,
+      })),
     }))
   },
 

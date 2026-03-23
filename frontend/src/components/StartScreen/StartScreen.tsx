@@ -8,7 +8,7 @@ import type { CountryProfile } from '@/types/content'
 import { CountryCard } from './CountryCard'
 import { LanguageSelector } from './LanguageSelector'
 
-const COUNTRY_KEYS = ['usa', 'uk', 'china', 'russia', 'france'] as const
+const COUNTRY_KEYS = ['usa', 'uk', 'france'] as const
 
 export default function StartScreen() {
   const { t } = useTranslation()
@@ -213,7 +213,7 @@ export default function StartScreen() {
           <div style={dividerStyle}>
             {'━'.repeat(48)}
           </div>
-          <div style={poweredByStyle}>Powered by Palantir Technologies™</div>
+          <div style={poweredByStyle}>INTELLIGENCE ANALYTICS PLATFORM v2.1</div>
           <div style={onboardingStyle}>{t('start.subtitle')}</div>
         </header>
 

@@ -127,7 +127,7 @@ frontend/src/
 ```
 frontend/public/content/
 ├── scenarios/default.json       # Directives + contract events for each week
-├── countries/                   # 5 country profiles (usa, uk, china, russia, france)
+├── countries/                   # 3 country profiles (usa, uk, france)
 ├── inference_rules.json         # User-editable inference rules
 ├── data_banks/                  # Domain reference data (health, finance, judicial, social, messages)
 ├── outcomes.json                # Outcome narrative templates
@@ -144,8 +144,6 @@ Each country profile defines: agency name, operator title, surveillance depth, a
 |---------|--------|-------------------|---------------|
 | USA | Department of Homeland Intelligence | 3/3 | NSA PRISM, ICE data sharing |
 | UK | GCHQ Civic Monitoring Division | 3/3 | Investigatory Powers Act 2016 |
-| China | Ministry of Public Security | 3/3 | Social Credit System |
-| Russia | FSB Civilian Analytics | 2/3 | SORM surveillance system |
 | France | DGSI Civil Intelligence | 2/3 | French surveillance law 2015 |
 
 ---
