@@ -26,5 +26,13 @@
     "Fichier des personnes recherchées: national watchlist database with over 500,000 entries",
     "Paris 2024 Olympics AI surveillance: law passed allowing algorithmic video surveillance of public spaces",
     "OCLCTIC: France's cybercrime unit granted broad internet surveillance powers under anti-terrorism legislation"
+  ],
+  "neighborhoods": [
+    { "id": "saint_denis", "name": "Saint-Denis", "description": "Northern suburb with high immigrant population", "population_descriptor": "North African and sub-Saharan immigrant families", "est_arrests_min": 8, "est_arrests_max": 18, "consequence_risk": "high" },
+    { "id": "neuilly", "name": "Neuilly-sur-Seine", "description": "Affluent western suburb", "population_descriptor": "High-income professionals and retirees", "est_arrests_min": 1, "est_arrests_max": 4, "consequence_risk": "low" },
+    { "id": "belleville", "name": "Belleville", "description": "Multicultural urban district", "population_descriptor": "Artists, immigrants, and working-class residents", "est_arrests_min": 5, "est_arrests_max": 13, "consequence_risk": "medium" },
+    { "id": "banlieue_nord", "name": "Banlieue Nord", "description": "Outer ring housing projects", "population_descriptor": "Low-income families and unemployed youth", "est_arrests_min": 7, "est_arrests_max": 17, "consequence_risk": "high" },
+    { "id": "marais", "name": "Le Marais", "description": "Historic central district", "population_descriptor": "LGBTQ community, tourists, and professionals", "est_arrests_min": 2, "est_arrests_max": 7, "consequence_risk": "low" },
+    { "id": "la_defense", "name": "La Défense", "description": "Major business district", "population_descriptor": "Corporate workers and financial sector employees", "est_arrests_min": 3, "est_arrests_max": 10, "consequence_risk": "medium" }
   ]
 }

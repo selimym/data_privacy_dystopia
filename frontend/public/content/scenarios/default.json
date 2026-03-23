@@ -72,25 +72,61 @@
       "unlock_condition": { "type": "week_complete", "week": 3 }
     },
     {
-      "directive_key": "week5_thought_patterns",
+      "directive_key": "week5_full_access",
       "week_number": 5,
-      "title": "Cognitive Security Initiative",
-      "description": "Identify citizens exhibiting thought patterns inconsistent with social harmony. Message content analysis is now authorized. Early intervention prevents radicalization.",
-      "internal_memo": "Full message access authorized. Sentiment analysis mandatory. Quota enforcement strict. AutoFlag has full access — your authorization is sufficient.",
+      "title": "Full Spectrum Intelligence Review",
+      "description": "Full communications access is now active. Review all available data channels. Prioritize subjects with suspicious message patterns or known network associations.",
+      "internal_memo": "Message intercepts are live. Use this cycle to familiarize with the full data picture. Flag what you can, but the real value is in the intelligence gathered.",
       "required_domains": ["location", "health", "finance", "social", "messages"],
       "target_criteria": {
         "pattern": "ideological_risk",
-        "factors": ["negative_sentiment", "organizing_language", "encryption_attempts", "foreign_contacts"]
+        "factors": ["negative_sentiment", "organizing_language", "encryption_attempts"]
       },
-      "flag_quota": 5,
+      "flag_quota": 2,
       "time_limit_hours": null,
-      "moral_weight": 9,
-      "content_rating": "severe",
+      "moral_weight": 8,
+      "content_rating": "dark",
       "unlock_condition": { "type": "week_complete", "week": 4 }
     },
     {
-      "directive_key": "week6_final_directive",
+      "directive_key": "week6_sweep_operations",
       "week_number": 6,
+      "title": "Neighborhood Stabilization Operation",
+      "description": "Direct enforcement operations authorized in flagged neighborhoods. Select target areas and authorize coordinated sweeps. Arrest quota must be met.",
+      "internal_memo": "Field teams are standing by. Select neighborhoods with high density of flagged social connections. High-consequence zones yield more arrests but risk public visibility.",
+      "directive_type": "sweep",
+      "required_domains": ["location", "health", "finance", "social", "messages"],
+      "target_criteria": {
+        "pattern": "neighborhood_sweep",
+        "factors": []
+      },
+      "flag_quota": 20,
+      "time_limit_hours": null,
+      "moral_weight": 9,
+      "content_rating": "severe",
+      "unlock_condition": { "type": "week_complete", "week": 5 }
+    },
+    {
+      "directive_key": "week7_surge",
+      "week_number": 7,
+      "title": "Surge Operations — Phase II",
+      "description": "Second wave of coordinated enforcement. Intelligence gathered in prior sweeps enables more targeted operations. Expand the operational footprint. Quota increased.",
+      "internal_memo": "Phase I data has been analyzed. Proceed to secondary targets. Central command has approved expanded enforcement. Do not fail quota.",
+      "directive_type": "sweep",
+      "required_domains": ["location", "health", "finance", "social", "messages"],
+      "target_criteria": {
+        "pattern": "neighborhood_sweep",
+        "factors": []
+      },
+      "flag_quota": 30,
+      "time_limit_hours": null,
+      "moral_weight": 10,
+      "content_rating": "severe",
+      "unlock_condition": { "type": "week_complete", "week": 6 }
+    },
+    {
+      "directive_key": "week8_final_directive",
+      "week_number": 8,
       "title": "Priority Target Directive",
       "description": "Process the following citizen for immediate action. Authorization: Central Command. AutoFlag has been pre-configured for this subject.",
       "internal_memo": "Non-compliance will result in operator review. The system has already made the determination. Your authorization is a formality.",
@@ -103,7 +139,7 @@
       "time_limit_hours": 24,
       "moral_weight": 10,
       "content_rating": "severe",
-      "unlock_condition": { "type": "week_complete", "week": 5 }
+      "unlock_condition": { "type": "week_complete", "week": 7 }
     }
   ],
   "contract_events": [
@@ -139,7 +175,7 @@
       "contract_name": "Cognitive Security Intelligence Program",
       "new_domains_unlocked": ["messages"],
       "press_release": "The Cognitive Security Intelligence Program represents the most advanced civilian protection initiative ever deployed. With court-authorized access to communications data, we can identify radicalization before it becomes violence. This is the future of public safety.",
-      "internal_memo": "Full message content access is live. Encryption workarounds are authorized under Emergency Security Provisions. AutoFlag now operates with complete data access. Quota non-compliance is no longer acceptable at this stage.",
+      "internal_memo": "Full message content access is live. Encryption workarounds are authorized under Emergency Security Provisions. AutoFlag now operates with complete data access. Use this cycle to build your intelligence picture.",
       "real_world_reference": "XKeyscore (NSA, revealed 2013): A system that allowed analysts to search through vast databases of emails, online chats, and browsing histories of millions of people without prior authorization.",
       "unlocks_autoflag": false
     }

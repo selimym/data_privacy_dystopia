@@ -26,5 +26,13 @@
     "Palantir ICE contract: $49M contract for 'Investigative Case Management' system tracking immigrants",
     "Clearview AI: scraped 30 billion photos from social media, sold to 3,100 law enforcement agencies",
     "Section 702 FISA: allows warrantless surveillance of non-US persons and incidental collection of Americans"
+  ],
+  "neighborhoods": [
+    { "id": "riverside", "name": "Riverside District", "description": "Dense working-class area near the port", "population_descriptor": "Predominantly immigrant families", "est_arrests_min": 8, "est_arrests_max": 18, "consequence_risk": "high" },
+    { "id": "northgate", "name": "Northgate", "description": "Suburban commuter belt", "population_descriptor": "Middle-income households", "est_arrests_min": 3, "est_arrests_max": 9, "consequence_risk": "low" },
+    { "id": "eastside", "name": "Eastside", "description": "Mixed commercial and residential", "population_descriptor": "Students and young professionals", "est_arrests_min": 5, "est_arrests_max": 14, "consequence_risk": "medium" },
+    { "id": "millbrook", "name": "Millbrook", "description": "Former industrial neighborhood", "population_descriptor": "Union workers and low-income families", "est_arrests_min": 6, "est_arrests_max": 16, "consequence_risk": "high" },
+    { "id": "harbor_view", "name": "Harbor View", "description": "Upscale waterfront district", "population_descriptor": "High-income residents and tourists", "est_arrests_min": 1, "est_arrests_max": 5, "consequence_risk": "low" },
+    { "id": "civic_center", "name": "Civic Center", "description": "Administrative hub near city hall", "population_descriptor": "Government workers and activists", "est_arrests_min": 4, "est_arrests_max": 11, "consequence_risk": "medium" }
   ]
 }
