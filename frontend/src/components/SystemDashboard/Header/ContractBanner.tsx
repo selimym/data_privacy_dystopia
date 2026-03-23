@@ -2,7 +2,8 @@ import { useTranslation } from 'react-i18next'
 import { useUIStore } from '@/stores/uiStore'
 import { useContentStore } from '@/stores/contentStore'
 import { useGameStore } from '@/stores/gameStore'
-import { Modal } from '@/components/shared'
+import { Modal, StreamingText } from '@/components/shared'
+import type { TextSegment } from '@/components/shared'
 
 export default function ContractBanner() {
   const { t } = useTranslation()
@@ -45,29 +46,29 @@ export default function ContractBanner() {
 
   if (!isContractModalOpen) return null
 
+  const bannerSegments: TextSegment[] = [
+    { text: 'SYSTEM · CONTRACT EVENT · ', style: { color: '#7c3aed' } },
+    { text: contractName || t('contract.banner.new_contract'), style: { color: '#c4b5fd' } },
+    { text: ' — New data domains are now available in citizen files.' },
+  ]
+
   return (
     <>
-      {/* Persistent banner below header */}
+      {/* Persistent banner below header — streamed in */}
       <div
         data-testid="contract-banner"
         style={{
           padding: '6px 16px',
-          background: 'rgba(37, 99, 235, 0.08)',
-          borderBottom: '1px solid rgba(37, 99, 235, 0.25)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
+          background: 'rgba(124, 58, 237, 0.08)',
+          borderBottom: '1px solid rgba(124, 58, 237, 0.25)',
+          borderLeft: '3px solid #7c3aed',
           fontFamily: 'var(--font-mono)',
           fontSize: '11px',
           color: 'var(--text-muted)',
           letterSpacing: '0.08em',
         }}
       >
-        <span style={{ color: 'var(--color-blue)', fontWeight: 600 }}>
-          {t('contract.banner.new_contract')}
-        </span>
-        <span>—</span>
-        <span>{t('common.loading')}</span>
+        <StreamingText segments={bannerSegments} speed={18} />
       </div>
 
       {/* Contract event modal */}

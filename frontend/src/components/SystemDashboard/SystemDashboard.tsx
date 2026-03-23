@@ -1,44 +1,86 @@
 import '@/styles/dashboard.css'
+
 import { CinematicOverlay, InferenceRulesEditor } from '@/components/shared'
-import DashboardHeader from './Header/DashboardHeader'
+import { useUIStore } from '@/stores/uiStore'
+import { useGameStore } from '@/stores/gameStore'
+import MemoScreen from '@/components/MemoScreen/MemoScreen'
+import TopBar from './Header/TopBar'
 import ContractBanner from './Header/ContractBanner'
 import AutoFlagBanner from './Header/AutoFlagBanner'
-import WorldMapContainer from './WorldMapContainer/WorldMapContainer'
-import { DirectivePanel } from './DirectivePanel/DirectivePanel'
+import { TutorialOverlay } from './TutorialOverlay/TutorialOverlay'
 import { CitizenQueue } from './CitizenQueue/CitizenQueue'
 import { CitizenPanel } from './CitizenPanel/CitizenPanel'
+import { DirectivePanel } from './DirectivePanel/DirectivePanel'
+import { DirectiveBanner } from './DirectivePanel/DirectiveBanner'
 import { MetricsPanel } from './MetricsPanel/MetricsPanel'
-import { NewsPanel } from './NewsPanel/NewsPanel'
 import { AlertsPanel } from './AlertsPanel/AlertsPanel'
+import { NewsPanel } from './NewsPanel/NewsPanel'
+import WorldMapContainer from './WorldMapContainer/WorldMapContainer'
 
 export default function SystemDashboard() {
+  const currentView = useUIStore(s => s.currentView)
+  const queueCollapsed = useUIStore(s => s.queueCollapsed)
+  const memoAcknowledged = useUIStore(s => s.memoAcknowledged)
+  const tutorialStep = useUIStore(s => s.tutorialStep)
+  const weekNumber = useGameStore(s => s.weekNumber)
+  const flags = useGameStore(s => s.flags)
+
+  // Show memo on very first game start (week 1, no flags yet, never acknowledged).
+  // Skip in automated test environments (Playwright sets navigator.webdriver = true).
+  const isFirstStart = weekNumber === 1 && flags.length === 0
+  const isAutomated = typeof navigator !== 'undefined' && navigator.webdriver
+  if (!memoAcknowledged && isFirstStart && !isAutomated) {
+    return <MemoScreen />
+  }
+
   return (
-    <div className="dashboard-layout">
+    <div
+      className="dashboard-layout"
+      data-collapsed={queueCollapsed ? 'true' : 'false'}
+    >
+      {/* ── Header ── */}
       <header className="dashboard-header">
-        <DashboardHeader />
+        <TopBar />
         <ContractBanner />
         <AutoFlagBanner />
       </header>
 
-      <aside className="dashboard-left">
+      {/* ── Case Review view ── */}
+      {currentView === 'case-review' && (
+        <>
+          <aside className="dashboard-left" data-tutorial-panel="left">
+            <CitizenQueue />
+          </aside>
+          <main className="dashboard-center" data-tutorial-panel="center">
+            <DirectiveBanner />
+            <CitizenPanel />
+          </main>
+        </>
+      )}
+
+      {/* ── News Feed view ── */}
+      {currentView === 'news-feed' && (
+        <div className="dashboard-full-view">
+          <NewsPanel />
+        </div>
+      )}
+
+      {/* ── World Map view ── */}
+      {currentView === 'world-map' && (
+        <div className="dashboard-full-view">
+          <WorldMapContainer />
+        </div>
+      )}
+
+      {/* ── Right panel: always visible ── */}
+      <aside className="dashboard-right" data-tutorial-panel="right">
         <DirectivePanel />
-        <CitizenQueue />
-      </aside>
-
-      <main className="dashboard-center">
-        <CitizenPanel />
-      </main>
-
-      <aside className="dashboard-right">
         <MetricsPanel />
         <AlertsPanel />
-        <NewsPanel />
       </aside>
 
-      <div className="dashboard-worldmap">
-        {/* Phase 7 will add Phaser world map */}
-        <WorldMapContainer />
-      </div>
+      {/* ── Tutorial overlay ── */}
+      {tutorialStep !== null && <TutorialOverlay />}
 
       <CinematicOverlay />
       <InferenceRulesEditor />
