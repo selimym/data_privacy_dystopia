@@ -49,8 +49,10 @@
 .dashboard-center {
   grid-column: 2;
   grid-row: 2;
-  overflow-y: auto;
+  overflow: hidden;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Right panel: always visible compliance + metrics */
