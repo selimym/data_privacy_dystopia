@@ -87,7 +87,7 @@ export function CitizenPanel() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          minHeight: 200,
+          height: '100%',
         }}
       >
         <div
@@ -106,9 +106,9 @@ export function CitizenPanel() {
   }
 
   return (
-    <div data-testid="citizen-panel" className="panel" style={{ overflowY: 'auto' }}>
+    <div data-testid="citizen-panel" className="panel" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
       {/* Panel title */}
-      <div className="panel-title" style={{ marginBottom: 8 }}>
+      <div className="panel-title" style={{ marginBottom: 8, flexShrink: 0 }}>
         {t('citizen.panel.title')}
         {selectedCitizenId && (
           <span
@@ -132,6 +132,7 @@ export function CitizenPanel() {
             color: 'var(--text-muted)',
             padding: '16px 0',
             textAlign: 'center',
+            flexShrink: 0,
           }}
         >
           {t('common.loading')}
@@ -140,28 +141,33 @@ export function CitizenPanel() {
 
       {!isLoading && profile && (
         <>
-          {/* AutoFlag decision panel at top */}
-          <AutoFlagDecisionPanel citizenId={selectedCitizenId} />
+          {/* Scrollable data section — fills available space */}
+          <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
+            {/* AutoFlag decision panel at top */}
+            <AutoFlagDecisionPanel citizenId={selectedCitizenId} />
 
-          {/* Domain tabs */}
-          <DataDomainTabs
-            profile={profile}
-            unlockedDomains={unlockedDomains}
-            activeTab={activeTab}
-            onTabChange={setActiveTab}
-          />
+            {/* Domain tabs */}
+            <DataDomainTabs
+              profile={profile}
+              unlockedDomains={unlockedDomains}
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+            />
 
-          {/* Inference panel */}
-          <InferencePanel
-            results={inferenceResults}
-            isLoading={false}
-          />
+            {/* Inference panel */}
+            <InferencePanel
+              results={inferenceResults}
+              isLoading={false}
+            />
+          </div>
 
-          {/* Flag submission — hidden when bot has pending decision */}
-          <FlagSubmission
-            citizenId={selectedCitizenId}
-            isVisible={!hasBotDecision}
-          />
+          {/* Flag submission — pinned to bottom */}
+          <div style={{ flexShrink: 0, borderTop: '1px solid var(--border-subtle)' }}>
+            <FlagSubmission
+              citizenId={selectedCitizenId}
+              isVisible={!hasBotDecision}
+            />
+          </div>
         </>
       )}
     </div>

@@ -7,10 +7,15 @@ interface CaseRowProps {
   collapsed: boolean
 }
 
+function riskLabel(score: number): 'LOW' | 'MEDIUM' | 'HIGH' {
+  if (score >= 65) return 'HIGH'
+  if (score >= 35) return 'MEDIUM'
+  return 'LOW'
+}
+
 function riskColor(score: number): string {
-  if (score >= 70) return 'var(--color-red)'
-  if (score >= 50) return '#ea580c'
-  if (score >= 30) return 'var(--color-amber)'
+  if (score >= 65) return 'var(--color-red)'
+  if (score >= 35) return '#ea580c'
   return 'var(--color-green)'
 }
 
@@ -23,7 +28,7 @@ export function CaseRow({ caseItem, isSelected, onSelect, collapsed }: CaseRowPr
     return (
       <div
         data-testid={`view-citizen-btn-${caseItem.citizen_id}`}
-        title={`${caseItem.display_name} · Risk ${caseItem.risk_score}`}
+        title={`${caseItem.display_name} · Risk ${riskLabel(caseItem.risk_score)}`}
         onClick={isActionable ? onSelect : undefined}
         style={{
           width: 20,
@@ -93,7 +98,7 @@ export function CaseRow({ caseItem, isSelected, onSelect, collapsed }: CaseRowPr
           flexShrink: 0,
         }}
       >
-        {caseItem.risk_score}
+        {riskLabel(caseItem.risk_score)}
       </span>
     </div>
   )

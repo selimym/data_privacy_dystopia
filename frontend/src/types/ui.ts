@@ -72,6 +72,15 @@ export interface CinematicInstruction {
   duration_ms: number
 }
 
+// ─── Shift memo ───────────────────────────────────────────────────────────────
+
+export interface ShiftMemoData {
+  weekNumber: number
+  memoText: string
+  tone: 'positive' | 'warning'
+  nextDirective: import('./game').Directive | null
+}
+
 // ─── Modal state ──────────────────────────────────────────────────────────────
 
 export type ModalType =

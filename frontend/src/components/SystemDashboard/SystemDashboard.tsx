@@ -1,6 +1,6 @@
 import '@/styles/dashboard.css'
 
-import { CinematicOverlay, InferenceRulesEditor } from '@/components/shared'
+import { CinematicOverlay, ShiftMemoOverlay, InferenceRulesEditor } from '@/components/shared'
 import { useUIStore } from '@/stores/uiStore'
 import { useGameStore } from '@/stores/gameStore'
 import MemoScreen from '@/components/MemoScreen/MemoScreen'
@@ -82,6 +82,7 @@ export default function SystemDashboard() {
       {/* ── Tutorial overlay ── */}
       {tutorialStep !== null && <TutorialOverlay />}
 
+      <ShiftMemoOverlay />
       <CinematicOverlay />
       <InferenceRulesEditor />
     </div>

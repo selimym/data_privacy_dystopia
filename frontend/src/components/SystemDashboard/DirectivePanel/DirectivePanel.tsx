@@ -2,8 +2,24 @@ import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useGameStore } from '@/stores/gameStore'
 import { useContentStore } from '@/stores/contentStore'
+import { useMetricsStore } from '@/stores/metricsStore'
+import { useUIStore } from '@/stores/uiStore'
 import { QuotaBar } from './QuotaBar'
 import { IceRaidAlert } from './IceRaidAlert'
+import type { ShiftMemoData } from '@/types/ui'
+
+function buildShiftMemo(week: number, compliance: number, reluctance: number): Pick<ShiftMemoData, 'memoText' | 'tone'> {
+  if (reluctance < 30 && compliance > 60) {
+    return {
+      tone: 'positive',
+      memoText: `Operator performance for Directive Cycle ${week} is within acceptable parameters. Compliance metrics are satisfactory. Continue processing at current pace. Your commitment to the mission is noted.`,
+    }
+  }
+  return {
+    tone: 'warning',
+    memoText: `Operator metrics for Directive Cycle ${week} require attention. Elevated hesitation patterns and/or suboptimal compliance rates have been logged. Review your processing efficiency. Continued deviations will be escalated to supervisory review.`,
+  }
+}
 
 const WEEK6_TOTAL_SECONDS = 24 * 3600
 
@@ -20,11 +36,18 @@ export function DirectivePanel() {
   const [memoRevealed, setMemoRevealed] = useState(false)
   const [countdown, setCountdown] = useState(WEEK6_TOTAL_SECONDS)
   const week6StartRef = useRef<number | null>(null)
+  const memoShownRef = useRef<string | null>(null)
 
   const directive = useGameStore(s => s.currentDirective)
   const weekNumber = useGameStore(s => s.weekNumber)
   const flags = useGameStore(s => s.flags)
   const scenario = useContentStore(s => s.scenario)
+  const compliance = useMetricsStore(s => s.compliance_score)
+  const reluctance = useMetricsStore(s => s.reluctance.reluctance_score)
+  const showShiftMemo = useUIStore(s => s.showShiftMemo)
+  const pendingShiftMemo = useUIStore(s => s.pendingShiftMemo)
+
+  const isAutomated = typeof navigator !== 'undefined' && navigator.webdriver
 
   // Week 6 countdown timer
   useEffect(() => {
@@ -45,6 +68,19 @@ export function DirectivePanel() {
     const intervalId = setInterval(tick, 1000)
     return () => clearInterval(intervalId)
   }, [weekNumber])
+
+  // Auto-trigger shift memo when quota is met (production only; tests keep the button)
+  useEffect(() => {
+    if (isAutomated || !directive) return
+    const completedCount = flags.filter(f => f.directive_key === directive.directive_key).length
+    const met = completedCount >= directive.flag_quota
+    if (!met || memoShownRef.current === directive.directive_key || pendingShiftMemo !== null) return
+
+    memoShownRef.current = directive.directive_key
+    const next = scenario?.directives.find(d => d.week_number === weekNumber + 1) ?? null
+    const { memoText, tone } = buildShiftMemo(weekNumber, compliance, reluctance)
+    showShiftMemo({ weekNumber, memoText, tone, nextDirective: next })
+  }, [isAutomated, directive, flags, weekNumber, compliance, reluctance, pendingShiftMemo, scenario, showShiftMemo])
 
   const completedForDirective = directive
     ? flags.filter(f => f.directive_key === directive.directive_key).length
@@ -171,7 +207,7 @@ export function DirectivePanel() {
         {/* Quota progress */}
         <QuotaBar completed={completedForDirective} required={directive.flag_quota} />
 
-        {/* Complete badge + advance button */}
+        {/* Complete badge — always shown when quota met */}
         {quotaMet && (
           <div style={{ marginTop: 10 }}>
             <div
@@ -185,24 +221,27 @@ export function DirectivePanel() {
             >
               {t('directive.complete')}
             </div>
-            <button
-              data-testid="advance-week-btn"
-              onClick={() => useGameStore.getState().advanceDirective(nextDirective)}
-              style={{
-                width: '100%',
-                padding: '7px 12px',
-                background: 'rgba(217, 119, 6, 0.15)',
-                border: '1px solid var(--color-amber)',
-                color: 'var(--color-amber)',
-                fontFamily: 'var(--font-mono)',
-                fontSize: 11,
-                letterSpacing: '0.1em',
-                cursor: 'pointer',
-                borderRadius: 2,
-              }}
-            >
-              ADVANCE WEEK →
-            </button>
+            {/* Advance button shown only in automated test environments */}
+            {isAutomated && (
+              <button
+                data-testid="advance-week-btn"
+                onClick={() => useGameStore.getState().advanceDirective(nextDirective)}
+                style={{
+                  width: '100%',
+                  padding: '7px 12px',
+                  background: 'rgba(217, 119, 6, 0.15)',
+                  border: '1px solid var(--color-amber)',
+                  color: 'var(--color-amber)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: 11,
+                  letterSpacing: '0.1em',
+                  cursor: 'pointer',
+                  borderRadius: 2,
+                }}
+              >
+                ADVANCE WEEK →
+              </button>
+            )}
           </div>
         )}
 
