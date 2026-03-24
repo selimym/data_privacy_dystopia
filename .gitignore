@@ -93,4 +93,4 @@ frontend-v2/playwright-report/
 .superpowers/
 
 # Test results (root level)
-test-results/
+test-results/.worktrees/
