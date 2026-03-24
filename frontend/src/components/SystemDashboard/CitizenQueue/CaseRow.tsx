@@ -102,6 +102,7 @@ export function CaseRow({ caseItem, isSelected, onSelect, collapsed }: CaseRowPr
           {caseItem.display_name}
         </span>
         <span
+          data-testid={`risk-badge-${caseItem.citizen_id}`}
           style={{
             fontFamily: 'var(--font-mono)',
             fontSize: 11,
