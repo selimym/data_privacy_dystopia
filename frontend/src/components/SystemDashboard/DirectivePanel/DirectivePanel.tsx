@@ -216,6 +216,24 @@ function buildBriefingMemo(directive: Directive, prevWeek: number, newDomains: s
   }
 }
 
+function buildHacktivistContactMemo(weekNumber: number, nextDirective: Directive | null): ShiftMemoData {
+  return {
+    weekNumber,
+    memoText:
+      `You made the right call.\n\n` +
+      `I've been watching. The people running this aren't abstract — they have names. ` +
+      `They have files in your system. Richard Holt. Sandra Vance. ` +
+      `They're in your queue next cycle.\n\n` +
+      `Flag them. That's all I'm asking. Just flag them. ` +
+      `Let the system do what it does to the people who built it.\n\n` +
+      `— K`,
+    tone: 'warning',
+    nextDirective,
+    isHacktivistContact: true,
+    sender: { name: 'K', title: 'Unknown sender — encrypted relay' },
+  }
+}
+
 function buildEpsteinOrderMemo(weekNumber: number, nextDirective: Directive | null): ShiftMemoData {
   return {
     weekNumber,
@@ -261,6 +279,8 @@ export function DirectivePanel() {
   const activeProtests = useGameStore(s => s.activeProtests)
   const wrongFlagsPendingMemo = useGameStore(s => s.wrongFlagsPendingMemo)
   const epsteinOrderShown = useGameStore(s => s.epsteinOrderShown)
+  const hacktivistFlagged = useGameStore(s => s.hacktivistFlagged)
+  const hacktivistContactMade = useGameStore(s => s.hacktivistContactMade)
   const scenario = useContentStore(s => s.scenario)
   const compliance = useMetricsStore(s => s.compliance_score)
   const reluctance = useMetricsStore(s => s.reluctance.reluctance_score)
@@ -330,10 +350,17 @@ export function DirectivePanel() {
     memoShownRef.current = directive.directive_key
     const next = scenario?.directives.find(d => d.week_number === weekNumber + 1) ?? null
 
-    // Week 4 (ICE sweep): show Epstein protected-citizen order instead of colleague memo
+    // Week 4 (ICE sweep): append Epstein order after the regular memo
     if (weekNumber === 4 && !epsteinOrderShown) {
       useGameStore.getState()._setEpsteinOrderShown()
       showShiftMemo(buildEpsteinOrderMemo(weekNumber, next))
+      return
+    }
+
+    // Week 5: hacktivist contact memo (path A — hacktivist not flagged)
+    if (weekNumber === 5 && !hacktivistFlagged && !hacktivistContactMade) {
+      useGameStore.getState()._setHacktivistContactMade()
+      showShiftMemo(buildHacktivistContactMemo(weekNumber, next))
       return
     }
 
@@ -341,7 +368,7 @@ export function DirectivePanel() {
     const { memoText, tone, sender, wrongFlags, recruitmentLink } = buildColleagueMemo(weekNumber, compliance, reluctance, hasProtests, wrongFlagsPendingMemo)
     showShiftMemo({ weekNumber, memoText, tone, nextDirective: next, sender, wrongFlags, recruitmentLink })
     useGameStore.getState()._clearWrongFlagsPending()
-  }, [isAutomated, directive, flags, raidRecords, isSweep, weekNumber, compliance, reluctance, pendingShiftMemo, scenario, showShiftMemo, activeProtests, wrongFlagsPendingMemo, epsteinOrderShown])
+  }, [isAutomated, directive, flags, raidRecords, isSweep, weekNumber, compliance, reluctance, pendingShiftMemo, scenario, showShiftMemo, activeProtests, wrongFlagsPendingMemo, epsteinOrderShown, hacktivistFlagged, hacktivistContactMade])
 
   const completedForDirective = directive
     ? isSweep

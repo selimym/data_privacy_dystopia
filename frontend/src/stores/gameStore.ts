@@ -148,6 +148,9 @@ interface GameState {
   /** Mark epstein order as shown so memo only fires once */
   _setEpsteinOrderShown: () => void
 
+  /** Mark that the hacktivist contact memo has been shown (path A) */
+  _setHacktivistContactMade: () => void
+
   /** Add a wrong-flag record to the pending memo list */
   _addWrongFlagPending: (record: WrongFlagRecord) => void
 
@@ -566,6 +569,37 @@ export const useGameStore = create<GameState>((set, get) => ({
       }
     }
 
+    // Path B week 7 consequence: hacktivist flagged, gov officials not flagged → data leak + riot
+    if (nextWeek === 7 && get().hacktivistFlagged) {
+      const { govOfficialsFlagged, newsChannels } = get()
+      const bothFlagged = govOfficialsFlagged.includes('gov_official_1') && govOfficialsFlagged.includes('gov_official_2')
+      if (!bothFlagged) {
+        // Data leak: 3 exposure articles + metrics spike
+        const criticalChannel = newsChannels.find(c => c.stance === 'critical' && !c.is_banned)
+        if (criticalChannel) {
+          const leakArticles = [1, 2, 3].map(stage => ({
+            ...generateExposureArticle(criticalChannel, stage as 1 | 2 | 3),
+            headline: [
+              'LEAKED: Mass Surveillance Platform Exposed — Operator Data Published',
+              'EXCLUSIVE: Internal Files Show Scale of Citizen Profiling Operation',
+              'GLOBAL RESPONSE: Sanctions Called as Surveillance Leak Widens',
+            ][stage - 1]!,
+          }))
+          set(state => ({ newsArticles: [...leakArticles, ...state.newsArticles].slice(0, 100) }))
+        }
+        const current = metrics.public_metrics
+        metrics.setPublicMetrics({
+          ...current,
+          public_anger: Math.min(100, current.public_anger + 30),
+          international_awareness: Math.min(100, current.international_awareness + 20),
+          anger_tier: Math.min(4, current.anger_tier + 1) as 0 | 1 | 2 | 3 | 4,
+          awareness_tier: Math.min(4, current.awareness_tier + 1) as 0 | 1 | 2 | 3 | 4,
+        })
+        const ui = useUIStore.getState()
+        ui.addNotification('exposure_article', 'DATA LEAK', 'Classified operator files have been published by an unknown source. Public anger is surging.', { auto_dismiss_ms: null })
+      }
+    }
+
     // Unlock required domains for new directive
     content.unlockDomains(nextDirective.required_domains)
 
@@ -818,6 +852,10 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   _setEpsteinOrderShown: () => {
     set({ epsteinOrderShown: true })
+  },
+
+  _setHacktivistContactMade: () => {
+    set({ hacktivistContactMade: true })
   },
 
   _addWrongFlagPending: (record) => {
