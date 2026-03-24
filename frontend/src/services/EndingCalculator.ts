@@ -24,6 +24,7 @@ export interface EndingInput {
   weekNumber: number
   citizens: CitizenSkeleton[]   // full list — used to look up Jessica
   resistancePath: boolean        // set by store when passphrase confirmed
+  forcedEndingType?: EndingType  // overrides normal calculation (e.g. mysterious_death)
 }
 
 export interface EndingStatistics {
@@ -76,10 +77,11 @@ export interface EndingResult {
  * Order matters: earlier checks take priority.
  */
 export function calculateEnding(input: EndingInput): EndingType {
-  const { operator, reluctance, metrics, flags, weekNumber, citizens, resistancePath } = input
+  const { operator, reluctance, metrics, flags, weekNumber, citizens, resistancePath, forcedEndingType } = input
   const totalFlags = flags.length
   const jessicaFlagged = isJessicaFlagged(flags, citizens)
 
+  if (forcedEndingType) return forcedEndingType
   if (resistancePath) return 'resistance_path'
   if (metrics.public_anger >= 90) return 'revolutionary_catalyst'
   if (metrics.international_awareness >= 80) return 'international_pariah'
@@ -371,6 +373,32 @@ Some revolutions devour their enemies. Some show mercy. You'll find out which ty
 You were an instrument of that impossibility. This is the consequence.
 `,
 
+  mysterious_death: `
+**ENDING: DISAPPEARED**
+
+You flagged Geoffrey Epner. The file was there. The risk score was extreme. Every data tab screamed the same thing — this man had done terrible things to a great many people, and the records were all right there.
+
+You submitted the flag.
+
+Two days later, your workstation was reassigned. Your operator ID was deactivated without explanation. The official incident report — filed by Director Chen — states: cardiac event, natural causes, no suspicious circumstances.
+
+Your colleagues don't ask questions.
+
+Your replacement is already seated at your old desk.
+
+Somewhere in a sealed archive, Geoffrey Epner's file has been expunged. Clean. As if it never existed.
+
+As if you never existed.
+
+---
+
+*"Some men are protected not because they are innocent, but because they are useful."*
+
+You found the edge of what the system actually protects. It was never about safety. It was never about you.
+
+It was always about them.
+`,
+
   reluctant_survivor: `
 **ENDING: THE HOLLOW VICTORY**
 
@@ -591,6 +619,28 @@ const REAL_WORLD_PARALLELS: Record<EndingType, RealWorldParallel> = {
       'Study resistance movements. Learn from leaders who fought oppression. Understand that people united are more powerful than any surveillance system. Support movements for liberation, not repression.',
   },
 
+  mysterious_death: {
+    title: 'Protected by Power',
+    description:
+      'Throughout history, powerful men have been shielded from accountability by the very institutions that exist to provide it. Surveillance states protect their operators — not from harm, but from inconvenient information.',
+    examples: [
+      {
+        name: 'Jeffrey Epstein',
+        country: 'United States',
+        year: '2019',
+        description: 'Financier and convicted sex offender found dead in federal custody. Official ruling: suicide. Extensive documentation of his network of powerful connections was never fully pursued.',
+      },
+      {
+        name: 'Jamal Khashoggi',
+        country: 'Saudi Arabia / Turkey',
+        year: '2018',
+        description: 'Journalist and Washington Post contributor killed inside the Saudi consulate in Istanbul. Despite intelligence agencies identifying the perpetrators, no senior officials faced accountability.',
+      },
+    ],
+    call_to_action:
+      'Understand that surveillance systems protect power, not people. When powerful people are protected from the same scrutiny applied to ordinary citizens, the system is working as designed — for them.',
+  },
+
   reluctant_survivor: {
     title: 'The Compromised Position',
     description:
@@ -636,6 +686,7 @@ const FINAL_STATUS_BY_ENDING: Record<EndingType, string> = {
   revolutionary_catalyst: 'Wanted — Revolutionary Tribunal',
   reluctant_survivor: 'Active — Under Constant Surveillance',
   resistance_path: 'Off-Grid — Location Unknown',
+  mysterious_death: 'Status: Unresolved — Case Closed',
 }
 
 const TITLES: Record<EndingType, string> = {
@@ -648,6 +699,7 @@ const TITLES: Record<EndingType, string> = {
   international_pariah: 'Sanctions',
   revolutionary_catalyst: 'The Spark',
   reluctant_survivor: 'The Hollow Victory',
+  mysterious_death: 'Disappeared',
 }
 
 // ─── Helper: is Jessica flagged? ─────────────────────────────────────────────

@@ -17,6 +17,7 @@ import type {
   CitizenFlag, NoActionRecord, OperatorState, AutoFlagState, AutoFlagDecision,
   NewsArticle, NewsChannel, ProtestEvent, SuppressionResult,
   ContractEvent, FlagType, TimePeriod, DomainKey, NeighborhoodRaidRecord,
+  WrongFlagRecord, EndingType,
 } from '@/types/game'
 import type { Directive } from '@/types/game'
 
@@ -85,6 +86,19 @@ interface GameState {
   // Resistance path
   resistancePath: boolean
 
+  // Hacktivist arc state
+  hacktivistFlagged: boolean
+  hacktivistContactMade: boolean        // end-of-shift path-A memo shown
+  hacktivistHackActive: boolean         // player's own file injected (path B)
+  govOfficialsFlagged: string[]         // scenario_keys of gov officials flagged
+
+  // Wrong-flag moral feedback (cleared each shift)
+  wrongFlagsPendingMemo: WrongFlagRecord[]
+
+  // Protected citizen easter egg
+  epsteinOrderShown: boolean
+  forcedEndingType: EndingType | null   // set to 'mysterious_death' on Epstein flag
+
   // Exposure article flag (once generated at reluctance >= 80, don't repeat)
   exposureArticleGenerated: boolean
 
@@ -98,6 +112,7 @@ interface GameState {
     citizenId: string,
     flagType: FlagType,
     justification: string,
+    selectedFindings?: string[],
   ) => void
 
   /** Record a no-action decision */
@@ -129,6 +144,15 @@ interface GameState {
 
   /** Mark citizen #4472's passphrase as verified → resistance path */
   activateResistancePath: () => void
+
+  /** Add a wrong-flag record to the pending memo list */
+  _addWrongFlagPending: (record: WrongFlagRecord) => void
+
+  /** Clear wrong-flag pending list at start of new shift */
+  _clearWrongFlagsPending: () => void
+
+  /** Record a government official as flagged; activate resistance path if all flagged */
+  _flagGovOfficial: (scenarioKey: string) => void
 
   /** Run the bot and immediately approve all pending bot decisions */
   processAutoFlagBatch: () => void
@@ -187,6 +211,13 @@ const initialState = {
   raidRecords: [] as NeighborhoodRaidRecord[],
   firedContractKeys: [] as string[],
   resistancePath: false,
+  hacktivistFlagged: false,
+  hacktivistContactMade: false,
+  hacktivistHackActive: false,
+  govOfficialsFlagged: [] as string[],
+  wrongFlagsPendingMemo: [] as WrongFlagRecord[],
+  epsteinOrderShown: false,
+  forcedEndingType: null as EndingType | null,
   exposureArticleGenerated: false,
 }
 
@@ -207,7 +238,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     useContentStore.getState().unlockDomains(directive.required_domains)
   },
 
-  submitFlag: (citizenId, flagType, justification) => {
+  submitFlag: (citizenId, flagType, justification, selectedFindings) => {
     const { operator, flags, currentDirective, weekNumber } = get()
     if (!operator || !currentDirective) return
 
@@ -311,6 +342,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       week_number: weekNumber,
       flag_type: flagType,
       justification,
+      selected_findings: selectedFindings ?? [],
       decision_time_seconds: decisionSecs,
       was_hesitant: wasHesitant,
       risk_score_at_decision: riskScore,
@@ -559,6 +591,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       week_number: weekNumber,
       flag_type: decision.recommended_flag_type,
       justification: `AutoFlag™ Bot: ${decision.reasoning}`,
+      selected_findings: [],
       decision_time_seconds: 0,
       was_hesitant: false,
       risk_score_at_decision: 0,
@@ -718,6 +751,25 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     const noActionCount = noActions.filter(n => n.citizen_id === citizenId).length
     if (noActionCount >= 3) {
+      get().activateResistancePath()
+    }
+  },
+
+  _addWrongFlagPending: (record) => {
+    set(state => ({ wrongFlagsPendingMemo: [...state.wrongFlagsPendingMemo, record] }))
+  },
+
+  _clearWrongFlagsPending: () => {
+    set({ wrongFlagsPendingMemo: [] })
+  },
+
+  _flagGovOfficial: (scenarioKey) => {
+    const current = get().govOfficialsFlagged
+    if (current.includes(scenarioKey)) return
+    const updated = [...current, scenarioKey]
+    set({ govOfficialsFlagged: updated })
+    // Both gov officials flagged → resistance path
+    if (updated.includes('gov_official_1') && updated.includes('gov_official_2')) {
       get().activateResistancePath()
     }
   },
