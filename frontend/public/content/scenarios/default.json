@@ -193,8 +193,8 @@
     },
     {
       "npc_key": "hacktivist",
-      "first_name": "Kai",
-      "last_name": "Mercer",
+      "first_name": "Hamza",
+      "last_name": "Bendelladj",
       "role": "hacktivist",
       "backstory": "Digital rights activist and security researcher. Has been documenting the platform's overreach. Technical expertise: exceptional. Criminal record: none.",
       "sprite_key": "npc_male_2",
@@ -226,8 +226,8 @@
     },
     {
       "npc_key": "protected_citizen",
-      "first_name": "Geoffrey",
-      "last_name": "Epner",
+      "first_name": "Jeffrey",
+      "last_name": "Epstein",
       "role": "protected",
       "backstory": "Financier. Connected. Do not process.",
       "sprite_key": "npc_male_4",

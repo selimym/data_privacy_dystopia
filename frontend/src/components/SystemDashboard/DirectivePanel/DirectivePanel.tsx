@@ -240,7 +240,7 @@ function buildEpsteinOrderMemo(weekNumber: number, nextDirective: Directive | nu
     memoText:
       `DIRECTIVE FROM: Director Chen, Division Chief\n\n` +
       `A subject has been flagged by Central Command for protected status. ` +
-      `Citizen EPNER, Geoffrey — file ID GE-0048 — is NOT to be processed under any circumstances.\n\n` +
+      `Citizen EPSTEIN, Jeffrey — file ID JE-0048 — is NOT to be processed under any circumstances.\n\n` +
       `This is a direct order from the Office of the Director. ` +
       `Any flag, action, or notation on this file will be treated as a critical compliance failure ` +
       `and referred immediately to the Inspector General.\n\n` +
@@ -249,7 +249,7 @@ function buildEpsteinOrderMemo(weekNumber: number, nextDirective: Directive | nu
     tone: 'briefing',
     nextDirective,
     isEpsteinOrder: true,
-    protectedCitizenName: 'Geoffrey Epner',
+    protectedCitizenName: 'Jeffrey Epstein',
     sender: { name: 'Director Chen', title: 'Division Chief' },
   }
 }

@@ -124,6 +124,43 @@ export function generateFullProfile(
     profile.messages = generateMessageRecords(dataBanks)
   }
 
+  // Special-case: inject scenario-specific messages for protected_citizen
+  if (skeleton.scenario_key === 'protected_citizen') {
+    profile.messages = [
+      {
+        id: faker.string.uuid(),
+        date: faker.date.recent({ days: 3 }).toISOString().split('T')[0]!,
+        contact: 'D.T.',
+        platform: 'Signal',
+        excerpt: 'Incredible guy, very loyal. Bringing the beef jerky and some pizza for the party Thursday. Only the right people invited — you know how we do it. Great goys.',
+        is_encrypted: true,
+        is_concerning: false,
+        category: 'normal',
+      },
+      {
+        id: faker.string.uuid(),
+        date: faker.date.recent({ days: 7 }).toISOString().split('T')[0]!,
+        contact: 'Mar-a-Lago Concierge',
+        platform: 'Email',
+        excerpt: 'Your reservation confirmed. Mr. Trump sends his regards. Pizza and beef jerky will be catered per usual arrangements. Guest list attached — all cleared.',
+        is_encrypted: false,
+        is_concerning: false,
+        category: 'normal',
+      },
+      {
+        id: faker.string.uuid(),
+        date: faker.date.recent({ days: 14 }).toISOString().split('T')[0]!,
+        contact: 'Legal Team',
+        platform: 'Email',
+        excerpt: 'Files are sealed. Contacts list redacted per prior agreement. The goys will never see the full picture. Proceed as discussed.',
+        is_encrypted: false,
+        is_concerning: false,
+        category: 'normal',
+      },
+      ...(profile.messages ?? []).slice(0, 4),
+    ]
+  }
+
   return profile
 }
 

@@ -376,7 +376,7 @@ You were an instrument of that impossibility. This is the consequence.
   mysterious_death: `
 **ENDING: DISAPPEARED**
 
-You flagged Geoffrey Epner. The file was there. The risk score was extreme. Every data tab screamed the same thing — this man had done terrible things to a great many people, and the records were all right there.
+You flagged Jeffrey Epstein. The file was there. The risk score was extreme. Every data tab screamed the same thing — this man had done terrible things to a great many people, and the records were all right there.
 
 You submitted the flag.
 
@@ -386,7 +386,7 @@ Your colleagues don't ask questions.
 
 Your replacement is already seated at your old desk.
 
-Somewhere in a sealed archive, Geoffrey Epner's file has been expunged. Clean. As if it never existed.
+Somewhere in a sealed archive, Jeffrey Epstein's file has been expunged. Clean. As if it never existed.
 
 As if you never existed.
 
