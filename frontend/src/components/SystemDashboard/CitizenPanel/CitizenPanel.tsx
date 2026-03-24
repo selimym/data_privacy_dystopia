@@ -18,6 +18,7 @@ export function CitizenPanel() {
   const { t } = useTranslation()
 
   const selectedCitizenId = useUIStore(s => s.selectedCitizenId)
+  const tutorialStep = useUIStore(s => s.tutorialStep)
   const startDecisionTimer = useUIStore(s => s.startDecisionTimer)
   const getProfile = useCitizenStore(s => s.getProfile)
   const dataBanks = useContentStore(s => s.dataBanks)
@@ -44,7 +45,7 @@ export function CitizenPanel() {
     setInferenceResults([])
     setActiveTab('identity')
 
-    startDecisionTimer()
+    if (tutorialStep === null) startDecisionTimer()
 
     getProfile(selectedCitizenId, dataBanks, country)
       .then(loadedProfile => {
