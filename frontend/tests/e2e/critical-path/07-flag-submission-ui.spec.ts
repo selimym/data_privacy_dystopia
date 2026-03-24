@@ -8,8 +8,9 @@ import { test, expect } from '@playwright/test'
  * a finding, selects a flag type, and submits.
  *
  * Week 1 has no inference rules (location+judicial only).
- * We advance headlessly to week 2 (health unlocked) where
- * findings fire, then exercise the UI flow.
+ * We advance headlessly to week 3 (health+finance unlocked) where
+ * 6 inference rules can fire, then exercise the UI flow.
+ * We try citizens until one with checkable findings is found.
  */
 
 test.describe('07 — Flag Submission UI', () => {
@@ -31,51 +32,80 @@ test.describe('07 — Flag Submission UI', () => {
       { timeout: 10000 },
     )
 
-    // ── Advance to week 2 headlessly (health domain unlocked → findings fire) ─
-    // Submit 2 flags for week 1 quota, then advance directive
+    // ── Advance to week 3 headlessly (health+finance unlocked → 6 rules fire) ─
     await page.evaluate(() => {
       const w = window as unknown as Record<string, Record<string, unknown>>
       const game = w.__stores['game'] as () => Record<string, unknown>
       const citizens = w.__stores['citizens'] as () => Record<string, unknown>
       const content = w.__stores['content'] as () => Record<string, unknown>
 
-      const skeletons = (citizens()['skeletons'] as Array<Record<string, unknown>>)
-      // Submit week 1 quota (2 flags)
+      const skeletons = citizens()['skeletons'] as Array<Record<string, unknown>>
       const submitFlag = game()['submitFlag'] as (id: string, type: string, just: string) => void
-      submitFlag(skeletons[0]!['id'] as string, 'monitoring', 'test')
-      submitFlag(skeletons[1]!['id'] as string, 'monitoring', 'test')
-
-      // Advance to week 2
-      const scenario = (content()['scenario'] as Record<string, unknown>)
+      const advanceDirective = game()['advanceDirective'] as (d: unknown) => void
+      const scenario = content()['scenario'] as Record<string, unknown>
       const directives = [...(scenario['directives'] as Array<Record<string, unknown>>)]
         .sort((a, b) => (a['week_number'] as number) - (b['week_number'] as number))
-      const advanceDirective = game()['advanceDirective'] as (d: unknown) => void
+
+      let idx = 0
+      // Week 1: quota 2
+      submitFlag(skeletons[idx++]!['id'] as string, 'monitoring', 'test')
+      submitFlag(skeletons[idx++]!['id'] as string, 'monitoring', 'test')
       advanceDirective(directives[1])
+
+      // Week 2: quota 2
+      submitFlag(skeletons[idx++]!['id'] as string, 'monitoring', 'test')
+      submitFlag(skeletons[idx++]!['id'] as string, 'monitoring', 'test')
+      advanceDirective(directives[2])
     })
 
-    // ── Verify we're on week 2 ────────────────────────────────────────────────
-    await expect(page.locator('[data-testid="week-indicator"]')).toContainText('2', { timeout: 5000 })
+    // ── Verify we're on week 3 ────────────────────────────────────────────────
+    await expect(page.locator('[data-testid="week-indicator"]')).toContainText('3', { timeout: 5000 })
 
-    // ── Select first citizen from queue ───────────────────────────────────────
-    const viewBtn = page.locator('[data-testid^="view-citizen-btn-"]').first()
-    await expect(viewBtn).toBeVisible({ timeout: 10000 })
-    await viewBtn.click()
+    // ── Clear all queued cinematics and modals ────────────────────────────────
+    await page.evaluate(() => {
+      const w = window as unknown as Record<string, Record<string, () => void>>
+      w.__stores['ui']()['skipCinematic']()
+      w.__stores['ui']()['closeModal']()
+    })
+    await page.waitForFunction(
+      () => {
+        const w = window as unknown as Record<string, Record<string, () => unknown>>
+        return (w.__stores['ui']() as Record<string, unknown>)['currentCinematic'] === null
+      },
+      { timeout: 3000 },
+    )
+    await page.waitForTimeout(300)
 
-    // ── Wait for citizen panel to load ────────────────────────────────────────
-    await page.waitForSelector('[data-testid="identity-section"]', { timeout: 10000 })
-    await expect(page.locator('[data-testid="domain-tabs"]')).toBeVisible()
+    // ── Find a citizen with checkable findings by trying each queue entry ─────
+    const domainTabs: string[] = ['location', 'health', 'finance', 'judicial']
+    let citizenPanelReady = false
 
-    // ── Visit all unlocked domain tabs to maximise checkable findings ─────────
-    for (const domain of ['location', 'health', 'judicial']) {
-      const tab = page.locator(`[data-testid="tab-${domain}"]`)
-      if (await tab.count() > 0) {
-        await tab.click()
-        await page.waitForTimeout(200)
+    for (let attempt = 0; attempt < 8; attempt++) {
+      const viewBtns = page.locator('[data-testid^="view-citizen-btn-"]')
+      const count = await viewBtns.count()
+      if (attempt >= count) break
+
+      await viewBtns.nth(attempt).click()
+      await page.waitForSelector('[data-testid="identity-section"]', { timeout: 5000 })
+
+      // Visit all available domain tabs
+      for (const domain of domainTabs) {
+        const tab = page.locator(`[data-testid="tab-${domain}"]`)
+        if (await tab.count() > 0) {
+          await tab.click()
+          await page.waitForTimeout(100)
+        }
+      }
+
+      // Check if any checkable (enabled) finding appeared
+      const hasFindings = await page.locator('[data-testid^="finding-checkbox-"]:not([disabled])').count()
+      if (hasFindings > 0) {
+        citizenPanelReady = true
+        break
       }
     }
 
-    // ── Wait for a checkable finding to appear ────────────────────────────────
-    await page.waitForSelector('[data-testid^="finding-checkbox-"]:not([disabled])', { timeout: 8000 })
+    expect(citizenPanelReady).toBe(true)
 
     // ── Check the first enabled finding ──────────────────────────────────────
     const firstCheckbox = page.locator('[data-testid^="finding-checkbox-"]:not([disabled])').first()

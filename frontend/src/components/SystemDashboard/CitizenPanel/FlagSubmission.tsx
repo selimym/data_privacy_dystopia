@@ -166,7 +166,8 @@ export function FlagSubmission({ citizenId, isVisible, inferenceResults, visited
                     data-testid={`finding-checkbox-${r.rule_key}`}
                     checked={checked}
                     disabled={!checkable}
-                    onChange={() => checkable && toggleFinding(r.rule_key)}
+                    onChange={e => { e.stopPropagation(); checkable && toggleFinding(r.rule_key) }}
+                    onClick={e => e.stopPropagation()}
                     style={{ accentColor: 'var(--color-amber)', marginTop: 1, flexShrink: 0 }}
                   />
                   <div style={{ flex: 1, minWidth: 0 }}>
