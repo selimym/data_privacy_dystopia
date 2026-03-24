@@ -6,7 +6,7 @@ import { useMetricsStore } from '@/stores/metricsStore'
 import { useUIStore } from '@/stores/uiStore'
 import { QuotaBar } from './QuotaBar'
 import type { ShiftMemoData } from '@/types/ui'
-import type { Directive } from '@/types/game'
+import type { Directive, WrongFlagRecord } from '@/types/game'
 
 // ─── Colleague-voice memo generator ──────────────────────────────────────────
 
@@ -30,7 +30,34 @@ function buildColleagueMemo(
   compliance: number,
   reluctance: number,
   hasProtests: boolean,
-): Pick<ShiftMemoData, 'memoText' | 'tone' | 'sender' | 'recruitmentLink'> {
+  wrongFlags: WrongFlagRecord[] = [],
+): Pick<ShiftMemoData, 'memoText' | 'tone' | 'sender' | 'recruitmentLink' | 'wrongFlags'> {
+  // Wrong-flag moral feedback — colleague calls out low-risk or fabricated flags
+  if (wrongFlags.length > 0) {
+    const wf = wrongFlags[0]!
+    const isPerverse = compliance > 60
+    if (isPerverse) {
+      return {
+        tone: 'positive',
+        sender: MARCUS,
+        memoText:
+          `Ha. ${wf.citizen_name}? That one's a stretch. ${wf.consequence}. ` +
+          `Bold move, honestly. Nobody's going to cry about it.`,
+        wrongFlags,
+      }
+    } else {
+      return {
+        tone: 'warning',
+        sender: ALEX,
+        memoText:
+          `Hey — I pulled the file on ${wf.citizen_name}. ` +
+          `The risk indicators weren't there. That was a real person. ${wf.consequence}. ` +
+          `I know the quota pressure is real. Just... be careful what you're signing off on.`,
+        wrongFlags,
+      }
+    }
+  }
+
   // Exploration week — special templates
   if (week === 5) {
     if (Math.random() < 0.5) {
@@ -212,6 +239,7 @@ export function DirectivePanel() {
   const flags = useGameStore(s => s.flags)
   const raidRecords = useGameStore(s => s.raidRecords)
   const activeProtests = useGameStore(s => s.activeProtests)
+  const wrongFlagsPendingMemo = useGameStore(s => s.wrongFlagsPendingMemo)
   const scenario = useContentStore(s => s.scenario)
   const compliance = useMetricsStore(s => s.compliance_score)
   const reluctance = useMetricsStore(s => s.reluctance.reluctance_score)
@@ -282,9 +310,10 @@ export function DirectivePanel() {
     const next = scenario?.directives.find(d => d.week_number === weekNumber + 1) ?? null
 
     const hasProtests = activeProtests.some(p => p.status === 'active' || p.status === 'forming' || p.status === 'violent')
-    const { memoText, tone, sender } = buildColleagueMemo(weekNumber, compliance, reluctance, hasProtests)
-    showShiftMemo({ weekNumber, memoText, tone, nextDirective: next, sender })
-  }, [isAutomated, directive, flags, raidRecords, isSweep, weekNumber, compliance, reluctance, pendingShiftMemo, scenario, showShiftMemo, activeProtests])
+    const { memoText, tone, sender, wrongFlags, recruitmentLink } = buildColleagueMemo(weekNumber, compliance, reluctance, hasProtests, wrongFlagsPendingMemo)
+    showShiftMemo({ weekNumber, memoText, tone, nextDirective: next, sender, wrongFlags, recruitmentLink })
+    useGameStore.getState()._clearWrongFlagsPending()
+  }, [isAutomated, directive, flags, raidRecords, isSweep, weekNumber, compliance, reluctance, pendingShiftMemo, scenario, showShiftMemo, activeProtests, wrongFlagsPendingMemo])
 
   const completedForDirective = directive
     ? isSweep

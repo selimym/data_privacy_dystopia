@@ -352,6 +352,17 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
     set(state => ({ flags: [...state.flags, flag] }))
 
+    // ── 6b. Wrong-flag moral feedback ─────────────────────────────────────────
+    const skeleton = citizens.skeletons.find(s => s.id === citizenId)
+    if (skeleton && !skeleton.is_scenario_npc &&
+        skeleton.risk_score_cache !== null && skeleton.risk_score_cache < 25) {
+      get()._addWrongFlagPending({
+        citizen_name: `${skeleton.first_name} ${skeleton.last_name}`,
+        flag_type: flagType,
+        consequence: _wrongFlagConsequence(flagType),
+      })
+    }
+
     // Clear selected citizen
     ui.setSelectedCitizen(null)
 
@@ -907,4 +918,15 @@ async function _persist(get: () => GameState): Promise<void> {
     },
     saved_at: new Date().toISOString(),
   }).catch(err => console.error('[Persist] Failed to save:', err))
+}
+
+const WRONG_FLAG_CONSEQUENCES: Record<string, string> = {
+  monitoring: 'Placed under indefinite surveillance — daily movements logged',
+  restriction: 'Travel banned — unable to see family across the border',
+  intervention: 'Social services contacted — children temporarily removed',
+  detention: 'Detained without charge for 72 hours — lost their job',
+}
+
+function _wrongFlagConsequence(flagType: FlagType): string {
+  return WRONG_FLAG_CONSEQUENCES[flagType] ?? 'Flagged without cause — life disrupted'
 }
