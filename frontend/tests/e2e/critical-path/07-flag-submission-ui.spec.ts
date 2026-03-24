@@ -1,15 +1,15 @@
 import { test, expect } from '@playwright/test'
 
 /**
- * Test 07 — Flag Submission UI
+ * Test 07 — Flag Submission UI (Option C: inference-based findings)
  *
  * Verifies that a citizen can be selected from the queue,
- * their file opens with identity + domain tabs, a flag type
- * can be selected, a justification entered, and the flag submitted.
+ * their file opens, the player visits a domain tab to unlock
+ * findings, checks a finding, selects a flag type, and submits.
  */
 
 test.describe('07 — Flag Submission UI', () => {
-  test('select citizen → open file → submit flag', async ({ page }) => {
+  test('select citizen → visit domain tab → check finding → submit flag', async ({ page }) => {
     // ── Navigate and start game ───────────────────────────────────────────────
     await page.goto('/')
     await page.waitForSelector('[data-testid="start-screen"]', { timeout: 15000 })
@@ -26,17 +26,41 @@ test.describe('07 — Flag Submission UI', () => {
     await expect(viewBtn).toBeVisible({ timeout: 10000 })
     await viewBtn.click()
 
-    // ── Wait for citizen panel to show content (not empty state) ─────────────
-    // The identity-section renders only when profile is loaded
+    // ── Wait for citizen panel to show content ────────────────────────────────
     await page.waitForSelector('[data-testid="identity-section"]', { timeout: 10000 })
 
-    // ── Verify identity section is visible ────────────────────────────────────
-    const identitySection = page.locator('[data-testid="identity-section"]')
-    await expect(identitySection).toBeVisible()
+    // ── Verify identity section and domain tabs are visible ───────────────────
+    await expect(page.locator('[data-testid="identity-section"]')).toBeVisible()
+    await expect(page.locator('[data-testid="domain-tabs"]')).toBeVisible()
 
-    // ── Verify domain tabs are visible ────────────────────────────────────────
-    const domainTabs = page.locator('[data-testid="domain-tabs"]')
-    await expect(domainTabs).toBeVisible()
+    // ── Visit a domain tab to unlock findings ─────────────────────────────────
+    // Week 1 has location + judicial domains unlocked
+    const locationTab = page.locator('[data-testid="tab-location"]')
+    await expect(locationTab).toBeVisible({ timeout: 5000 })
+    await locationTab.click()
+
+    // ── Wait for findings panel ───────────────────────────────────────────────
+    await page.waitForSelector('[data-testid="findings-panel"]', { timeout: 5000 })
+
+    // ── Check a finding that is now checkable (location tab visited) ──────────
+    // Some findings may be checkable immediately after visiting location tab
+    const checkableCheckbox = page.locator('[data-testid^="finding-checkbox-"]:not([disabled])').first()
+
+    // If a checkable finding exists, check it; otherwise visit judicial tab too
+    const checkableCount = await checkableCheckbox.count()
+    if (checkableCount === 0) {
+      const judicialTab = page.locator('[data-testid="tab-judicial"]')
+      if (await judicialTab.count() > 0) {
+        await judicialTab.click()
+        await page.waitForTimeout(300)
+      }
+    }
+
+    // Now check the first available finding checkbox
+    const firstCheckbox = page.locator('[data-testid^="finding-checkbox-"]:not([disabled])').first()
+    await expect(firstCheckbox).toBeVisible({ timeout: 5000 })
+    await firstCheckbox.click()
+    await expect(firstCheckbox).toBeChecked()
 
     // ── Select "monitoring" flag type ─────────────────────────────────────────
     const monitoringRadio = page.locator('[data-testid="flag-type-monitoring"]')
@@ -44,34 +68,20 @@ test.describe('07 — Flag Submission UI', () => {
     await monitoringRadio.click()
     await expect(monitoringRadio).toBeChecked()
 
-    // ── Fill justification (must be ≥10 characters) ───────────────────────────
-    const justificationInput = page.locator('[data-testid="justification-input"]')
-    await expect(justificationInput).toBeVisible()
-    await justificationInput.fill('Test justification for monitoring flag')
-
     // ── Submit the flag ───────────────────────────────────────────────────────
     const submitBtn = page.locator('[data-testid="submit-flag-btn"]')
     await expect(submitBtn).toBeEnabled()
     await submitBtn.click()
 
-    // ── Verify the citizen no longer shows a VIEW FILE button (now Flagged) ──
-    // After flagging, the citizen row shows "FLAGGED" badge instead of VIEW FILE
-    // We wait briefly for UI to update
+    // ── Handle optional cinematic overlay ────────────────────────────────────
     await page.waitForTimeout(500)
-
-    // The queue row for the citizen should no longer have an actionable VIEW FILE btn
-    // or should show already_flagged badge. The first view btn should now be a different citizen
-    // (or the queue should have changed). We verify submit was successful by checking
-    // no cinematic overlay is blocking (or handle it if it appears).
     const cinematicOverlay = page.locator('[data-testid="cinematic-overlay"]')
     const isCinematicVisible = await cinematicOverlay.isVisible()
 
     if (isCinematicVisible) {
-      // Skip the cinematic
       const skipBtn = page.locator('[data-testid="cinematic-skip"]')
       await expect(skipBtn).toBeVisible()
       await skipBtn.click()
-      // Wait for overlay to disappear
       await expect(cinematicOverlay).not.toBeVisible({ timeout: 5000 })
     }
 
