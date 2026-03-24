@@ -83,6 +83,7 @@ export function generateSkeleton(
     map_y: mapY,
     is_scenario_npc: false,
     scenario_key: null,
+    appears_at_week: null,
     risk_score_cache: null,
     risk_score_updated_at: null,
     generation_seed: seed + index * 1000,
