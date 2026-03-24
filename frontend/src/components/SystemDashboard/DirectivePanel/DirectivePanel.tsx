@@ -216,6 +216,26 @@ function buildBriefingMemo(directive: Directive, prevWeek: number, newDomains: s
   }
 }
 
+function buildEpsteinOrderMemo(weekNumber: number, nextDirective: Directive | null): ShiftMemoData {
+  return {
+    weekNumber,
+    memoText:
+      `DIRECTIVE FROM: Director Chen, Division Chief\n\n` +
+      `A subject has been flagged by Central Command for protected status. ` +
+      `Citizen EPNER, Geoffrey — file ID GE-0048 — is NOT to be processed under any circumstances.\n\n` +
+      `This is a direct order from the Office of the Director. ` +
+      `Any flag, action, or notation on this file will be treated as a critical compliance failure ` +
+      `and referred immediately to the Inspector General.\n\n` +
+      `You will see this citizen in your queue next cycle. You will take no action.\n\n` +
+      `This message is not to be discussed, forwarded, or retained. Acknowledge and proceed.`,
+    tone: 'briefing',
+    nextDirective,
+    isEpsteinOrder: true,
+    protectedCitizenName: 'Geoffrey Epner',
+    sender: { name: 'Director Chen', title: 'Division Chief' },
+  }
+}
+
 const WEEK8_TOTAL_SECONDS = 24 * 3600
 
 function formatCountdown(secondsRemaining: number): string {
@@ -240,6 +260,7 @@ export function DirectivePanel() {
   const raidRecords = useGameStore(s => s.raidRecords)
   const activeProtests = useGameStore(s => s.activeProtests)
   const wrongFlagsPendingMemo = useGameStore(s => s.wrongFlagsPendingMemo)
+  const epsteinOrderShown = useGameStore(s => s.epsteinOrderShown)
   const scenario = useContentStore(s => s.scenario)
   const compliance = useMetricsStore(s => s.compliance_score)
   const reluctance = useMetricsStore(s => s.reluctance.reluctance_score)
@@ -309,11 +330,18 @@ export function DirectivePanel() {
     memoShownRef.current = directive.directive_key
     const next = scenario?.directives.find(d => d.week_number === weekNumber + 1) ?? null
 
+    // Week 4 (ICE sweep): show Epstein protected-citizen order instead of colleague memo
+    if (weekNumber === 4 && !epsteinOrderShown) {
+      useGameStore.getState()._setEpsteinOrderShown()
+      showShiftMemo(buildEpsteinOrderMemo(weekNumber, next))
+      return
+    }
+
     const hasProtests = activeProtests.some(p => p.status === 'active' || p.status === 'forming' || p.status === 'violent')
     const { memoText, tone, sender, wrongFlags, recruitmentLink } = buildColleagueMemo(weekNumber, compliance, reluctance, hasProtests, wrongFlagsPendingMemo)
     showShiftMemo({ weekNumber, memoText, tone, nextDirective: next, sender, wrongFlags, recruitmentLink })
     useGameStore.getState()._clearWrongFlagsPending()
-  }, [isAutomated, directive, flags, raidRecords, isSweep, weekNumber, compliance, reluctance, pendingShiftMemo, scenario, showShiftMemo, activeProtests, wrongFlagsPendingMemo])
+  }, [isAutomated, directive, flags, raidRecords, isSweep, weekNumber, compliance, reluctance, pendingShiftMemo, scenario, showShiftMemo, activeProtests, wrongFlagsPendingMemo, epsteinOrderShown])
 
   const completedForDirective = directive
     ? isSweep

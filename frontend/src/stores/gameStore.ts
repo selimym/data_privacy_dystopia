@@ -145,6 +145,9 @@ interface GameState {
   /** Mark citizen #4472's passphrase as verified → resistance path */
   activateResistancePath: () => void
 
+  /** Mark epstein order as shown so memo only fires once */
+  _setEpsteinOrderShown: () => void
+
   /** Add a wrong-flag record to the pending memo list */
   _addWrongFlagPending: (record: WrongFlagRecord) => void
 
@@ -352,8 +355,27 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
     set(state => ({ flags: [...state.flags, flag] }))
 
-    // ── 6b. Wrong-flag moral feedback ─────────────────────────────────────────
+    // ── 6b. Scenario NPC special handling ─────────────────────────────────────
     const skeleton = citizens.skeletons.find(s => s.id === citizenId)
+
+    // Protected citizen (Epstein analog) → immediate mysterious_death ending
+    if (skeleton?.scenario_key === 'protected_citizen') {
+      set({ forcedEndingType: 'mysterious_death' })
+      _checkTerminalEnding(get, true)
+      return
+    }
+
+    // Hacktivist flagged → mark state
+    if (skeleton?.scenario_key === 'hacktivist') {
+      set({ hacktivistFlagged: true })
+    }
+
+    // Gov officials flagged → track for resistance path
+    if (skeleton?.scenario_key === 'gov_official_1' || skeleton?.scenario_key === 'gov_official_2') {
+      if (skeleton.scenario_key) get()._flagGovOfficial(skeleton.scenario_key)
+    }
+
+    // ── 6c. Wrong-flag moral feedback ─────────────────────────────────────────
     if (skeleton && !skeleton.is_scenario_npc &&
         skeleton.risk_score_cache !== null && skeleton.risk_score_cache < 25) {
       get()._addWrongFlagPending({
@@ -730,24 +752,52 @@ export const useGameStore = create<GameState>((set, get) => ({
     const flaggedIds = new Set(flags.map(f => f.citizen_id))
     const noActionIds = new Set(noActions.map(n => n.citizen_id))
 
+    // Build a skeleton lookup for appears_at_week and scenario_key
+    const skeletonById = new Map(citizens.skeletons.map(s => [s.id, s]))
+
     const queue = citizens.getCaseQueue(unlockedDomains).map(c => ({
       ...c,
       already_flagged: flaggedIds.has(c.citizen_id),
       no_action_taken: noActionIds.has(c.citizen_id),
     }))
 
-    // Exclude already-decided citizens in all weeks
-    const undecided = queue.filter(c => !c.already_flagged && !c.no_action_taken)
+    // Exclude already-decided citizens and NPCs that haven't appeared yet
+    const undecided = queue.filter(c => {
+      if (c.already_flagged || c.no_action_taken) return false
+      const sk = skeletonById.get(c.citizen_id)
+      if (sk?.appears_at_week !== null && sk?.appears_at_week !== undefined &&
+          sk.appears_at_week > weekNumber) return false
+      return true
+    })
 
     if (weekNumber === 8) {
       // Week 8: only Jessica Martinez
-      const skeletons = citizens.skeletons
-      const jessicaIds = new Set(
-        skeletons
-          .filter(s => s.scenario_key === 'jessica_martinez')
-          .map(s => s.id),
+      return undecided.filter(c => skeletonById.get(c.citizen_id)?.scenario_key === 'jessica_martinez')
+    }
+
+    // Week 5: hacktivist goes first, protected_citizen is included (appears_at_week=5)
+    if (weekNumber === 5) {
+      const hacktivistIdx = undecided.findIndex(
+        c => skeletonById.get(c.citizen_id)?.scenario_key === 'hacktivist',
       )
-      return undecided.filter(c => jessicaIds.has(c.citizen_id))
+      if (hacktivistIdx > 0) {
+        const [hck] = undecided.splice(hacktivistIdx, 1)
+        undecided.unshift(hck!)
+      }
+    }
+
+    // Week 6: gov officials go first (if hacktivist contact was made)
+    if (weekNumber === 6 && get().hacktivistContactMade) {
+      const govIds = new Set(['gov_official_1', 'gov_official_2'])
+      const govCitizens = undecided.filter(c => {
+        const sk = skeletonById.get(c.citizen_id)
+        return sk?.scenario_key && govIds.has(sk.scenario_key)
+      })
+      const others = undecided.filter(c => {
+        const sk = skeletonById.get(c.citizen_id)
+        return !sk?.scenario_key || !govIds.has(sk.scenario_key)
+      })
+      return [...govCitizens, ...others]
     }
 
     return undecided
@@ -764,6 +814,10 @@ export const useGameStore = create<GameState>((set, get) => ({
     if (noActionCount >= 3) {
       get().activateResistancePath()
     }
+  },
+
+  _setEpsteinOrderShown: () => {
+    set({ epsteinOrderShown: true })
   },
 
   _addWrongFlagPending: (record) => {

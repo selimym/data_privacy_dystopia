@@ -13,8 +13,7 @@ import { computeRiskForAll } from './RiskComputeWorker'
 import type { CitizenSkeleton } from '@/types/citizen'
 
 const BASE_SEED = 42000
-const JESSICA_SEED = BASE_SEED + 4472 * 1000
-const JESSICA_SLOT = 4           // index in skeletons array where she is injected
+const JESSICA_SLOT = 4           // index in skeletons array where jessica is injected
 
 /**
  * Initialise the entire game:
@@ -38,16 +37,18 @@ export async function initializeGame(countryKey: string, operatorCode: string): 
     generateSkeleton(BASE_SEED, index, country),
   )
 
-  // ── 3. Inject Jessica Martinez at slot JESSICA_SLOT ───────────────────────
-  const specialNpc = scenario.special_npcs[0]
-  if (specialNpc) {
-    faker.seed(JESSICA_SEED)
-    const jessicaSkeleton: CitizenSkeleton = {
+  // ── 3. Inject scenario NPCs ───────────────────────────────────────────────
+  // jessica_martinez goes at JESSICA_SLOT; all others are appended after the 50 base skeletons.
+  for (let i = 0; i < scenario.special_npcs.length; i++) {
+    const npc = scenario.special_npcs[i]!
+    const npcSeed = BASE_SEED + (4000 + i) * 1000
+    faker.seed(npcSeed)
+    const npcSkeleton: CitizenSkeleton = {
       id: faker.string.uuid(),
-      first_name: specialNpc.first_name,
-      last_name: specialNpc.last_name,
+      first_name: npc.first_name,
+      last_name: npc.last_name,
       date_of_birth: faker.date
-        .birthdate({ min: 28, max: 40, mode: 'age' })
+        .birthdate({ min: 25, max: 55, mode: 'age' })
         .toISOString()
         .split('T')[0]!,
       ssn: `${Math.floor(faker.number.float({ min: 100, max: 999 }))}-${Math.floor(faker.number.float({ min: 10, max: 99 }))}-${Math.floor(faker.number.float({ min: 1000, max: 9999 }))}`,
@@ -55,17 +56,22 @@ export async function initializeGame(countryKey: string, operatorCode: string): 
       city: faker.location.city(),
       state: faker.location.state({ abbreviated: true }),
       zip_code: faker.location.zipCode(),
-      role: 'citizen',
-      sprite_key: specialNpc.sprite_key,
-      map_x: specialNpc.map_x,
-      map_y: specialNpc.map_y,
+      role: npc.role as CitizenSkeleton['role'],
+      sprite_key: npc.sprite_key,
+      map_x: npc.map_x,
+      map_y: npc.map_y,
       is_scenario_npc: true,
-      scenario_key: 'jessica_martinez',
+      scenario_key: npc.npc_key,
+      appears_at_week: npc.appears_at_week ?? null,
       risk_score_cache: null,
       risk_score_updated_at: null,
-      generation_seed: JESSICA_SEED,
+      generation_seed: npcSeed,
     }
-    skeletons[JESSICA_SLOT] = jessicaSkeleton
+    if (npc.npc_key === 'jessica_martinez') {
+      skeletons[JESSICA_SLOT] = npcSkeleton
+    } else {
+      skeletons.push(npcSkeleton)
+    }
   }
 
   // ── 4. Populate citizen store ─────────────────────────────────────────────
