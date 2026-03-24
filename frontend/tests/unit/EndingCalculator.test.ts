@@ -52,6 +52,7 @@ function makeFlags(count = 10, flagType: CitizenFlag['flag_type'] = 'monitoring'
     week_number: 1,
     flag_type: flagType,
     justification: 'test',
+    selected_findings: [],
     decision_time_seconds: 10,
     was_hesitant: false,
     risk_score_at_decision: 50,
@@ -78,6 +79,7 @@ function jessica(): CitizenSkeleton {
     map_y: 10,
     is_scenario_npc: true,
     scenario_key: 'jessica_martinez',
+    appears_at_week: 8,
     risk_score_cache: null,
     risk_score_updated_at: null,
     generation_seed: 42,
@@ -98,6 +100,10 @@ function baseInput(overrides: Partial<EndingInput> = {}): EndingInput {
 }
 
 describe('calculateEnding', () => {
+  it('mysterious_death when forcedEndingType is set', () => {
+    expect(calculateEnding(baseInput({ forcedEndingType: 'mysterious_death' }))).toBe('mysterious_death')
+  })
+
   it('resistance_path wins when flag is set', () => {
     expect(calculateEnding(baseInput({ resistancePath: true }))).toBe('resistance_path')
   })
@@ -148,6 +154,7 @@ describe('calculateEnding', () => {
         week_number: 6,
         flag_type: 'detention' as const,
         justification: 'test',
+        selected_findings: [],
         decision_time_seconds: 5,
         was_hesitant: false,
         risk_score_at_decision: 40,
