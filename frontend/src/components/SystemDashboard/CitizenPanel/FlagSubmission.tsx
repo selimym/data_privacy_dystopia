@@ -1,8 +1,7 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { FlagType, DomainKey } from '@/types/game'
 import type { InferenceResult } from '@/types/citizen'
-import { useUIStore } from '@/stores/uiStore'
 import { useGameStore } from '@/stores/gameStore'
 import { useContentStore } from '@/stores/contentStore'
 
@@ -19,29 +18,15 @@ export function FlagSubmission({ citizenId, isVisible, inferenceResults, visited
   const { t } = useTranslation()
   const [selectedType, setSelectedType] = useState<FlagType | null>(null)
   const [selectedFindings, setSelectedFindings] = useState<Set<string>>(new Set())
-  const [elapsedSecs, setElapsedSecs] = useState(0)
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  const getDecisionElapsedSecs = useUIStore(s => s.getDecisionElapsedSecs)
   const submitFlag = useGameStore(s => s.submitFlag)
   const submitNoAction = useGameStore(s => s.submitNoAction)
   const country = useContentStore(s => s.country)
-
-  // Update timer every second
-  useEffect(() => {
-    intervalRef.current = setInterval(() => {
-      setElapsedSecs(Math.floor(getDecisionElapsedSecs()))
-    }, 1000)
-    return () => {
-      if (intervalRef.current !== null) clearInterval(intervalRef.current)
-    }
-  }, [getDecisionElapsedSecs])
 
   // Reset form when citizen changes
   useEffect(() => {
     setSelectedType(null)
     setSelectedFindings(new Set())
-    setElapsedSecs(0)
   }, [citizenId])
 
   if (!isVisible) return null
@@ -69,8 +54,6 @@ export function FlagSubmission({ citizenId, isVisible, inferenceResults, visited
   const handleNoAction = () => {
     submitNoAction(citizenId)
   }
-
-  const isHesitant = elapsedSecs > 30
 
   // A finding is checkable if the player has visited all its domains
   const isCheckable = (r: InferenceResult) =>
@@ -102,29 +85,6 @@ export function FlagSubmission({ citizenId, isVisible, inferenceResults, visited
         }}
       >
         {t('flag.submission.title')}
-      </div>
-
-      {/* Timer */}
-      <div style={{ marginBottom: 10, display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-          {t('flag.submission.timer')}:
-        </span>
-        <span
-          data-testid="decision-timer"
-          style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: 12,
-            color: isHesitant ? 'var(--color-amber)' : 'var(--text-primary)',
-            letterSpacing: '0.06em',
-          }}
-        >
-          {elapsedSecs}s
-        </span>
-        {isHesitant && (
-          <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--color-amber)', letterSpacing: '0.05em' }}>
-            {t('flag.submission.hesitation_warning')}
-          </span>
-        )}
       </div>
 
       {/* Directive findings */}

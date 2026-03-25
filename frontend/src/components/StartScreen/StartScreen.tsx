@@ -4,6 +4,7 @@ import { loadCountryProfile } from '@/services/ContentLoader'
 import { initializeGame } from '@/services/GameOrchestrator'
 import { useUIStore } from '@/stores/uiStore'
 import { LoadingScreen } from '@/components/shared'
+import { hasSeenAnyEnding } from '@/services/EndingsArchive'
 import type { CountryProfile } from '@/types/content'
 import { CountryCard } from './CountryCard'
 import { LanguageSelector } from './LanguageSelector'
@@ -249,6 +250,39 @@ export default function StartScreen() {
           >
             {starting ? t('common.loading') : t('start.begin_shift')}
           </button>
+          {hasSeenAnyEnding() && (
+            <button
+              data-testid="open-archive-btn"
+              onClick={() => setScreen('endings_archive')}
+              type="button"
+              style={{
+                marginTop: 12,
+                background: 'transparent',
+                border: '1px solid rgba(255,255,255,0.15)',
+                color: '#6b7280',
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: 11,
+                letterSpacing: '0.15em',
+                textTransform: 'uppercase',
+                padding: '10px 28px',
+                cursor: 'pointer',
+                borderRadius: 2,
+                transition: 'border-color 0.15s, color 0.15s',
+                display: 'block',
+                width: '100%',
+              }}
+              onMouseEnter={e => {
+                ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.35)'
+                ;(e.currentTarget as HTMLButtonElement).style.color = '#9ca3af'
+              }}
+              onMouseLeave={e => {
+                ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.15)'
+                ;(e.currentTarget as HTMLButtonElement).style.color = '#6b7280'
+              }}
+            >
+              ◆ {t('archive.title').split('—')[1]?.trim() ?? 'Endings Archive'}
+            </button>
+          )}
         </div>
       </div>
     </div>

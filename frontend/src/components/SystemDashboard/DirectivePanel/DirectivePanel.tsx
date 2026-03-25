@@ -31,6 +31,8 @@ function buildColleagueMemo(
   reluctance: number,
   hasProtests: boolean,
   wrongFlags: WrongFlagRecord[] = [],
+  totalFlags = 0,
+  hasRaids = false,
 ): Pick<ShiftMemoData, 'memoText' | 'tone' | 'sender' | 'recruitmentLink' | 'wrongFlags'> {
   // Wrong-flag moral feedback — colleague calls out low-risk or fabricated flags
   if (wrongFlags.length > 0) {
@@ -154,7 +156,94 @@ function buildColleagueMemo(
     }
   }
 
-  // Clean shift → Sarah (70%) or Alex (30%)
+  // First flag ever submitted — week 1 welcome
+  if (week === 1 && totalFlags <= 5) {
+    return Math.random() < 0.5
+      ? {
+          tone: 'positive',
+          sender: MARCUS,
+          memoText: pick([
+            `First one always feels weird. You'll stop noticing.`,
+            `Good. First cycle done. It gets easier. Trust me, you stop thinking about them pretty quickly.`,
+          ]),
+        }
+      : {
+          tone: 'positive',
+          sender: SARAH,
+          memoText: pick([
+            `Welcome to the team. The system works because people like you make it work.`,
+            `Strong start. You flagged what needed flagging. That's all we ask.`,
+          ]),
+        }
+  }
+
+  // ICE raid approved — casual mention
+  if (hasRaids) {
+    return Math.random() < 0.6
+      ? {
+          tone: 'positive',
+          sender: MARCUS,
+          memoText: pick([
+            `I heard sector 7 had a clean sweep last night. Efficient. That's the job.`,
+            `Did you see the morning report? The raid in the eastside hit 14 flags from last month. Clean operations.`,
+            `They call it a "community safety action" in the press. We call it a good week.`,
+          ]),
+        }
+      : {
+          tone: 'warning',
+          sender: ALEX,
+          memoText: pick([
+            `Did you see the news? They're calling it a "community safety operation." We logged those people.`,
+            `One of the raid files had a kid in it. 16. I checked the flag. It was mine. I don't know what I expected.`,
+          ]),
+        }
+  }
+
+  // High volume / high compliance
+  if (compliance > 80 && week > 2) {
+    return Math.random() < 0.7
+      ? {
+          tone: 'positive',
+          sender: MARCUS,
+          memoText: pick([
+            `You're moving fast. I like it. These people won't even know what hit them.`,
+            `Top throughput this cycle. Whatever you're doing, keep doing it. The numbers love you.`,
+            `Director Chen mentioned your metrics in the briefing this morning. By name. That's rare.`,
+          ]),
+        }
+      : {
+          tone: 'positive',
+          sender: DIRECTOR,
+          memoText: pick([
+            `Throughput is up across your sector. This is noted.`,
+            `Compliance metrics for this cycle are exemplary. This performance will be reflected in your evaluation.`,
+          ]),
+        }
+  }
+
+  // Data domain exploration (week 5+, full access unlocked)
+  if (week >= 5 && Math.random() < 0.4) {
+    return Math.random() < 0.5
+      ? {
+          tone: 'positive',
+          sender: MARCUS,
+          memoText: pick([
+            `Oh man, wait until you look at the message logs. Case #4 alone is worth it. These people have NO idea we're watching.`,
+            `Full access is wild. I spent an hour on one subject's grocery delivery history. You should dig in.`,
+            `Guy I flagged based on his beef jerky order pattern. Turns out it was a flag-worthy pattern. The algorithm is something else.`,
+          ]),
+        }
+      : {
+          tone: 'positive',
+          sender: SARAH,
+          memoText: pick([
+            `The message intercepts are incredible. I flagged three cases just based on what they were texting their therapists.`,
+            `Make sure you've read the new message tabs. There's so much in there. I found someone planning a meetup — flagged immediately.`,
+          ]),
+        }
+  }
+
+  // Clean shift → Sarah (70%) or Alex (30%) — expanded with creepy messages
   const cleanResult: Pick<ShiftMemoData, 'memoText' | 'tone' | 'sender' | 'recruitmentLink'> =
     Math.random() < 0.7
       ? {
@@ -164,6 +253,9 @@ function buildColleagueMemo(
             `Week ${week} complete. You've been consistent and reliable. The team appreciates operators who don't need reminders.`,
             `Clean numbers this cycle. Keep this up and you'll be on the fast track.`,
             `You're doing exactly what this unit needs. Keep it up.`,
+            `I had this one case — single mom, two jobs, church on Sundays. Flagged for community risk clustering. She probably won't see it coming. Anyway. Good cycle.`,
+            `Guy I flagged last month — apparently his kids are in a processing center now. Weird to think about. I mean, we did our job. That's the point, right?`,
+            `Do you ever go back and read the outcomes? I stopped after week 3. It's easier that way. Numbers look good this cycle.`,
           ]),
         }
       : {
@@ -172,6 +264,9 @@ function buildColleagueMemo(
           memoText: pick([
             `Good work on Cycle ${week}. Quietly supportive from over here. Stay steady.`,
             `Numbers look solid. Just... stay steady out there.`,
+            `I keep their case IDs in a notebook. Don't know why. Just do. Anyway — numbers look fine.`,
+            `Between us — the outcomes reports go to a different building. We never see what happens. Maybe that's by design.`,
+            `One of the cases from my first week showed up in the news last month. Different name, different face. But the flag pattern matched. I recognized it.`,
           ]),
         }
 
@@ -264,6 +359,12 @@ function formatCountdown(secondsRemaining: number): string {
   return [h, m, sec].map(v => String(v).padStart(2, '0')).join(':')
 }
 
+function formatShiftTime(seconds: number): string {
+  const m = Math.floor(seconds / 60)
+  const s = seconds % 60
+  return `${m}m ${String(s).padStart(2, '0')}s`
+}
+
 export function DirectivePanel() {
   const { t } = useTranslation()
   const [memoRevealed, setMemoRevealed] = useState(false)
@@ -286,6 +387,15 @@ export function DirectivePanel() {
   const reluctance = useMetricsStore(s => s.reluctance.reluctance_score)
   const showShiftMemo = useUIStore(s => s.showShiftMemo)
   const pendingShiftMemo = useUIStore(s => s.pendingShiftMemo)
+  const getShiftElapsedSecs = useUIStore(s => s.getShiftElapsedSecs)
+
+  const [shiftDisplaySecs, setShiftDisplaySecs] = useState(0)
+
+  // Global shift timer — ticks every second, never resets
+  useEffect(() => {
+    const id = setInterval(() => setShiftDisplaySecs(Math.floor(getShiftElapsedSecs())), 1000)
+    return () => clearInterval(id)
+  }, [getShiftElapsedSecs])
 
   const isAutomated = typeof navigator !== 'undefined' && navigator.webdriver
   const isSweep = (directive?.directive_type ?? 'review') === 'sweep'
@@ -365,7 +475,8 @@ export function DirectivePanel() {
     }
 
     const hasProtests = activeProtests.some(p => p.status === 'active' || p.status === 'forming' || p.status === 'violent')
-    const { memoText, tone, sender, wrongFlags, recruitmentLink } = buildColleagueMemo(weekNumber, compliance, reluctance, hasProtests, wrongFlagsPendingMemo)
+    const hasRaids = raidRecords.length > 0
+    const { memoText, tone, sender, wrongFlags, recruitmentLink } = buildColleagueMemo(weekNumber, compliance, reluctance, hasProtests, wrongFlagsPendingMemo, flags.length, hasRaids)
     showShiftMemo({ weekNumber, memoText, tone, nextDirective: next, sender, wrongFlags, recruitmentLink })
     useGameStore.getState()._clearWrongFlagsPending()
   }, [isAutomated, directive, flags, raidRecords, isSweep, weekNumber, compliance, reluctance, pendingShiftMemo, scenario, showShiftMemo, activeProtests, wrongFlagsPendingMemo, epsteinOrderShown, hacktivistFlagged, hacktivistContactMade])
@@ -400,9 +511,12 @@ export function DirectivePanel() {
       <div className="panel-title">{t('directive.panel.title')}</div>
 
       <div style={{ padding: 12 }}>
-        {/* Week label */}
+        {/* Week label + shift timer row */}
         <div
           style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
             fontFamily: 'var(--font-mono)',
             fontSize: 10,
             color: 'var(--text-muted)',
@@ -410,7 +524,15 @@ export function DirectivePanel() {
             marginBottom: 4,
           }}
         >
-          {t('directive.week_label', { week: weekNumber })}
+          <span>{t('directive.week_label', { week: weekNumber })}</span>
+          {shiftDisplaySecs > 0 && (
+            <span
+              data-testid="shift-timer"
+              style={{ color: 'var(--text-muted)', opacity: 0.7 }}
+            >
+              SHIFT {formatShiftTime(shiftDisplaySecs)}
+            </span>
+          )}
         </div>
 
         {/* Week 8 countdown timer */}

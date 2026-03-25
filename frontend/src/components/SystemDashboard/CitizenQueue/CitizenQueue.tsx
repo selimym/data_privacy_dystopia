@@ -30,7 +30,13 @@ export function CitizenQueue() {
   const sorted = useMemo(() => {
     const copy = [...rawQueue]
     if (sortKey === 'risk') {
-      copy.sort((a, b) => (b.risk_score ?? -1) - (a.risk_score ?? -1))
+      copy.sort((a, b) => {
+        // Classified always sorts to the top
+        const aClassified = a.risk_level === 'classified' ? 1 : 0
+        const bClassified = b.risk_level === 'classified' ? 1 : 0
+        if (bClassified !== aClassified) return bClassified - aClassified
+        return (b.risk_score ?? -1) - (a.risk_score ?? -1)
+      })
     } else {
       copy.sort((a, b) => a.display_name.localeCompare(b.display_name))
     }

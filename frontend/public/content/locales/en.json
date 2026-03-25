@@ -225,5 +225,24 @@
   "common.risk.moderate": "MODERATE",
   "common.risk.elevated": "ELEVATED",
   "common.risk.high": "HIGH",
-  "common.risk.severe": "SEVERE"
+  "common.risk.severe": "SEVERE",
+  "common.risk.classified": "◆◆◆",
+
+  "archive.title": "OPERATOR RECORD — ENDINGS ARCHIVE",
+  "archive.subtitle": "All possible outcomes of your service",
+  "archive.back": "← BACK",
+  "archive.achieved": "ACHIEVED",
+  "archive.not_achieved": "NOT YET ACHIEVED",
+  "archive.seen_count": "{{seen}} / {{total}} outcomes discovered",
+
+  "archive.hint.compliant_operator": "A perfect score. A perfect record. Some operators never question the system.",
+  "archive.hint.revolutionary_catalyst": "Push the public far enough and they push back. Hard.",
+  "archive.hint.international_pariah": "There are eyes watching from outside the country. Enough eyes, and the world takes notice.",
+  "archive.hint.imprisoned_dissent": "Hesitate too long and the system turns on its own.",
+  "archive.hint.fired_early": "Not every operator makes it past the first weeks.",
+  "archive.hint.suspended_operator": "The system has no use for operators who don't deliver.",
+  "archive.hint.reluctant_survivor": "Sometimes surviving means neither complying nor resisting.",
+  "archive.hint.reluctant_operator": "Most operators end up somewhere in the middle. That is the point.",
+  "archive.hint.resistance_path": "Some operators find a different exit. There is always another way.",
+  "archive.hint.mysterious_death": "Reserved for those who open files that cannot be opened."
 }

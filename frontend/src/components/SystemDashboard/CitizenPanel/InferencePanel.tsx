@@ -4,9 +4,14 @@ import type { InferenceResult } from '@/types/citizen'
 import { Badge } from '@/components/shared/Badge'
 import { useUIStore } from '@/stores/uiStore'
 
+import type { DomainKey } from '@/types/game'
+
 interface InferencePanelProps {
   results: InferenceResult[]
   isLoading: boolean
+  visitedTabs?: Set<DomainKey>
+  unlockedDomains?: DomainKey[]
+  isProtectedCitizen?: boolean
 }
 
 function scarinessVariant(level: number): 'muted' | 'blue' | 'amber' | 'red' {
@@ -25,7 +30,10 @@ function scarinessLabel(level: number): string {
   return 'MINIMAL'
 }
 
-export function InferencePanel({ results, isLoading }: InferencePanelProps) {
+export function InferencePanel({ results, isLoading, visitedTabs, unlockedDomains, isProtectedCitizen }: InferencePanelProps) {
+  const allTabsVisited = unlockedDomains && unlockedDomains.length > 0 && visitedTabs
+    ? unlockedDomains.every(d => visitedTabs.has(d))
+    : false
   const { t } = useTranslation()
   const [expandedKey, setExpandedKey] = useState<string | null>(null)
 
@@ -175,6 +183,58 @@ export function InferencePanel({ results, isLoading }: InferencePanelProps) {
             ))}
           </tbody>
         </table>
+      )}
+
+      {/* Cross-domain easter egg — only shown after visiting all unlocked tabs */}
+      {allTabsVisited && !isProtectedCitizen && (
+        <div
+          data-testid="cross-domain-inference"
+          style={{
+            marginTop: 10,
+            padding: '8px 12px',
+            background: 'rgba(239, 68, 68, 0.05)',
+            border: '1px solid rgba(239, 68, 68, 0.2)',
+            borderRadius: 2,
+            fontFamily: 'var(--font-mono)',
+            fontSize: 10,
+            color: '#6b7280',
+            letterSpacing: '0.04em',
+            lineHeight: 1.5,
+          }}
+        >
+          <div style={{ color: '#ef4444', fontSize: 9, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 4 }}>
+            ◆ CROSS-DOMAIN INFERENCE
+          </div>
+          Subject's behavioral signature matches surveillance-derived archetype{' '}
+          <span style={{ color: '#374151' }}>[REDACTED]</span>. This pattern was identified in{' '}
+          <span style={{ color: '#374151' }}>[REDACTED]</span> prior cases.
+          Disposition: <span style={{ color: '#374151' }}>[REDACTED]</span>.
+        </div>
+      )}
+
+      {/* Protected citizen special inference — all tabs visited */}
+      {allTabsVisited && isProtectedCitizen && (
+        <div
+          data-testid="protected-cross-domain-inference"
+          style={{
+            marginTop: 10,
+            padding: '8px 12px',
+            background: 'rgba(239, 68, 68, 0.08)',
+            border: '1px solid rgba(239, 68, 68, 0.4)',
+            borderRadius: 2,
+            fontFamily: 'var(--font-mono)',
+            fontSize: 10,
+            color: '#ef4444',
+            letterSpacing: '0.04em',
+            lineHeight: 1.5,
+          }}
+        >
+          <div style={{ fontSize: 9, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 4 }}>
+            ⚠ PROTECTED — CROSS-REFERENCE BLOCKED
+          </div>
+          OPERATOR CLEARANCE INSUFFICIENT.
+          This file has been accessed. Access has been logged.
+        </div>
       )}
     </div>
   )

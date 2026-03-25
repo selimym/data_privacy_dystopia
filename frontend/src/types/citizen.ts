@@ -177,7 +177,7 @@ export interface VictimStatement {
 
 // ─── Risk assessment ─────────────────────────────────────────────────────────
 
-export type RiskLevel = 'low' | 'moderate' | 'elevated' | 'high' | 'severe'
+export type RiskLevel = 'low' | 'moderate' | 'elevated' | 'high' | 'severe' | 'classified'
 
 export interface RiskFactor {
   key: string
@@ -204,4 +204,5 @@ export interface CaseOverview {
   available_domains: DomainKey[]
   already_flagged: boolean
   no_action_taken: boolean
+  scenario_key: string | null
 }
