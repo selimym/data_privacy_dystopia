@@ -83,13 +83,6 @@ export interface ShiftMemoData {
   isBriefing?: boolean
   /** Optional easter-egg / recruitment link rendered below memo body. */
   recruitmentLink?: { label: string; href: string }
-  /** Wrong-flag moral feedback — colleague calls out low-risk or fabricated flags. */
-  wrongFlags?: import('./game').WrongFlagRecord[]
-  /** Hacktivist contact — path A end-of-shift memo from Hamza Bendelladj. */
-  isHacktivistContact?: boolean
-  /** Protected citizen order — Central Command "do not process" directive. */
-  isEpsteinOrder?: boolean
-  protectedCitizenName?: string
 }
 
 // ─── Modal state ──────────────────────────────────────────────────────────────

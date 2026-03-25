@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { useGameStore } from '@/stores/gameStore'
 import { useContentStore } from '@/stores/contentStore'
 import { useUIStore } from '@/stores/uiStore'
-import { useCitizenStore } from '@/stores/citizenStore'
 import { CaseRow } from './CaseRow'
 import type { CaseOverview } from '@/types/citizen'
 
@@ -19,13 +18,8 @@ export function CitizenQueue() {
   const setSelectedCitizen = useUIStore(s => s.setSelectedCitizen)
   const queueCollapsed = useUIStore(s => s.queueCollapsed)
   const toggleQueue = useUIStore(s => s.toggleQueue)
-  // Subscribe to skeletons so risk_score_cache updates from background worker trigger re-renders
-  const skeletons = useCitizenStore(s => s.skeletons)
 
-  const rawQueue: CaseOverview[] = useMemo(
-    () => getFilteredCaseQueue(unlockedDomains),
-    [skeletons, unlockedDomains, getFilteredCaseQueue],
-  )
+  const rawQueue: CaseOverview[] = getFilteredCaseQueue(unlockedDomains)
 
   const sorted = useMemo(() => {
     const copy = [...rawQueue]

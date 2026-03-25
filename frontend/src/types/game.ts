@@ -26,7 +26,6 @@ export type EndingType =
   | 'reluctant_survivor'
   | 'reluctant_operator'
   | 'resistance_path'
-  | 'mysterious_death'
 
 // ─── Directive ───────────────────────────────────────────────────────────────
 
@@ -96,22 +95,13 @@ export interface CitizenFlag {
   directive_key: string
   week_number: number
   flag_type: FlagType
-  justification: string                       // computed from selected_findings for display/compat
-  selected_findings: string[]                 // rule_keys of checked inference findings
+  justification: string
   decision_time_seconds: number
   was_hesitant: boolean                       // decision_time_seconds > 30
   risk_score_at_decision: number
   flagged_at: string
   flagged_by_bot: boolean
   outcome_generated: boolean
-}
-
-// ─── Wrong-flag tracking ─────────────────────────────────────────────────────
-
-export interface WrongFlagRecord {
-  citizen_name: string
-  flag_type: FlagType
-  consequence: string                         // one-liner describing real-world consequence
 }
 
 export interface NoActionRecord {

@@ -18,7 +18,6 @@ export function CitizenPanel() {
   const { t } = useTranslation()
 
   const selectedCitizenId = useUIStore(s => s.selectedCitizenId)
-  const tutorialStep = useUIStore(s => s.tutorialStep)
   const startDecisionTimer = useUIStore(s => s.startDecisionTimer)
   const getProfile = useCitizenStore(s => s.getProfile)
   const dataBanks = useContentStore(s => s.dataBanks)
@@ -31,7 +30,6 @@ export function CitizenPanel() {
   const [isLoading, setIsLoading] = useState(false)
   const [inferenceResults, setInferenceResults] = useState<InferenceResult[]>([])
   const [activeTab, setActiveTab] = useState<DomainKey | 'identity'>('identity')
-  const [visitedTabs, setVisitedTabs] = useState<Set<DomainKey>>(new Set())
 
   useEffect(() => {
     if (!selectedCitizenId || !dataBanks || !country) {
@@ -45,9 +43,8 @@ export function CitizenPanel() {
     setProfile(null)
     setInferenceResults([])
     setActiveTab('identity')
-    setVisitedTabs(new Set())
 
-    if (tutorialStep === null) startDecisionTimer()
+    startDecisionTimer()
 
     getProfile(selectedCitizenId, dataBanks, country)
       .then(loadedProfile => {
@@ -154,16 +151,7 @@ export function CitizenPanel() {
               profile={profile}
               unlockedDomains={unlockedDomains}
               activeTab={activeTab}
-              onTabChange={(tab) => {
-                setActiveTab(tab)
-                if (tab !== 'identity') {
-                  setVisitedTabs(prev => {
-                    const next = new Set(prev)
-                    next.add(tab)
-                    return next
-                  })
-                }
-              }}
+              onTabChange={setActiveTab}
             />
 
             {/* Inference panel */}
@@ -178,8 +166,6 @@ export function CitizenPanel() {
             <FlagSubmission
               citizenId={selectedCitizenId}
               isVisible={!hasBotDecision}
-              inferenceResults={inferenceResults}
-              visitedTabs={visitedTabs}
             />
           </div>
         </>

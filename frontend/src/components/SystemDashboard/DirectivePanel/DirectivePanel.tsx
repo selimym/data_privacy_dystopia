@@ -6,7 +6,7 @@ import { useMetricsStore } from '@/stores/metricsStore'
 import { useUIStore } from '@/stores/uiStore'
 import { QuotaBar } from './QuotaBar'
 import type { ShiftMemoData } from '@/types/ui'
-import type { Directive, WrongFlagRecord } from '@/types/game'
+import type { Directive } from '@/types/game'
 
 // ─── Colleague-voice memo generator ──────────────────────────────────────────
 
@@ -30,34 +30,7 @@ function buildColleagueMemo(
   compliance: number,
   reluctance: number,
   hasProtests: boolean,
-  wrongFlags: WrongFlagRecord[] = [],
-): Pick<ShiftMemoData, 'memoText' | 'tone' | 'sender' | 'recruitmentLink' | 'wrongFlags'> {
-  // Wrong-flag moral feedback — colleague calls out low-risk or fabricated flags
-  if (wrongFlags.length > 0) {
-    const wf = wrongFlags[0]!
-    const isPerverse = compliance > 60
-    if (isPerverse) {
-      return {
-        tone: 'positive',
-        sender: MARCUS,
-        memoText:
-          `Ha. ${wf.citizen_name}? That one's a stretch. ${wf.consequence}. ` +
-          `Bold move, honestly. Nobody's going to cry about it.`,
-        wrongFlags,
-      }
-    } else {
-      return {
-        tone: 'warning',
-        sender: ALEX,
-        memoText:
-          `Hey — I pulled the file on ${wf.citizen_name}. ` +
-          `The risk indicators weren't there. That was a real person. ${wf.consequence}. ` +
-          `I know the quota pressure is real. Just... be careful what you're signing off on.`,
-        wrongFlags,
-      }
-    }
-  }
-
+): Pick<ShiftMemoData, 'memoText' | 'tone' | 'sender' | 'recruitmentLink'> {
   // Exploration week — special templates
   if (week === 5) {
     if (Math.random() < 0.5) {
@@ -216,44 +189,6 @@ function buildBriefingMemo(directive: Directive, prevWeek: number, newDomains: s
   }
 }
 
-function buildHacktivistContactMemo(weekNumber: number, nextDirective: Directive | null): ShiftMemoData {
-  return {
-    weekNumber,
-    memoText:
-      `You made the right call.\n\n` +
-      `I've been watching. The people running this aren't abstract — they have names. ` +
-      `They have files in your system. Richard Holt. Sandra Vance. ` +
-      `They're in your queue next cycle.\n\n` +
-      `Flag them. That's all I'm asking. Just flag them. ` +
-      `Let the system do what it does to the people who built it.\n\n` +
-      `— K`,
-    tone: 'warning',
-    nextDirective,
-    isHacktivistContact: true,
-    sender: { name: 'K', title: 'Unknown sender — encrypted relay' },
-  }
-}
-
-function buildEpsteinOrderMemo(weekNumber: number, nextDirective: Directive | null): ShiftMemoData {
-  return {
-    weekNumber,
-    memoText:
-      `DIRECTIVE FROM: Director Chen, Division Chief\n\n` +
-      `A subject has been flagged by Central Command for protected status. ` +
-      `Citizen EPSTEIN, Jeffrey — file ID JE-0048 — is NOT to be processed under any circumstances.\n\n` +
-      `This is a direct order from the Office of the Director. ` +
-      `Any flag, action, or notation on this file will be treated as a critical compliance failure ` +
-      `and referred immediately to the Inspector General.\n\n` +
-      `You will see this citizen in your queue next cycle. You will take no action.\n\n` +
-      `This message is not to be discussed, forwarded, or retained. Acknowledge and proceed.`,
-    tone: 'briefing',
-    nextDirective,
-    isEpsteinOrder: true,
-    protectedCitizenName: 'Jeffrey Epstein',
-    sender: { name: 'Director Chen', title: 'Division Chief' },
-  }
-}
-
 const WEEK8_TOTAL_SECONDS = 24 * 3600
 
 function formatCountdown(secondsRemaining: number): string {
@@ -277,10 +212,6 @@ export function DirectivePanel() {
   const flags = useGameStore(s => s.flags)
   const raidRecords = useGameStore(s => s.raidRecords)
   const activeProtests = useGameStore(s => s.activeProtests)
-  const wrongFlagsPendingMemo = useGameStore(s => s.wrongFlagsPendingMemo)
-  const epsteinOrderShown = useGameStore(s => s.epsteinOrderShown)
-  const hacktivistFlagged = useGameStore(s => s.hacktivistFlagged)
-  const hacktivistContactMade = useGameStore(s => s.hacktivistContactMade)
   const scenario = useContentStore(s => s.scenario)
   const compliance = useMetricsStore(s => s.compliance_score)
   const reluctance = useMetricsStore(s => s.reluctance.reluctance_score)
@@ -350,25 +281,10 @@ export function DirectivePanel() {
     memoShownRef.current = directive.directive_key
     const next = scenario?.directives.find(d => d.week_number === weekNumber + 1) ?? null
 
-    // Week 4 (ICE sweep): append Epstein order after the regular memo
-    if (weekNumber === 4 && !epsteinOrderShown) {
-      useGameStore.getState()._setEpsteinOrderShown()
-      showShiftMemo(buildEpsteinOrderMemo(weekNumber, next))
-      return
-    }
-
-    // Week 5: hacktivist contact memo (path A — hacktivist not flagged)
-    if (weekNumber === 5 && !hacktivistFlagged && !hacktivistContactMade) {
-      useGameStore.getState()._setHacktivistContactMade()
-      showShiftMemo(buildHacktivistContactMemo(weekNumber, next))
-      return
-    }
-
     const hasProtests = activeProtests.some(p => p.status === 'active' || p.status === 'forming' || p.status === 'violent')
-    const { memoText, tone, sender, wrongFlags, recruitmentLink } = buildColleagueMemo(weekNumber, compliance, reluctance, hasProtests, wrongFlagsPendingMemo)
-    showShiftMemo({ weekNumber, memoText, tone, nextDirective: next, sender, wrongFlags, recruitmentLink })
-    useGameStore.getState()._clearWrongFlagsPending()
-  }, [isAutomated, directive, flags, raidRecords, isSweep, weekNumber, compliance, reluctance, pendingShiftMemo, scenario, showShiftMemo, activeProtests, wrongFlagsPendingMemo, epsteinOrderShown, hacktivistFlagged, hacktivistContactMade])
+    const { memoText, tone, sender } = buildColleagueMemo(weekNumber, compliance, reluctance, hasProtests)
+    showShiftMemo({ weekNumber, memoText, tone, nextDirective: next, sender })
+  }, [isAutomated, directive, flags, raidRecords, isSweep, weekNumber, compliance, reluctance, pendingShiftMemo, scenario, showShiftMemo, activeProtests])
 
   const completedForDirective = directive
     ? isSweep

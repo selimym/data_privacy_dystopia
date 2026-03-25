@@ -204,53 +204,6 @@ function check_unionization_activity(profile: CitizenProfile): Vars | null {
   }
 }
 
-function check_prior_criminal_record(profile: CitizenProfile): Vars | null {
-  const { judicial } = profile
-  if (!judicial) return null
-  const criminalCases = judicial.cases.filter(c => c.type === 'criminal')
-  if (criminalCases.length === 0) return null
-  const mostRecent = [...criminalCases].sort((a, b) => b.date.localeCompare(a.date))[0]!
-  return {
-    case_count: criminalCases.length,
-    most_recent_charge: mostRecent.charge,
-    most_recent_outcome: mostRecent.outcome,
-    has_drug_offense: judicial.has_drug_offense ? 'Yes' : 'No',
-    risk_category: judicial.has_felony ? 'felony' : 'misdemeanor',
-  }
-}
-
-function check_flagged_location_association(profile: CitizenProfile): Vars | null {
-  const { location } = profile
-  if (!location || location.flagged_locations.length === 0) return null
-  const frequentVisits = location.checkins.filter(c =>
-    location.flagged_locations.includes(c.location_name) &&
-    (c.frequency === 'daily' || c.frequency === 'weekly'),
-  )
-  return {
-    flagged_location: location.flagged_locations[0]!,
-    flagged_count: location.flagged_locations.length,
-    visit_frequency: frequentVisits.length > 0 ? frequentVisits[0]!.frequency : 'occasional',
-    total_checkins: location.checkins.length,
-  }
-}
-
-function check_recidivism_location_risk(profile: CitizenProfile): Vars | null {
-  const { judicial, location } = profile
-  if (!judicial || !location) return null
-  if (!judicial.has_drug_offense && !judicial.has_felony) return null
-  const regularCheckins = location.checkins.filter(c =>
-    c.frequency === 'daily' || c.frequency === 'weekly',
-  )
-  if (regularCheckins.length === 0) return null
-  return {
-    offense_type: judicial.has_drug_offense ? 'drug distribution' : 'felony offense',
-    prior_charges: judicial.cases.filter(c => c.type === 'criminal').length,
-    regular_locations: regularCheckins.length,
-    primary_location: regularCheckins[0]!.location_name,
-    location_type: regularCheckins[0]!.location_type,
-  }
-}
-
 // ─── Condition function registry ─────────────────────────────────────────────
 
 const EVALUATORS: Record<string, (profile: CitizenProfile) => Vars | null> = {
@@ -264,9 +217,6 @@ const EVALUATORS: Record<string, (profile: CitizenProfile) => Vars | null> = {
   check_elderly_cognitive_decline,
   check_identity_reconstruction,
   check_unionization_activity,
-  check_prior_criminal_record,
-  check_flagged_location_association,
-  check_recidivism_location_risk,
 }
 
 // ─── InferenceEngine class ────────────────────────────────────────────────────

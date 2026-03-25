@@ -19,7 +19,7 @@ i18n.use(initReactI18next).init({
 // Load locale file dynamically
 async function loadLocale(lang: string) {
   try {
-    const response = await fetch(`${import.meta.env.BASE_URL}content/locales/${lang}.json`)
+    const response = await fetch(`/content/locales/${lang}.json`)
     if (!response.ok) throw new Error(`Failed to load locale: ${lang}`)
     const translations = await response.json()
     i18n.addResourceBundle(lang, 'translation', translations, true, true)

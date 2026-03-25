@@ -12,13 +12,12 @@ export interface CitizenSkeleton {
   city: string
   state: string
   zip_code: string
-  role: 'citizen' | 'government_official' | 'data_analyst' | 'hacktivist' | 'protected'
+  role: 'citizen' | 'government_official' | 'data_analyst'
   sprite_key: string
   map_x: number                // 0-49 grid coordinate
   map_y: number                // 0-49 grid coordinate
   is_scenario_npc: boolean
   scenario_key: string | null  // e.g. 'jessica_martinez'
-  appears_at_week: number | null   // null = always in queue; set = only from this week onward
   risk_score_cache: number | null
   risk_score_updated_at: string | null
   generation_seed: number      // deterministic: used to regenerate full profile

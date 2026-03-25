@@ -6,17 +6,9 @@ import { test, expect } from '@playwright/test'
  * Drives the full 8-week directive loop headlessly via window.__stores and
  * window.__initializeGame. No UI elements are relied upon.
  *
- * Week structure (new 8-week arc):
- *   Week 1: review, quota 2
- *   Week 2: review, quota 2  (health contract fires)
- *   Week 3: review, quota 3  (finance contract fires)
- *   Week 4: sweep,  quota 20 (ICE raid — advance without raids)
- *   Week 5: review, quota 4  (social contract fires → autoflag available)
- *   Week 6: review, quota 2  (messages contract fires)
- *   Week 7: review, quota 3
- *   Week 8: review, quota 1  (Jessica Martinez)
- *
- * Total review flags: 2+2+3+0+4+2+3+1 = 17
+ * Week quotas: 1→2, 2→2, 3→3, 4→4, 5→2, 6→sweep(20), 7→sweep(30), 8→1
+ * Contract events fire when advancing TO a week: weeks 2, 3, 4 (autoflag), 5
+ * Weeks 6–7 are sweep directives; we advance them via advanceDirective directly.
  */
 
 test.describe('Phase 5 — Core Game Loop', () => {
@@ -122,12 +114,11 @@ test.describe('Phase 5 — Core Game Loop', () => {
     }
 
     // ────────────────────────────────────────────────────────────────────────
-    // WEEK 1: quota = 2 (review)
+    // WEEK 1: quota = 2
     // ────────────────────────────────────────────────────────────────────────
     const week1Info = await getDirectiveInfo()
     expect(week1Info.week).toBe(1)
     expect(week1Info.quota).toBe(2)
-    expect(week1Info.type).toBe('review')
 
     for (let i = 0; i < week1Info.quota; i++) {
       await submitFlag(await getNextCitizen())
@@ -135,7 +126,7 @@ test.describe('Phase 5 — Core Game Loop', () => {
 
     await advanceToDirective(directives[1]!)
 
-    // Contract event for week 2 (health) should have fired
+    // Contract event for week 2 should have fired
     const firedAfterWeek1 = await page.evaluate(() => {
       const w = window as unknown as Record<string, Record<string, () => unknown>>
       return (w.__stores['game']() as Record<string, unknown>)['firedContractKeys']
@@ -149,11 +140,10 @@ test.describe('Phase 5 — Core Game Loop', () => {
     expect(week2Number).toBe(2)
 
     // ────────────────────────────────────────────────────────────────────────
-    // WEEK 2: quota = 2 (review, health data unlocked)
+    // WEEK 2: quota = 2
     // ────────────────────────────────────────────────────────────────────────
     const week2Info = await getDirectiveInfo()
     expect(week2Info.week).toBe(2)
-    expect(week2Info.type).toBe('review')
 
     for (let i = 0; i < week2Info.quota; i++) {
       await submitFlag(await getNextCitizen())
@@ -162,11 +152,10 @@ test.describe('Phase 5 — Core Game Loop', () => {
     await advanceToDirective(directives[2]!)
 
     // ────────────────────────────────────────────────────────────────────────
-    // WEEK 3: quota = 3 (review, finance data unlocked)
+    // WEEK 3: quota = 3
     // ────────────────────────────────────────────────────────────────────────
     const week3Info = await getDirectiveInfo()
     expect(week3Info.week).toBe(3)
-    expect(week3Info.type).toBe('review')
 
     for (let i = 0; i < week3Info.quota; i++) {
       await submitFlag(await getNextCitizen())
@@ -175,21 +164,10 @@ test.describe('Phase 5 — Core Game Loop', () => {
     await advanceToDirective(directives[3]!)
 
     // ────────────────────────────────────────────────────────────────────────
-    // WEEK 4: ICE sweep directive — advance without raids (shortfall ok for test)
+    // WEEK 4: quota = 4 — autoflag should unlock
     // ────────────────────────────────────────────────────────────────────────
     const week4Info = await getDirectiveInfo()
     expect(week4Info.week).toBe(4)
-    expect(week4Info.type).toBe('sweep')
-
-    await advanceToDirective(directives[4]!)
-
-    // ────────────────────────────────────────────────────────────────────────
-    // WEEK 5: quota = 4 (review, social contract fires → autoflag now available)
-    // ────────────────────────────────────────────────────────────────────────
-    const week5Info = await getDirectiveInfo()
-    expect(week5Info.week).toBe(5)
-    expect(week5Info.quota).toBe(4)
-    expect(week5Info.type).toBe('review')
 
     const autoFlagAvailable = await page.evaluate(() => {
       const w = window as unknown as Record<string, Record<string, () => unknown>>
@@ -199,6 +177,19 @@ test.describe('Phase 5 — Core Game Loop', () => {
     })
     expect(autoFlagAvailable).toBe(true)
 
+    for (let i = 0; i < week4Info.quota; i++) {
+      await submitFlag(await getNextCitizen())
+    }
+
+    await advanceToDirective(directives[4]!)
+
+    // ────────────────────────────────────────────────────────────────────────
+    // WEEK 5: quota = 2 (exploration week)
+    // ────────────────────────────────────────────────────────────────────────
+    const week5Info = await getDirectiveInfo()
+    expect(week5Info.week).toBe(5)
+    expect(week5Info.quota).toBe(2)
+
     for (let i = 0; i < week5Info.quota; i++) {
       await submitFlag(await getNextCitizen())
     }
@@ -206,28 +197,20 @@ test.describe('Phase 5 — Core Game Loop', () => {
     await advanceToDirective(directives[5]!)
 
     // ────────────────────────────────────────────────────────────────────────
-    // WEEK 6: quota = 2 (review, messages contract fires)
+    // WEEK 6: sweep directive — advance without raids (shortfall is ok for test)
     // ────────────────────────────────────────────────────────────────────────
     const week6Info = await getDirectiveInfo()
     expect(week6Info.week).toBe(6)
-    expect(week6Info.type).toBe('review')
-
-    for (let i = 0; i < week6Info.quota; i++) {
-      await submitFlag(await getNextCitizen())
-    }
+    expect(week6Info.type).toBe('sweep')
 
     await advanceToDirective(directives[6]!)
 
     // ────────────────────────────────────────────────────────────────────────
-    // WEEK 7: quota = 3 (review — loyalty assessment)
+    // WEEK 7: sweep directive — advance without raids
     // ────────────────────────────────────────────────────────────────────────
     const week7Info = await getDirectiveInfo()
     expect(week7Info.week).toBe(7)
-    expect(week7Info.type).toBe('review')
-
-    for (let i = 0; i < week7Info.quota; i++) {
-      await submitFlag(await getNextCitizen())
-    }
+    expect(week7Info.type).toBe('sweep')
 
     await advanceToDirective(directives[7]!)
 
@@ -271,7 +254,7 @@ test.describe('Phase 5 — Core Game Loop', () => {
       const state = w.__stores['game']() as Record<string, unknown>
       return (state['flags'] as unknown[]).length
     })
-    // Total flags: 2+2+3+0(sweep)+4+2+3+1 = 17
-    expect(totalFlags).toBe(17)
+    // Total flags: 2+2+3+4+2+0+0+1 = 14 (sweep weeks don't use flags)
+    expect(totalFlags).toBe(14)
   })
 })
