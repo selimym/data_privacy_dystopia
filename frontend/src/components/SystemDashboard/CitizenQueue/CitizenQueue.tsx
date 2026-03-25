@@ -15,6 +15,9 @@ export function CitizenQueue() {
 
   const unlockedDomains = useContentStore(s => s.unlockedDomains)
   const getFilteredCaseQueue = useGameStore(s => s.getFilteredCaseQueue)
+  // Subscribe to flags + noActions so queue updates immediately after a decision
+  const flags = useGameStore(s => s.flags)
+  const noActions = useGameStore(s => s.noActions)
   const selectedCitizenId = useUIStore(s => s.selectedCitizenId)
   const setSelectedCitizen = useUIStore(s => s.setSelectedCitizen)
   const queueCollapsed = useUIStore(s => s.queueCollapsed)
@@ -24,7 +27,8 @@ export function CitizenQueue() {
 
   const rawQueue: CaseOverview[] = useMemo(
     () => getFilteredCaseQueue(unlockedDomains),
-    [skeletons, unlockedDomains, getFilteredCaseQueue],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [skeletons, unlockedDomains, getFilteredCaseQueue, flags, noActions],
   )
 
   const sorted = useMemo(() => {
