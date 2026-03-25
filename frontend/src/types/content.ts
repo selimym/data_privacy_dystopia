@@ -12,6 +12,7 @@ export interface SpecialNPC {
   sprite_key: string
   map_x: number
   map_y: number
+  appears_at_week?: number
 }
 
 export interface Scenario {

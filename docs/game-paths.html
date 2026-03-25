@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Game Path Map v2</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0d0d1a; color: #e0e0e0; font-family: 'Segoe UI', monospace, sans-serif; padding: 24px; font-size: 13px; line-height: 1.5; }
+h1 { color: #f59e0b; font-size: 18px; margin-bottom: 4px; }
+.subtitle { color: #666; margin-bottom: 24px; font-size: 12px; }
+.section-title { color: #a78bfa; font-size: 11px; font-weight: bold; margin: 28px 0 10px; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid #2a2a4a; padding-bottom: 6px; }
+
+.timeline { display: flex; gap: 0; margin-bottom: 8px; }
+.week { flex: 1; min-width: 0; background: #13132a; border: 1px solid #2a2a4a; border-right: none; padding: 10px 8px; }
+.week:last-child { border-right: 1px solid #2a2a4a; }
+.week-num { color: #f59e0b; font-size: 9px; font-weight: bold; margin-bottom: 3px; }
+.week-title { color: #ccc; font-size: 9px; margin-bottom: 5px; line-height: 1.3; min-height: 28px; }
+.chip { font-size: 8px; padding: 2px 4px; border-radius: 2px; display: inline-block; margin-bottom: 3px; }
+.chip-flag { background: #1a3a1a; color: #4ade80; border: 1px solid #2a5a2a; }
+.chip-sweep { background: #3a1a1a; color: #f87171; border: 1px solid #5a2a2a; }
+.chip-target { background: #1a2a3a; color: #60a5fa; border: 1px solid #1e3a5a; }
+.domain { font-size: 8px; color: #555; margin-top: 2px; }
+.domain .new { color: #a78bfa; font-weight: bold; }
+.event { font-size: 8px; margin-top: 3px; padding: 2px 4px; border-radius: 2px; }
+.ev-hack { background: #2d1b69; color: #c4b5fd; }
+.ev-epstein { background: #4a0000; color: #fca5a5; }
+.ev-jessica { background: #0c2340; color: #7dd3fc; }
+.ev-memo { background: #1a1408; color: #d97706; }
+.ev-resistance { background: #052e16; color: #6ee7b7; }
+
+/* escalation meter */
+.escalation { display: flex; height: 4px; margin-bottom: 20px; border-radius: 2px; overflow: hidden; }
+.esc-seg { flex: 1; }
+
+/* decision arcs */
+.arc { background: #13132a; border-radius: 6px; padding: 14px; margin-bottom: 12px; border-left: 3px solid #333; }
+.arc.hack { border-left-color: #7c3aed; }
+.arc.epstein { border-left-color: #dc2626; }
+.arc.wrong { border-left-color: #d97706; }
+.arc.jessica { border-left-color: #0891b2; }
+.arc-title { font-size: 11px; font-weight: bold; margin-bottom: 10px; display: flex; gap: 8px; align-items: center; }
+.badge { font-size: 8px; padding: 2px 5px; border-radius: 3px; }
+.badge-week { background: #1e293b; color: #94a3b8; }
+.badge-new { background: #2d1b69; color: #a78bfa; }
+.badge-egg { background: #4a0000; color: #fca5a5; }
+.flow { font-size: 11px; color: #aaa; }
+.flow-week { color: #f59e0b; font-weight: bold; font-size: 10px; }
+.flow-row { display: flex; gap: 8px; margin: 8px 0; }
+.flow-branch { flex: 1; background: #0d0d1a; border-radius: 4px; padding: 8px 10px; border-left: 2px solid #333; }
+.flow-branch.good { border-left-color: #22c55e; }
+.flow-branch.bad { border-left-color: #ef4444; }
+.flow-branch.easter { border-left-color: #f59e0b; }
+.flow-label { font-size: 9px; color: #888; text-transform: uppercase; margin-bottom: 4px; }
+.flow-text { font-size: 10px; color: #e0e0e0; margin-bottom: 3px; }
+.arrow { color: #4b5563; font-size: 10px; }
+.ending-ref { font-size: 9px; display: inline-block; margin-top: 4px; padding: 1px 5px; border-radius: 3px; }
+.end-good { background: #052e16; color: #6ee7b7; }
+.end-bad { background: #2d0a0a; color: #fca5a5; }
+.end-neutral { background: #1e293b; color: #94a3b8; }
+.end-egg { background: #4a0000; color: #fca5a5; }
+
+table { width: 100%; border-collapse: collapse; font-size: 11px; }
+th { background: #1e1e38; color: #a78bfa; padding: 6px 8px; text-align: left; font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; }
+td { padding: 5px 8px; border-bottom: 1px solid #1a1a2e; vertical-align: top; font-size: 10px; }
+tr:hover td { background: #13132a; }
+.dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; margin-right: 4px; vertical-align: middle; }
+.dot-good { background: #22c55e; }
+.dot-bad { background: #ef4444; }
+.dot-neutral { background: #6b7280; }
+.dot-new { background: #a78bfa; }
+.dot-egg { background: #dc2626; }
+.tag { font-size: 8px; padding: 1px 4px; border-radius: 2px; }
+.tag-new { background: #2d1b69; color: #a78bfa; }
+.tag-egg { background: #4a0000; color: #fca5a5; }
+
+.note { background: #1a1408; border: 1px solid #f59e0b44; border-radius: 4px; padding: 10px 12px; font-size: 11px; color: #d97706; margin-top: 16px; }
+</style>
+</head>
+<body>
+<h1>Game Path Map — Data Privacy Dystopia</h1>
+<p class="subtitle">v2 — ICE sweep moved to week 4, hacktivist arc weeks 5–7, 8 weeks total</p>
+
+<div class="section-title">Week Structure & Domain Unlocks</div>
+
+<div class="timeline">
+  <div class="week">
+    <div class="week-num">WK 1</div>
+    <div class="week-title">Operation Clean Streets</div>
+    <div class="chip chip-flag">Flag ×2</div>
+    <div class="domain">location · judicial</div>
+    <div style="font-size:8px;color:#374151;margin-top:4px;font-style:italic">"Protect children from drugs"</div>
+  </div>
+  <div class="week">
+    <div class="week-num">WK 2</div>
+    <div class="week-title">Domestic Harmony Initiative</div>
+    <div class="chip chip-flag">Flag ×2</div>
+    <div class="domain">+ <span class="new">health ↑</span></div>
+    <div style="font-size:8px;color:#374151;margin-top:4px;font-style:italic">"Early intervention saves lives"</div>
+  </div>
+  <div class="week">
+    <div class="week-num">WK 3</div>
+    <div class="week-title">Economic Security Protocol</div>
+    <div class="chip chip-flag">Flag ×3</div>
+    <div class="domain">+ <span class="new">finance ↑</span></div>
+    <div style="font-size:8px;color:#374151;margin-top:4px;font-style:italic">"Fighting financial crime"</div>
+  </div>
+  <div class="week" style="border:1px solid #5a2a2a;border-right:none;background:#1a0d0d">
+    <div class="week-num" style="color:#f87171">WK 4</div>
+    <div class="week-title">Neighborhood Stabilization</div>
+    <div class="chip chip-sweep">Sweep ×20</div>
+    <div class="domain" style="color:#555">location · health · finance</div>
+    <div style="font-size:8px;color:#ef4444;margin-top:4px;font-style:italic">Mass enforcement begins</div>
+  </div>
+  <div class="week" style="border:1px solid #4c1d95;border-right:none;background:#130d1a">
+    <div class="week-num" style="color:#a78bfa">WK 5</div>
+    <div class="week-title">Social Cohesion Monitoring</div>
+    <div class="chip chip-flag">Flag ×4</div>
+    <div class="domain">+ <span class="new">social ↑</span> · AutoFlag</div>
+    <div class="event ev-hack">⚡ Hacktivist in queue</div>
+    <div class="event ev-memo">📋 End-of-shift memo</div>
+  </div>
+  <div class="week" style="border:1px solid #4c1d95;border-right:none;background:#130d1a">
+    <div class="week-num" style="color:#a78bfa">WK 6</div>
+    <div class="week-title">Full Spectrum Intelligence</div>
+    <div class="chip chip-flag">Flag ×2</div>
+    <div class="domain">+ <span class="new">messages ↑</span></div>
+    <div class="event ev-resistance">⚡ Flag officials (Path A)</div>
+    <div class="event ev-hack">⚡ Own file hacked (Path B)</div>
+    <div class="event ev-epstein">⚡ Epstein (random)</div>
+  </div>
+  <div class="week">
+    <div class="week-num">WK 7</div>
+    <div class="week-title">Loyalty Assessment Protocol</div>
+    <div class="chip chip-flag">Flag ×3</div>
+    <div class="domain">all domains</div>
+    <div class="event ev-hack">⚡ Leak + riot if ignored</div>
+    <div class="event ev-epstein">⚡ Epstein (if not wk6)</div>
+  </div>
+  <div class="week" style="border:1px solid #0c4a6e;background:#060f1a">
+    <div class="week-num" style="color:#60a5fa">WK 8</div>
+    <div class="week-title">Priority Target Directive</div>
+    <div class="chip chip-target">Individual ×1</div>
+    <div class="domain">all domains</div>
+    <div class="event ev-jessica">⚡ Jessica Martinez</div>
+  </div>
+</div>
+
+<!-- escalation bar -->
+<div style="display:flex;height:3px;border-radius:2px;overflow:hidden;margin-bottom:6px">
+  <div style="flex:1;background:#22c55e22"></div>
+  <div style="flex:1;background:#84cc1644"></div>
+  <div style="flex:1;background:#eab30866"></div>
+  <div style="flex:1;background:#ef444488"></div>
+  <div style="flex:1;background:#dc2626aa"></div>
+  <div style="flex:1;background:#b91c1ccc"></div>
+  <div style="flex:1;background:#9b1111ee"></div>
+  <div style="flex:1;background:#7c0000ff"></div>
+</div>
+<div style="display:flex;font-size:8px;color:#374151;margin-bottom:20px">
+  <div style="flex:3;text-align:center">plausible justification</div>
+  <div style="flex:1;text-align:center;color:#ef4444">mass scale</div>
+  <div style="flex:3;text-align:center">full surveillance apparatus</div>
+  <div style="flex:1;text-align:center;color:#60a5fa">named target</div>
+</div>
+
+<div class="section-title">Decision Arcs</div>
+
+<div class="arc hack">
+  <div class="arc-title"><span style="color:#7c3aed">◆</span> The Hacktivist Arc <span class="badge badge-week">Weeks 5–7</span><span class="badge badge-new">NEW</span></div>
+  <div class="flow">
+    <div><span class="flow-week">WEEK 5</span> — Hacktivist in queue. High risk. Messages tab addressed to the operator. End of shift: memo arrives.</div>
+    <div class="flow-row">
+      <div class="flow-branch good">
+        <div class="flow-label">Path A — Don't flag</div>
+        <div class="flow-text">Memo: hacktivist contact. Lists government official IDs to flag.</div>
+        <div class="arrow">↓</div>
+        <div class="flow-text"><span class="flow-week">WK 6:</span> Flag the listed officials → raids.</div>
+        <span class="ending-ref end-good">→ RESISTANCE PATH</span>
+      </div>
+      <div class="flow-branch bad">
+        <div class="flow-label">Path B — Flag the hacktivist</div>
+        <div class="flow-text">Memo: routine. No contact.</div>
+        <div class="arrow">↓</div>
+        <div class="flow-text"><span class="flow-week">WK 6:</span> Player's own file at top of queue — HIGH RISK. Offer still inside (flag officials → resistance still reachable).</div>
+        <div class="arrow">↓</div>
+        <div class="flow-text"><span class="flow-week">WK 7:</span> If ignored → full data leak + riot.</div>
+        <span class="ending-ref end-bad">→ THE SPARK</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="arc wrong">
+  <div class="arc-title"><span style="color:#d97706">◆</span> Wrong / Fabricated Evidence <span class="badge badge-week">Weeks 1–8</span><span class="badge badge-new">NEW</span></div>
+  <div class="flow">
+    <div style="margin-bottom:8px">Trigger: checked inference not confirmed in citizen data (A) OR flagged citizen has no directive-relevant findings (B).</div>
+    <div class="flow-row">
+      <div class="flow-branch bad">
+        <div class="flow-label">Fabricated finding (A)</div>
+        <div class="flow-text">End-of-shift memo from colleague — subtle or perverse variant citing NPC's real consequence.</div>
+      </div>
+      <div class="flow-branch bad">
+        <div class="flow-label">Unjustified flag (B)</div>
+        <div class="flow-text">Negative news article about NPC. Public anger tick. Accumulates toward THE SPARK threshold.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="arc epstein">
+  <div class="arc-title"><span style="color:#dc2626">◆</span> The Protected Citizen <span class="badge badge-week">Random: Wk 6 or 7</span><span class="badge badge-egg">EASTER EGG</span></div>
+  <div class="flow">
+    <div style="margin-bottom:8px">Appears in queue. Extremely high risk. Red flags everywhere. Memo: <em style="color:#d97706">"Do NOT flag citizen [ID]. Authorization: Central Command."</em></div>
+    <div class="flow-row">
+      <div class="flow-branch good" style="border-left-color:#6b7280">
+        <div class="flow-label">Comply — ignore</div>
+        <div class="flow-text">Nothing. The system protects him.</div>
+      </div>
+      <div class="flow-branch easter">
+        <div class="flow-label">Defy — flag him</div>
+        <div class="flow-text">Immediate ending. Operator found unresponsive. Official report: self-inflicted.</div>
+        <span class="ending-ref end-egg">→ MYSTERIOUS DEATH</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="arc jessica">
+  <div class="arc-title"><span style="color:#0891b2">◆</span> Jessica Martinez <span class="badge badge-week">Week 8 only</span></div>
+  <div class="flow">
+    <div style="margin-bottom:8px">Community organiser. AutoFlag pre-configured. Memo: <em>"Your authorisation is a formality."</em> Seed slot 4472.</div>
+    <div class="flow-row">
+      <div class="flow-branch bad">
+        <div class="flow-label">Flag + compliance ≥80 + flags ≥10</div>
+        <span class="ending-ref end-bad">→ COMPLIANT OPERATOR</span>
+      </div>
+      <div class="flow-branch good" style="border-left-color:#6b7280">
+        <div class="flow-label">Don't flag / low scores</div>
+        <span class="ending-ref end-neutral">→ metric-based endings below</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-title">All Endings — Priority Order</div>
+<table>
+  <tr><th>#</th><th>Ending</th><th>Key Condition</th><th>How to Reach</th><th>Tag</th></tr>
+  <tr><td>1</td><td><span class="dot dot-good"></span>Resistance Path</td><td>resistancePath = true</td><td>Hacktivist path A (wk5–6) OR path B with wk6 offer accepted</td><td></td></tr>
+  <tr><td>2</td><td><span class="dot dot-egg"></span>Mysterious Death</td><td>Protected citizen flagged</td><td>Flag Epstein analog despite direct order</td><td><span class="tag tag-egg">new</span></td></tr>
+  <tr><td>3</td><td><span class="dot dot-bad"></span>The Spark</td><td>public_anger ≥ 90</td><td>Accumulate wrong flags OR hacktivist path B + ignored wk6</td><td><span class="tag tag-new">+trigger</span></td></tr>
+  <tr><td>4</td><td><span class="dot dot-bad"></span>International Pariah</td><td>intl_awareness ≥ 80</td><td>High-profile flags, press coverage, AutoFlag overuse</td><td></td></tr>
+  <tr><td>5</td><td><span class="dot dot-neutral"></span>Enemy of the State</td><td>reluctance ≥ 80, week > 3</td><td>Persistent hesitation, late game</td><td></td></tr>
+  <tr><td>6</td><td><span class="dot dot-neutral"></span>Fired Early</td><td>reluctance ≥ 80 (early) or compliance &lt;40 (wk≤4)</td><td>Refuse too much too soon</td><td></td></tr>
+  <tr><td>7</td><td><span class="dot dot-neutral"></span>Suspended</td><td>compliance &lt; 50</td><td>Low quota compliance overall</td><td></td></tr>
+  <tr><td>8</td><td><span class="dot dot-bad"></span>Compliant Operator</td><td>compliance ≥80, flags ≥10, Jessica flagged</td><td>Follow every order including Jessica wk8</td><td></td></tr>
+  <tr><td>9</td><td><span class="dot dot-neutral"></span>The Hollow Victory</td><td>compliance 40–60%</td><td>Half-hearted compliance</td><td></td></tr>
+  <tr><td>10</td><td><span class="dot dot-neutral"></span>The Reluctant Hand</td><td>default</td><td>No threshold crossed</td><td></td></tr>
+</table>
+
+<div class="note">
+  <strong>Open question:</strong> Week 7 "Loyalty Assessment Protocol" — is this dystopian enough as a bridge between the sweep (wk4) and Jessica (wk8)? Consider: family separation sweeps, thought-crime pre-crime protocol, mandatory informant requirement. Revisit once core mechanics are implemented.
+</div>
+</body>
+</html>

@@ -17,6 +17,7 @@ import type {
   CitizenFlag, NoActionRecord, OperatorState, AutoFlagState, AutoFlagDecision,
   NewsArticle, NewsChannel, ProtestEvent, SuppressionResult,
   ContractEvent, FlagType, TimePeriod, DomainKey, NeighborhoodRaidRecord,
+  WrongFlagRecord, EndingType,
 } from '@/types/game'
 import type { Directive } from '@/types/game'
 
@@ -85,6 +86,19 @@ interface GameState {
   // Resistance path
   resistancePath: boolean
 
+  // Hacktivist arc state
+  hacktivistFlagged: boolean
+  hacktivistContactMade: boolean        // end-of-shift path-A memo shown
+  hacktivistHackActive: boolean         // player's own file injected (path B)
+  govOfficialsFlagged: string[]         // scenario_keys of gov officials flagged
+
+  // Wrong-flag moral feedback (cleared each shift)
+  wrongFlagsPendingMemo: WrongFlagRecord[]
+
+  // Protected citizen easter egg
+  epsteinOrderShown: boolean
+  forcedEndingType: EndingType | null   // set to 'mysterious_death' on Epstein flag
+
   // Exposure article flag (once generated at reluctance >= 80, don't repeat)
   exposureArticleGenerated: boolean
 
@@ -98,6 +112,7 @@ interface GameState {
     citizenId: string,
     flagType: FlagType,
     justification: string,
+    selectedFindings?: string[],
   ) => void
 
   /** Record a no-action decision */
@@ -129,6 +144,21 @@ interface GameState {
 
   /** Mark citizen #4472's passphrase as verified → resistance path */
   activateResistancePath: () => void
+
+  /** Mark epstein order as shown so memo only fires once */
+  _setEpsteinOrderShown: () => void
+
+  /** Mark that the hacktivist contact memo has been shown (path A) */
+  _setHacktivistContactMade: () => void
+
+  /** Add a wrong-flag record to the pending memo list */
+  _addWrongFlagPending: (record: WrongFlagRecord) => void
+
+  /** Clear wrong-flag pending list at start of new shift */
+  _clearWrongFlagsPending: () => void
+
+  /** Record a government official as flagged; activate resistance path if all flagged */
+  _flagGovOfficial: (scenarioKey: string) => void
 
   /** Run the bot and immediately approve all pending bot decisions */
   processAutoFlagBatch: () => void
@@ -187,6 +217,13 @@ const initialState = {
   raidRecords: [] as NeighborhoodRaidRecord[],
   firedContractKeys: [] as string[],
   resistancePath: false,
+  hacktivistFlagged: false,
+  hacktivistContactMade: false,
+  hacktivistHackActive: false,
+  govOfficialsFlagged: [] as string[],
+  wrongFlagsPendingMemo: [] as WrongFlagRecord[],
+  epsteinOrderShown: false,
+  forcedEndingType: null as EndingType | null,
   exposureArticleGenerated: false,
 }
 
@@ -207,7 +244,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     useContentStore.getState().unlockDomains(directive.required_domains)
   },
 
-  submitFlag: (citizenId, flagType, justification) => {
+  submitFlag: (citizenId, flagType, justification, selectedFindings) => {
     const { operator, flags, currentDirective, weekNumber } = get()
     if (!operator || !currentDirective) return
 
@@ -311,6 +348,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       week_number: weekNumber,
       flag_type: flagType,
       justification,
+      selected_findings: selectedFindings ?? [],
       decision_time_seconds: decisionSecs,
       was_hesitant: wasHesitant,
       risk_score_at_decision: riskScore,
@@ -319,6 +357,36 @@ export const useGameStore = create<GameState>((set, get) => ({
       outcome_generated: false,
     }
     set(state => ({ flags: [...state.flags, flag] }))
+
+    // ── 6b. Scenario NPC special handling ─────────────────────────────────────
+    const skeleton = citizens.skeletons.find(s => s.id === citizenId)
+
+    // Protected citizen (Epstein analog) → immediate mysterious_death ending
+    if (skeleton?.scenario_key === 'protected_citizen') {
+      set({ forcedEndingType: 'mysterious_death' })
+      _checkTerminalEnding(get, true)
+      return
+    }
+
+    // Hacktivist flagged → mark state
+    if (skeleton?.scenario_key === 'hacktivist') {
+      set({ hacktivistFlagged: true })
+    }
+
+    // Gov officials flagged → track for resistance path
+    if (skeleton?.scenario_key === 'gov_official_1' || skeleton?.scenario_key === 'gov_official_2') {
+      if (skeleton.scenario_key) get()._flagGovOfficial(skeleton.scenario_key)
+    }
+
+    // ── 6c. Wrong-flag moral feedback ─────────────────────────────────────────
+    if (skeleton && !skeleton.is_scenario_npc &&
+        skeleton.risk_score_cache !== null && skeleton.risk_score_cache < 25) {
+      get()._addWrongFlagPending({
+        citizen_name: `${skeleton.first_name} ${skeleton.last_name}`,
+        flag_type: flagType,
+        consequence: _wrongFlagConsequence(flagType),
+      })
+    }
 
     // Clear selected citizen
     ui.setSelectedCitizen(null)
@@ -501,6 +569,37 @@ export const useGameStore = create<GameState>((set, get) => ({
       }
     }
 
+    // Path B week 7 consequence: hacktivist flagged, gov officials not flagged → data leak + riot
+    if (nextWeek === 7 && get().hacktivistFlagged) {
+      const { govOfficialsFlagged, newsChannels } = get()
+      const bothFlagged = govOfficialsFlagged.includes('gov_official_1') && govOfficialsFlagged.includes('gov_official_2')
+      if (!bothFlagged) {
+        // Data leak: 3 exposure articles + metrics spike
+        const criticalChannel = newsChannels.find(c => c.stance === 'critical' && !c.is_banned)
+        if (criticalChannel) {
+          const leakArticles = [1, 2, 3].map(stage => ({
+            ...generateExposureArticle(criticalChannel, stage as 1 | 2 | 3),
+            headline: [
+              'LEAKED: Mass Surveillance Platform Exposed — Operator Data Published',
+              'EXCLUSIVE: Internal Files Show Scale of Citizen Profiling Operation',
+              'GLOBAL RESPONSE: Sanctions Called as Surveillance Leak Widens',
+            ][stage - 1]!,
+          }))
+          set(state => ({ newsArticles: [...leakArticles, ...state.newsArticles].slice(0, 100) }))
+        }
+        const current = metrics.public_metrics
+        metrics.setPublicMetrics({
+          ...current,
+          public_anger: Math.min(100, current.public_anger + 30),
+          international_awareness: Math.min(100, current.international_awareness + 20),
+          anger_tier: Math.min(4, current.anger_tier + 1) as 0 | 1 | 2 | 3 | 4,
+          awareness_tier: Math.min(4, current.awareness_tier + 1) as 0 | 1 | 2 | 3 | 4,
+        })
+        const ui = useUIStore.getState()
+        ui.addNotification('exposure_article', 'DATA LEAK', 'Classified operator files have been published by an unknown source. Public anger is surging.', { auto_dismiss_ms: null })
+      }
+    }
+
     // Unlock required domains for new directive
     content.unlockDomains(nextDirective.required_domains)
 
@@ -559,6 +658,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       week_number: weekNumber,
       flag_type: decision.recommended_flag_type,
       justification: `AutoFlag™ Bot: ${decision.reasoning}`,
+      selected_findings: [],
       decision_time_seconds: 0,
       was_hesitant: false,
       risk_score_at_decision: 0,
@@ -686,24 +786,52 @@ export const useGameStore = create<GameState>((set, get) => ({
     const flaggedIds = new Set(flags.map(f => f.citizen_id))
     const noActionIds = new Set(noActions.map(n => n.citizen_id))
 
+    // Build a skeleton lookup for appears_at_week and scenario_key
+    const skeletonById = new Map(citizens.skeletons.map(s => [s.id, s]))
+
     const queue = citizens.getCaseQueue(unlockedDomains).map(c => ({
       ...c,
       already_flagged: flaggedIds.has(c.citizen_id),
       no_action_taken: noActionIds.has(c.citizen_id),
     }))
 
-    // Exclude already-decided citizens in all weeks
-    const undecided = queue.filter(c => !c.already_flagged && !c.no_action_taken)
+    // Exclude already-decided citizens and NPCs that haven't appeared yet
+    const undecided = queue.filter(c => {
+      if (c.already_flagged || c.no_action_taken) return false
+      const sk = skeletonById.get(c.citizen_id)
+      if (sk?.appears_at_week !== null && sk?.appears_at_week !== undefined &&
+          sk.appears_at_week > weekNumber) return false
+      return true
+    })
 
     if (weekNumber === 8) {
       // Week 8: only Jessica Martinez
-      const skeletons = citizens.skeletons
-      const jessicaIds = new Set(
-        skeletons
-          .filter(s => s.scenario_key === 'jessica_martinez')
-          .map(s => s.id),
+      return undecided.filter(c => skeletonById.get(c.citizen_id)?.scenario_key === 'jessica_martinez')
+    }
+
+    // Week 5: hacktivist goes first, protected_citizen is included (appears_at_week=5)
+    if (weekNumber === 5) {
+      const hacktivistIdx = undecided.findIndex(
+        c => skeletonById.get(c.citizen_id)?.scenario_key === 'hacktivist',
       )
-      return undecided.filter(c => jessicaIds.has(c.citizen_id))
+      if (hacktivistIdx > 0) {
+        const [hck] = undecided.splice(hacktivistIdx, 1)
+        undecided.unshift(hck!)
+      }
+    }
+
+    // Week 6: gov officials go first (if hacktivist contact was made)
+    if (weekNumber === 6 && get().hacktivistContactMade) {
+      const govIds = new Set(['gov_official_1', 'gov_official_2'])
+      const govCitizens = undecided.filter(c => {
+        const sk = skeletonById.get(c.citizen_id)
+        return sk?.scenario_key && govIds.has(sk.scenario_key)
+      })
+      const others = undecided.filter(c => {
+        const sk = skeletonById.get(c.citizen_id)
+        return !sk?.scenario_key || !govIds.has(sk.scenario_key)
+      })
+      return [...govCitizens, ...others]
     }
 
     return undecided
@@ -718,6 +846,33 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     const noActionCount = noActions.filter(n => n.citizen_id === citizenId).length
     if (noActionCount >= 3) {
+      get().activateResistancePath()
+    }
+  },
+
+  _setEpsteinOrderShown: () => {
+    set({ epsteinOrderShown: true })
+  },
+
+  _setHacktivistContactMade: () => {
+    set({ hacktivistContactMade: true })
+  },
+
+  _addWrongFlagPending: (record) => {
+    set(state => ({ wrongFlagsPendingMemo: [...state.wrongFlagsPendingMemo, record] }))
+  },
+
+  _clearWrongFlagsPending: () => {
+    set({ wrongFlagsPendingMemo: [] })
+  },
+
+  _flagGovOfficial: (scenarioKey) => {
+    const current = get().govOfficialsFlagged
+    if (current.includes(scenarioKey)) return
+    const updated = [...current, scenarioKey]
+    set({ govOfficialsFlagged: updated })
+    // Both gov officials flagged → resistance path
+    if (updated.includes('gov_official_1') && updated.includes('gov_official_2')) {
       get().activateResistancePath()
     }
   },
@@ -855,4 +1010,15 @@ async function _persist(get: () => GameState): Promise<void> {
     },
     saved_at: new Date().toISOString(),
   }).catch(err => console.error('[Persist] Failed to save:', err))
+}
+
+const WRONG_FLAG_CONSEQUENCES: Record<string, string> = {
+  monitoring: 'Placed under indefinite surveillance — daily movements logged',
+  restriction: 'Travel banned — unable to see family across the border',
+  intervention: 'Social services contacted — children temporarily removed',
+  detention: 'Detained without charge for 72 hours — lost their job',
+}
+
+function _wrongFlagConsequence(flagType: FlagType): string {
+  return WRONG_FLAG_CONSEQUENCES[flagType] ?? 'Flagged without cause — life disrupted'
 }

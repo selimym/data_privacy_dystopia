@@ -107,8 +107,8 @@ export const useUIStore = create<UIState>((set, get) => ({
 
   setSelectedCitizen: (id) => {
     set({ selectedCitizenId: id })
-    if (id !== null) {
-      // Start the decision timer when a citizen is selected
+    if (id !== null && get().tutorialStep === null) {
+      // Only start the decision timer when outside the tutorial
       set({ decisionTimerStart: Date.now() })
     }
   },
