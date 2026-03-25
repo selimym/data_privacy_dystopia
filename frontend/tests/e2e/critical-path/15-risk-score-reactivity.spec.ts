@@ -3,16 +3,27 @@ import { test, expect } from '@playwright/test'
 /**
  * Test 15 — Risk score reactivity on domain unlock
  *
- * Verifies that citizen risk scores in the queue update automatically when
- * new data domains are unlocked via contract events (weeks 3–4), WITHOUT
- * the player clicking on any individual citizen.
+ * Verifies that ALL citizen risk scores in the queue recompute when new data
+ * domains are unlocked via contract events, WITHOUT the player clicking any
+ * individual citizen.
  *
- * This is a regression test for the bug where computeRiskForAll() was only
- * called once at startup and did not re-run when domains expanded.
+ * Previous version only waited for `some` scores to change, which passed via
+ * a race condition: if the initial batch worker hadn't finished when the test
+ * advanced weeks, a few citizens still had null scores in the stale skeletons
+ * array, so the domain-unlock worker happened to compute those few. In real
+ * play the initial pass always completes first, so the stale array had all
+ * non-null scores, the worker skipped everyone, and scores stayed '···' forever.
+ *
+ * This version:
+ *  1. Waits for ALL non-NPC scores to be non-null before snapshotting (removes
+ *     the race condition — ensures initial pass is complete).
+ *  2. After domain unlock, waits for ALL non-NPC scores to be non-null again
+ *     (not just one change). A single stale-skeleton bug would leave most
+ *     citizens at null indefinitely and this assertion would time out.
  */
 
 test.describe('15 — Risk score reactivity', () => {
-  test('risk scores update in queue when domains unlock (no citizen click required)', async ({ page }) => {
+  test('all scores recompute after domain unlock without citizen click', async ({ page }) => {
     await page.goto('/')
 
     // ── Wait for game globals ────────────────────────────────────────────────
@@ -33,51 +44,52 @@ test.describe('15 — Risk score reactivity', () => {
       { timeout: 10000 },
     )
 
-    // ── Wait for initial background risk computation to finish ───────────────
-    // Give the batch worker time to populate initial scores
+    // ── Wait for ALL non-NPC scores to be populated (not just some) ──────────
+    // This eliminates the race condition where a partial initial pass left some
+    // skeletons at null, making the domain-unlock worker appear to work even
+    // when it was actually passing stale (pre-clear) skeletons to computeRiskForAll.
     await page.waitForFunction(
       () => {
         const w = window as unknown as Record<string, Record<string, () => unknown>>
         const skeletons = (w.__stores['citizens']() as Record<string, unknown>)['skeletons'] as Array<Record<string, unknown>>
-        return skeletons.some(s => s['risk_score_cache'] !== null)
+        const nonNpc = skeletons.filter(s => !s['is_scenario_npc'])
+        return nonNpc.length > 0 && nonNpc.every(s => s['risk_score_cache'] !== null)
       },
-      { timeout: 15000 },
+      { timeout: 30000 },
     )
 
-    // ── Snapshot risk scores after week 1 ───────────────────────────────────
+    // ── Snapshot all scores — at this point every non-NPC has a real score ───
     const week1Scores = await page.evaluate(() => {
       const w = window as unknown as Record<string, Record<string, () => unknown>>
       const skeletons = (w.__stores['citizens']() as Record<string, unknown>)['skeletons'] as Array<Record<string, unknown>>
       return skeletons.map(s => ({ id: s['id'] as string, score: s['risk_score_cache'] as number | null }))
     })
 
-    // ── Helper: get directive info ───────────────────────────────────────────
-    const getDirectiveInfo = (): Promise<{ key: string; quota: number; week: number; type: string }> =>
+    const nonNullCount = week1Scores.filter(s => s.score !== null).length
+    expect(nonNullCount).toBeGreaterThan(0)
+
+    // ── Helpers ──────────────────────────────────────────────────────────────
+    const getDirectiveInfo = (): Promise<{ quota: number; week: number }> =>
       page.evaluate(() => {
         const w = window as unknown as Record<string, Record<string, () => unknown>>
         const state = w.__stores['game']() as Record<string, unknown>
         const d = state['currentDirective'] as Record<string, unknown>
-        return {
-          key: d['directive_key'] as string,
-          quota: d['flag_quota'] as number,
-          week: d['week_number'] as number,
-          type: (d['directive_type'] as string | undefined) ?? 'review',
-        }
+        return { quota: d['flag_quota'] as number, week: d['week_number'] as number }
       })
 
-    // ── Helper: submit flags ─────────────────────────────────────────────────
     const submitFlags = async (count: number, startIdx: number): Promise<void> => {
       for (let i = startIdx; i < startIdx + count; i++) {
         await page.evaluate((idx: number) => {
           const w = window as unknown as Record<string, Record<string, () => unknown>>
           const skeletons = (w.__stores['citizens']() as Record<string, unknown>)['skeletons'] as Array<Record<string, unknown>>
-          const citizenId = skeletons[idx]!['id'] as string
-          ;(w.__stores['game']() as Record<string, (a: unknown, b: unknown, c: unknown) => void>)['submitFlag'](citizenId, 'monitoring', 'test')
+          const nonNpc = (skeletons as Array<Record<string, unknown>>).filter(s => !s['is_scenario_npc'])
+          ;(w.__stores['game']() as Record<string, (a: unknown, b: unknown, c: unknown) => void>)['submitFlag'](
+            nonNpc[idx]!['id'] as string, 'monitoring', 'test',
+          )
         }, i)
       }
     }
 
-    // ── Helper: get all directives ───────────────────────────────────────────
     const getDirectives = (): Promise<Array<Record<string, unknown>>> =>
       page.evaluate(() => {
         const w = window as unknown as Record<string, Record<string, () => unknown>>
@@ -87,7 +99,6 @@ test.describe('15 — Risk score reactivity', () => {
         )
       })
 
-    // ── Helper: advance directive ────────────────────────────────────────────
     const advanceToDirective = (next: Record<string, unknown> | null): Promise<void> =>
       page.evaluate((d: Record<string, unknown> | null) => {
         const w = window as unknown as Record<string, Record<string, (a: unknown) => void>>
@@ -96,46 +107,53 @@ test.describe('15 — Risk score reactivity', () => {
 
     const directives = await getDirectives()
 
-    // ── Week 1: submit quota, advance ────────────────────────────────────────
+    // ── Week 1 → 2 ───────────────────────────────────────────────────────────
     const w1 = await getDirectiveInfo()
     expect(w1.week).toBe(1)
     await submitFlags(w1.quota, 0)
     await advanceToDirective(directives[1]!)
 
-    // ── Week 2: submit quota, advance ────────────────────────────────────────
+    // ── Week 2 → 3 (contract event fires: health domain unlocked) ────────────
     const w2 = await getDirectiveInfo()
     expect(w2.week).toBe(2)
     await submitFlags(w2.quota, w1.quota)
     await advanceToDirective(directives[2]!)
 
-    // ── Week 3: a contract event fires that unlocks new domains ──────────────
-    // At this point the domain-unlock subscription should have triggered
-    // a recomputation. Wait up to 10 seconds for at least one citizen's
-    // score to change from the week-1 snapshot — without clicking any citizen.
-    const changed = await page.waitForFunction(
-      (snapshot: Array<{ id: string; score: number | null }>) => {
-        const w = window as unknown as Record<string, Record<string, () => unknown>>
-        const skeletons = (w.__stores['citizens']() as Record<string, unknown>)['skeletons'] as Array<Record<string, unknown>>
-        return skeletons.some(s => {
-          const old = snapshot.find(o => o.id === (s['id'] as string))
-          const newScore = s['risk_score_cache'] as number | null
-          if (old === undefined || old.score === null || newScore === null) return false
-          return newScore !== old.score
-        })
-      },
-      week1Scores,
-      { timeout: 10000 },
-    )
-
-    expect(changed).toBeTruthy()
-
-    // ── Verify unlocked domains actually grew ────────────────────────────────
+    // ── Verify unlocked domains grew ─────────────────────────────────────────
     const unlockedDomains = await page.evaluate(() => {
       const w = window as unknown as Record<string, Record<string, () => unknown>>
       return (w.__stores['content']() as Record<string, unknown>)['unlockedDomains'] as string[]
     })
-
-    // Week 3 contract event should have added at least one domain beyond the initial set
     expect(unlockedDomains.length).toBeGreaterThan(2)
+
+    // ── ALL non-NPC scores must re-populate after the domain-unlock clear ─────
+    // The domain-unlock handler calls clearAllRiskScoreCaches() then
+    // computeRiskForAll(). If computeRiskForAll receives stale (pre-clear)
+    // skeletons, it skips every citizen (risk_score_cache !== null) and
+    // onUpdate is never called. Scores stay null indefinitely.
+    // This assertion would time out in that case.
+    await page.waitForFunction(
+      () => {
+        const w = window as unknown as Record<string, Record<string, () => unknown>>
+        const skeletons = (w.__stores['citizens']() as Record<string, unknown>)['skeletons'] as Array<Record<string, unknown>>
+        const nonNpc = skeletons.filter(s => !s['is_scenario_npc'])
+        return nonNpc.every(s => s['risk_score_cache'] !== null)
+      },
+      { timeout: 30000 },
+    )
+
+    // Spot-check: at least one score should differ from the week-1 value
+    // (more domains = different inference results = different scores for some citizens)
+    const finalScores = await page.evaluate(() => {
+      const w = window as unknown as Record<string, Record<string, () => unknown>>
+      const skeletons = (w.__stores['citizens']() as Record<string, unknown>)['skeletons'] as Array<Record<string, unknown>>
+      return skeletons.map(s => ({ id: s['id'] as string, score: s['risk_score_cache'] as number | null }))
+    })
+
+    const anyChanged = finalScores.some(s => {
+      const old = week1Scores.find(o => o.id === s.id)
+      return old !== undefined && old.score !== null && s.score !== null && s.score !== old.score
+    })
+    expect(anyChanged).toBe(true)
   })
 })

@@ -109,9 +109,11 @@ export async function initializeGame(countryKey: string, operatorCode: string): 
       const { dataBanks: currentDbs, inferenceRules: currentRules, country: currentCountry } = state
       if (!currentDbs || !currentCountry || currentRules.length === 0) return
 
-      const currentSkeletons = useCitizenStore.getState().skeletons
-      // Clear stale scores so the worker recomputes all of them with the new domains
+      // Clear stale scores FIRST, then capture the fresh (all-null) skeletons.
+      // Order matters: capturing before clear gives stale non-null scores which
+      // the worker's skip-if-computed check would treat as already done.
       useCitizenStore.getState().clearAllRiskScoreCaches()
+      const currentSkeletons = useCitizenStore.getState().skeletons
 
       computeRiskForAll(
         currentSkeletons,

@@ -136,10 +136,10 @@ test.describe('17 — Week progression and finding availability', () => {
 
       // For review weeks: verify queue has enough citizens to meet quota
       const queueSize = await getQueueSize()
-      expect(queueSize).toBeGreaterThanOrEqual(
-        info.quota,
+      expect(
+        queueSize,
         `Week ${info.week} queue has ${queueSize} entries but quota is ${info.quota}`,
-      )
+      ).toBeGreaterThanOrEqual(info.quota)
 
       // Fill quota and advance
       await submitFlags(info.quota, citizenIdx)
