@@ -622,8 +622,8 @@ export function DirectivePanel() {
         <div
           data-testid="directive-description"
           style={{
-            color: 'var(--text-muted)',
-            fontSize: 11,
+            color: 'var(--text-secondary)',
+            fontSize: 12,
             lineHeight: 1.5,
             marginBottom: 10,
           }}
@@ -689,7 +689,7 @@ export function DirectivePanel() {
             {memoVisible ? (
               <div
                 style={{
-                  fontSize: 11,
+                  fontSize: 12,
                   color: 'var(--text-secondary)',
                   lineHeight: 1.5,
                   padding: '6px 8px',

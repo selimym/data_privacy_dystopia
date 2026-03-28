@@ -35,7 +35,7 @@ export default function TopBar() {
       <span
         style={{
           color: 'var(--text-muted)',
-          fontSize: 9,
+          fontSize: 10,
           letterSpacing: '0.15em',
           whiteSpace: 'nowrap',
         }}
@@ -55,7 +55,7 @@ export default function TopBar() {
               border: `1px solid ${currentView === key ? 'var(--color-green)' : 'var(--border-subtle)'}`,
               color: currentView === key ? 'var(--color-green)' : 'var(--text-muted)',
               fontFamily: 'var(--font-mono)',
-              fontSize: 9,
+              fontSize: 11,
               letterSpacing: '0.12em',
               padding: '3px 10px',
               borderRadius: 2,
@@ -72,7 +72,7 @@ export default function TopBar() {
       <span
         style={{
           color: 'var(--text-muted)',
-          fontSize: 9,
+          fontSize: 10,
           letterSpacing: '0.1em',
           whiteSpace: 'nowrap',
         }}

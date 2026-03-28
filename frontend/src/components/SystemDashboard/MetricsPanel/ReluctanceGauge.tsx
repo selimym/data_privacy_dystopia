@@ -103,7 +103,7 @@ export function ReluctanceGauge() {
       <div
         style={{
           fontFamily: 'var(--font-mono)',
-          fontSize: 9,
+          fontSize: 10,
           color: 'var(--text-muted)',
           marginTop: 2,
           textAlign: 'right',

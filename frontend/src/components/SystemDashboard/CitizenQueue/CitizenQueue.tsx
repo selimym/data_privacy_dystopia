@@ -125,7 +125,7 @@ export function CitizenQueue() {
                   border: '1px solid var(--border-subtle)',
                   color: sortKey === key ? 'var(--text-primary)' : 'var(--text-muted)',
                   fontFamily: 'var(--font-mono)',
-                  fontSize: 9,
+                  fontSize: 10,
                   letterSpacing: '0.08em',
                   cursor: 'pointer',
                   borderRadius: 2,
