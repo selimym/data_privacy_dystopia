@@ -7,6 +7,7 @@ const MAX_ARTICLES = 10
 export function NewsPanel() {
   const { t } = useTranslation()
   const newsArticles = useGameStore(s => s.newsArticles)
+  const weekNumber = useGameStore(s => s.weekNumber)
 
   const displayed = newsArticles
     .slice()
@@ -29,7 +30,9 @@ export function NewsPanel() {
               textAlign: 'center',
             }}
           >
-            {t('common.loading')}
+            {weekNumber <= 1
+              ? 'NO ARTICLES PUBLISHED — BEGIN CASE REVIEW TO GENERATE FEED'
+              : t('common.pending')}
           </div>
         ) : (
           displayed.map(article => (

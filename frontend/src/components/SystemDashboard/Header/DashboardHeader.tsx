@@ -113,7 +113,7 @@ export default function DashboardHeader() {
             letterSpacing: '0.1em',
           }}
         >
-          {t('dashboard.header.week')} {weekNumber}/6
+          {t('dashboard.header.week')} {weekNumber}/8
           {reluctance.is_under_review && (
             <span
               style={{

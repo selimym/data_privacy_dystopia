@@ -8,8 +8,11 @@ export function AlertsPanel() {
   const { t } = useTranslation()
   const formalWarning = useMetricsStore(s => s.reluctance.formal_warning_issued)
   const unacknowledgedProtests = useGameStore(s => s.activeProtests).filter(p => !p.acknowledged)
+  const weekNumber = useGameStore(s => s.weekNumber)
 
   const hasAlerts = formalWarning || unacknowledgedProtests.length > 0
+
+  if (weekNumber === 1 && !hasAlerts) return null
 
   return (
     <div className="panel" data-testid="alerts-panel">
