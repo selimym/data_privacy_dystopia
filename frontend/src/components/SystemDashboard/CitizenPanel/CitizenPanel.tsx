@@ -146,7 +146,7 @@ export function CitizenPanel() {
       )}
 
       {!isLoading && profile && (
-          {/* Scrollable data section — fills available space, includes flag submission */}
+          /* Scrollable data section — fills available space, includes flag submission */
           <div style={{ flex: 1, overflowY: 'auto', minHeight: 0, paddingBottom: 20 }}>
             {/* AutoFlag decision panel at top */}
             <AutoFlagDecisionPanel citizenId={selectedCitizenId} />
