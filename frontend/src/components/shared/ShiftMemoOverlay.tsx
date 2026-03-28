@@ -27,6 +27,8 @@ export function ShiftMemoOverlay() {
     dismissShiftMemo()
   }
 
+  const isColleagueMessage = !!memo.sender && !isBriefing
+
   const headerLeft = memo.sender
     ? `${memo.sender.name.toUpperCase()} · ${memo.sender.title.toUpperCase()}`
     : isBriefing
@@ -39,11 +41,15 @@ export function ShiftMemoOverlay() {
 
   const subheading = isBriefing
     ? `DIRECTIVE BRIEFING — CYCLE ${memo.weekNumber}`
-    : `OPERATOR PERFORMANCE SUMMARY · DIRECTIVE CYCLE ${memo.weekNumber}`
+    : isColleagueMessage
+      ? `INTERNAL MESSAGE — END OF SHIFT`
+      : `OPERATOR PERFORMANCE SUMMARY · DIRECTIVE CYCLE ${memo.weekNumber}`
 
   const btnLabel = isBriefing
     ? 'ACKNOWLEDGE & BEGIN SHIFT →'
-    : 'ACKNOWLEDGE & BEGIN NEXT SHIFT →'
+    : isColleagueMessage
+      ? 'READ & BEGIN NEXT SHIFT →'
+      : 'ACKNOWLEDGE & BEGIN NEXT SHIFT →'
 
   return (
     <div
@@ -110,16 +116,52 @@ export function ShiftMemoOverlay() {
           >
             {subheading}
           </div>
-          <div
-            style={{
-              fontSize: 13,
-              lineHeight: 1.9,
-              color: 'var(--text-secondary)',
-              whiteSpace: 'pre-line',
-            }}
-          >
-            {memo.memoText}
-          </div>
+
+          {isColleagueMessage ? (
+            /* Colleague message — chat bubble style */
+            <div
+              style={{
+                borderLeft: `3px solid ${accentColor}`,
+                paddingLeft: 14,
+                marginLeft: 2,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 10,
+                  color: accentColor,
+                  fontFamily: 'var(--font-mono)',
+                  letterSpacing: '0.1em',
+                  marginBottom: 8,
+                  opacity: 0.8,
+                }}
+              >
+                {memo.sender!.name}
+              </div>
+              <div
+                style={{
+                  fontSize: 13,
+                  lineHeight: 1.9,
+                  color: 'var(--text-primary)',
+                  whiteSpace: 'pre-line',
+                  fontStyle: 'normal',
+                }}
+              >
+                {memo.memoText}
+              </div>
+            </div>
+          ) : (
+            <div
+              style={{
+                fontSize: 13,
+                lineHeight: 1.9,
+                color: 'var(--text-secondary)',
+                whiteSpace: 'pre-line',
+              }}
+            >
+              {memo.memoText}
+            </div>
+          )}
           {memo.recruitmentLink && (
             <div style={{ marginTop: 18, borderTop: '1px solid var(--border-subtle)', paddingTop: 14 }}>
               <a

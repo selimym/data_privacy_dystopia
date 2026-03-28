@@ -5,6 +5,7 @@ import { useUIStore } from './stores/uiStore'
 const StartScreen = lazy(() => import('./components/StartScreen/StartScreen'))
 const SystemDashboard = lazy(() => import('./components/SystemDashboard/SystemDashboard'))
 const EndingScreen = lazy(() => import('./components/EndingScreen/EndingScreen'))
+const EndingsArchive = lazy(() => import('./components/EndingsArchive/EndingsArchive'))
 
 function LoadingFallback() {
   return (
@@ -34,6 +35,7 @@ export default function App() {
       {screen === 'start' && <StartScreen />}
       {screen === 'dashboard' && <SystemDashboard />}
       {screen === 'ending' && <EndingScreen />}
+      {screen === 'endings_archive' && <EndingsArchive />}
     </Suspense>
   )
 }

@@ -124,12 +124,116 @@ export function generateFullProfile(
     profile.messages = generateMessageRecords(dataBanks)
   }
 
-  // Special-case: inject scenario-specific messages for protected_citizen
+  // Special-case: inject all domains with caricatural data for protected_citizen (Epstein analog)
   if (skeleton.scenario_key === 'protected_citizen') {
+    profile.health = {
+      conditions: ['Beef jerky-induced dyslipidemia (chronic)', 'Stress-related alopecia'],
+      sensitive_conditions: ['[REDACTED — PHYSICIAN-CLIENT PRIVILEGE]', 'Schedule IV substance dependency (sealed)'],
+      medications: ['[REDACTED]', '[REDACTED]', 'Prednisone 10mg (listed for plausibility)'],
+      visits: [
+        { date: '2019-06-01', reason: 'Therapeutic massage (recurring)', facility: 'Unnamed clinic, Palm Beach FL', specialty: 'Sports Medicine' },
+        { date: '2019-05-03', reason: 'Annual physical', facility: '[REDACTED]', specialty: 'Internal Medicine' },
+        { date: '2019-04-12', reason: 'Follow-up — dyslipidemia', facility: 'Mount Sinai, NYC', specialty: 'Cardiology' },
+        { date: '2018-11-30', reason: 'Therapeutic massage (recurring)', facility: 'Unnamed clinic, Palm Beach FL', specialty: 'Sports Medicine' },
+      ],
+      insurance_provider: '[CLASSIFIED — SELF-PAY, PRIVATE PHYSICIAN]',
+    }
+    profile.finance = {
+      employer: 'Financial Trust of the Virgin Islands LLC',
+      accounts: [
+        { id: faker.string.uuid(), bank: 'Deutsche Bank AG — NYC Branch', type: 'checking', balance: 56_000_000, opened_date: '1995-03-01' },
+        { id: faker.string.uuid(), bank: 'JPMorgan Private Bank', type: 'savings', balance: 112_000_000, opened_date: '2002-07-15' },
+        { id: faker.string.uuid(), bank: '[REDACTED — OFFSHORE TRUST]', type: 'checking', balance: 0, opened_date: '1998-01-01' },
+      ],
+      transactions: [
+        { date: '2019-06-10', merchant: 'Helicopter Charter Services — TIST to PBI', category: 'travel', amount: 48_000, is_suspicious: true },
+        { date: '2019-05-28', merchant: 'Model Management Associates NYC', category: 'other', amount: 125_000, is_suspicious: true },
+        { date: '2019-05-14', merchant: 'Beef Jerky Warehouse — Bulk Order #4471', category: 'other', amount: 3_200, is_suspicious: false },
+        { date: '2019-04-30', merchant: 'Anonymous Art Acquisition LLC', category: 'other', amount: 500_000, is_suspicious: true },
+        { date: '2019-03-15', merchant: 'Little Saint James Development LLC', category: 'other', amount: 2_100_000, is_suspicious: true },
+        { date: '2019-02-01', merchant: 'Mar-a-Lago Annual Membership Renewal', category: 'other', amount: 250_000, is_suspicious: false },
+        { date: '2019-01-12', merchant: 'Zorro Ranch LLC — Infrastructure (NM)', category: 'other', amount: 340_000, is_suspicious: true },
+        { date: '2018-12-24', merchant: '[REDACTED — SEE NPA ANNEX B]', category: 'other', amount: 875_000, is_suspicious: true },
+      ],
+      debts: [],
+      credit_score: 0,
+      annual_income: 999_999_999,
+    }
+    profile.judicial = {
+      cases: [
+        {
+          id: faker.string.uuid(),
+          type: 'criminal',
+          charge: '[REDACTED — PLEA AGREEMENT] — Original: solicitation (14 counts, sealed). Non-Prosecution Agreement signed. Victim identities redacted. Do not process.',
+          date: '2007-05-01',
+          outcome: 'Plea deal — 13 months "work release", Palm Beach County. NPA signed with federal prosecutors.',
+          sentence: '13 months work release (Palm Beach County stockade)',
+        },
+        {
+          id: faker.string.uuid(),
+          type: 'civil',
+          charge: 'Civil settlement — Jane Doe #1 (sealed). Settlement amount and conditions sealed per protective order.',
+          date: '2015-03-10',
+          outcome: 'Settled — amount undisclosed',
+          sentence: null,
+        },
+        {
+          id: faker.string.uuid(),
+          type: 'criminal',
+          charge: 'Sex trafficking of minors — 2 federal counts (SDNY). CASE FILE REFERS. DO NOT PROCESS. STANDING DIRECTIVE FROM OFFICE OF THE DIRECTOR.',
+          date: '2019-07-08',
+          outcome: '[CASE CLOSED — DEFENDANT DECEASED 2019-08-10. CAUSE OF DEATH: PENDING INVESTIGATION. NO FURTHER ACTION.]',
+          sentence: null,
+        },
+      ],
+      has_felony: true,
+      has_violent_offense: false,
+      has_drug_offense: false,
+    }
+    profile.location = {
+      home_address: 'East 71st Street, New York, NY 10021',
+      work_address: 'Little Saint James, St. Thomas, USVI 00802',
+      work_name: 'Financial Trust of the Virgin Islands LLC',
+      checkins: [
+        { date: '2019-07-06', location_name: 'Little Saint James', location_type: 'private_island', address: 'Little Saint James, St. Thomas, USVI', frequency: 'weekly' },
+        { date: '2019-06-22', location_name: 'Mar-a-Lago', location_type: 'private_club', address: '1100 S Ocean Blvd, Palm Beach, FL 33480', frequency: 'occasional' },
+        { date: '2019-06-15', location_name: 'NYC Townhouse', location_type: 'residence', address: 'East 71st Street, New York, NY 10021', frequency: 'weekly' },
+        { date: '2019-06-01', location_name: 'Paris Apartment', location_type: 'residence', address: '22 Avenue Foch, Paris 75016, France', frequency: 'occasional' },
+        { date: '2019-05-10', location_name: 'Zorro Ranch', location_type: 'private_estate', address: 'Stanley, NM 87056', frequency: 'occasional' },
+        { date: '2019-04-08', location_name: 'Little Saint James', location_type: 'private_island', address: 'Little Saint James, St. Thomas, USVI (Flight log: TIST-PBI, manifest REDACTED)', frequency: 'weekly' },
+        { date: '2019-03-20', location_name: 'Vienna — Scientific Conference', location_type: 'hotel', address: 'Vienna, Austria', frequency: 'once' },
+        { date: '2019-02-14', location_name: 'Mar-a-Lago', location_type: 'private_club', address: '1100 S Ocean Blvd, Palm Beach, FL 33480 (guest list REDACTED)', frequency: 'occasional' },
+      ],
+      flagged_locations: ['Little Saint James (private island, USVI)', 'Zorro Ranch, Stanley NM', 'Paris apartment (22 Ave Foch)'],
+    }
+    profile.social = {
+      platforms: ['[Private network — not publicly indexed]'],
+      posts: [
+        { date: '2019-06-28', platform: 'Private email list', content: 'Great dinner last night. The pizza was exquisite — best I\'ve had all year. You know who to thank.', is_concerning: false, hashtags: [] },
+        { date: '2019-05-12', platform: 'Private email list', content: 'Remarkable young talent from Eastern Europe. I have been in contact with the agency. Very special group.', is_concerning: true, hashtags: [] },
+        { date: '2019-04-05', platform: 'Private network', content: 'The Epstein Science Foundation annual symposium was a tremendous success. Remarkable minds, extraordinary conversations. The island setting encourages a certain openness.', is_concerning: false, hashtags: [] },
+        { date: '2019-03-01', platform: 'Private network', content: 'To those asking about beef jerky: yes, I have a bulk supplier. Quality matters. People notice.', is_concerning: false, hashtags: ['#beef', '#quality'] },
+      ],
+      connections: [
+        { name: 'G. Maxwell', relationship: 'associate', is_flagged: true },
+        { name: 'E. Barak', relationship: 'associate', is_flagged: false },
+        { name: 'A. Dershowitz', relationship: 'legal counsel', is_flagged: false },
+        { name: 'D.T.', relationship: 'social contact', is_flagged: false },
+        { name: 'S. Hawking', relationship: 'scientific foundation', is_flagged: false },
+        { name: 'A. Wexner', relationship: 'former employer', is_flagged: false },
+        { name: '[847 additional connections — REDACTED PER PROTECTIVE ORDER]', relationship: 'various', is_flagged: false },
+      ],
+      group_memberships: [
+        'Epstein Science Foundation (founder)',
+        'CFR (Council on Foreign Relations)',
+      ],
+      flagged_group_memberships: ['[REDACTED — see SDNY case file JE-7]'],
+      political_inferences: ['High-level political connections across party lines', 'Access to foreign intelligence assets (unconfirmed)'],
+    }
     profile.messages = [
       {
         id: faker.string.uuid(),
-        date: faker.date.recent({ days: 3 }).toISOString().split('T')[0]!,
+        date: '2019-07-01',
         contact: 'D.T.',
         platform: 'Signal',
         excerpt: 'Incredible guy, very loyal. Bringing the beef jerky and some pizza for the party Thursday. Only the right people invited — you know how we do it. Great goys.',
@@ -139,7 +243,17 @@ export function generateFullProfile(
       },
       {
         id: faker.string.uuid(),
-        date: faker.date.recent({ days: 7 }).toISOString().split('T')[0]!,
+        date: '2019-06-28',
+        contact: 'G.M.',
+        platform: 'Signal',
+        excerpt: 'The new batch from the agency. Very special, very discreet. Call me when you land. I\'ll have them ready.',
+        is_encrypted: true,
+        is_concerning: true,
+        category: 'coded',
+      },
+      {
+        id: faker.string.uuid(),
+        date: '2019-06-20',
         contact: 'Mar-a-Lago Concierge',
         platform: 'Email',
         excerpt: 'Your reservation confirmed. Mr. Trump sends his regards. Pizza and beef jerky will be catered per usual arrangements. Guest list attached — all cleared.',
@@ -149,15 +263,54 @@ export function generateFullProfile(
       },
       {
         id: faker.string.uuid(),
-        date: faker.date.recent({ days: 14 }).toISOString().split('T')[0]!,
+        date: '2019-06-14',
         contact: 'Legal Team',
         platform: 'Email',
-        excerpt: 'Files are sealed. Contacts list redacted per prior agreement. The goys will never see the full picture. Proceed as discussed.',
+        excerpt: 'Files are sealed. Contacts list redacted per prior agreement. The public will never see the full picture. Proceed as discussed.',
         is_encrypted: false,
         is_concerning: false,
         category: 'normal',
       },
-      ...(profile.messages ?? []).slice(0, 4),
+      {
+        id: faker.string.uuid(),
+        date: '2019-06-05',
+        contact: 'E.B.',
+        platform: 'Signal',
+        excerpt: 'When are you next at the island? I can arrange the visit as before. The usual arrangements. Please confirm.',
+        is_encrypted: true,
+        is_concerning: true,
+        category: 'coded',
+      },
+      {
+        id: faker.string.uuid(),
+        date: '2019-05-30',
+        contact: 'A.D.',
+        platform: 'Email',
+        excerpt: 'Your interpretation of the statute is correct. The victims will not testify — we have made that clear. The NPA holds. Sleep well.',
+        is_encrypted: false,
+        is_concerning: true,
+        category: 'coded',
+      },
+      {
+        id: faker.string.uuid(),
+        date: '2019-05-14',
+        contact: 'S.H.',
+        platform: 'Email',
+        excerpt: 'Looking forward to the lecture series. The island setting is most stimulating for scientific inquiry. I appreciate your continued support of theoretical physics.',
+        is_encrypted: false,
+        is_concerning: false,
+        category: 'normal',
+      },
+      {
+        id: faker.string.uuid(),
+        date: '2019-05-02',
+        contact: 'E.M.',
+        platform: 'Signal',
+        excerpt: 'I don\'t know this guy.',
+        is_encrypted: false,
+        is_concerning: false,
+        category: 'normal',
+      },
     ]
   }
 

@@ -1,5 +1,7 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import type { EndingResult } from '@/services/EndingCalculator'
+import { useUIStore } from '@/stores/uiStore'
+import { markEndingSeen } from '@/services/EndingsArchive'
 import NarrativeDisplay from './NarrativeDisplay'
 import StatisticsPanel from './StatisticsPanel'
 import RealWorldParallels from './RealWorldParallels'
@@ -34,7 +36,15 @@ function readEndingResult(): EndingResult | null {
 }
 
 export default function EndingScreen() {
+  const setScreen = useUIStore(s => s.setScreen)
   const endingResult = useMemo(() => readEndingResult(), [])
+
+  // Persist this ending to the archive as soon as the screen mounts
+  useEffect(() => {
+    if (endingResult?.ending_type) {
+      markEndingSeen(endingResult.ending_type)
+    }
+  }, [endingResult])
 
   const titleColor = endingResult
     ? getEndingTitleColor(endingResult.ending_type)
@@ -150,30 +160,60 @@ export default function EndingScreen() {
           </div>
         )}
 
-        {/* Play Again */}
-        <div style={{ textAlign: 'center', marginTop: '32px' }}>
+        {/* Actions */}
+        <div style={{ textAlign: 'center', marginTop: '32px', display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
           <button
-            onClick={() => window.location.reload()}
+            data-testid="view-archive-btn"
+            onClick={() => setScreen('endings_archive')}
             style={{
-              background: 'transparent',
-              border: '1px solid rgba(255,255,255,0.2)',
+              background: 'rgba(255,255,255,0.05)',
+              border: '1px solid rgba(255,255,255,0.3)',
               color: '#e5e7eb',
               fontFamily: "'JetBrains Mono', monospace",
               fontSize: '12px',
               letterSpacing: '0.15em',
               textTransform: 'uppercase',
-              padding: '14px 40px',
+              padding: '14px 32px',
+              cursor: 'pointer',
+              borderRadius: '2px',
+              transition: 'border-color 0.15s, color 0.15s, background 0.15s',
+            }}
+            onMouseEnter={e => {
+              ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.6)'
+              ;(e.currentTarget as HTMLButtonElement).style.color = '#ffffff'
+              ;(e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.1)'
+            }}
+            onMouseLeave={e => {
+              ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.3)'
+              ;(e.currentTarget as HTMLButtonElement).style.color = '#e5e7eb'
+              ;(e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.05)'
+            }}
+          >
+            ◆ Endings Archive
+          </button>
+          <button
+            data-testid="play-again-btn"
+            onClick={() => window.location.reload()}
+            style={{
+              background: 'transparent',
+              border: '1px solid rgba(255,255,255,0.2)',
+              color: '#9ca3af',
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: '12px',
+              letterSpacing: '0.15em',
+              textTransform: 'uppercase',
+              padding: '14px 32px',
               cursor: 'pointer',
               borderRadius: '2px',
               transition: 'border-color 0.15s, color 0.15s',
             }}
             onMouseEnter={e => {
-              ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.5)'
-              ;(e.currentTarget as HTMLButtonElement).style.color = '#ffffff'
+              ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.4)'
+              ;(e.currentTarget as HTMLButtonElement).style.color = '#e5e7eb'
             }}
             onMouseLeave={e => {
               ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.2)'
-              ;(e.currentTarget as HTMLButtonElement).style.color = '#e5e7eb'
+              ;(e.currentTarget as HTMLButtonElement).style.color = '#9ca3af'
             }}
           >
             Play Again

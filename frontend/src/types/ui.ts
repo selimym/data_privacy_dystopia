@@ -2,7 +2,7 @@ import type { CitizenOutcome } from './game'
 
 // ─── Screen routing ───────────────────────────────────────────────────────────
 
-export type Screen = 'start' | 'dashboard' | 'ending'
+export type Screen = 'start' | 'dashboard' | 'ending' | 'endings_archive'
 
 export type ActivePanel = 'citizen' | 'news' | 'metrics' | 'map' | null
 

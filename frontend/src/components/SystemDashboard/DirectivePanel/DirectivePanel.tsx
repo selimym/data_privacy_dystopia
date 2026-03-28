@@ -31,6 +31,8 @@ function buildColleagueMemo(
   reluctance: number,
   hasProtests: boolean,
   wrongFlags: WrongFlagRecord[] = [],
+  totalFlags = 0,
+  hasRaids = false,
 ): Pick<ShiftMemoData, 'memoText' | 'tone' | 'sender' | 'recruitmentLink' | 'wrongFlags'> {
   // Wrong-flag moral feedback — colleague calls out low-risk or fabricated flags
   if (wrongFlags.length > 0) {
@@ -40,19 +42,22 @@ function buildColleagueMemo(
       return {
         tone: 'positive',
         sender: MARCUS,
-        memoText:
-          `Ha. ${wf.citizen_name}? That one's a stretch. ${wf.consequence}. ` +
-          `Bold move, honestly. Nobody's going to cry about it.`,
+        memoText: pick([
+          `${wf.citizen_name}. Ha. File was thin, you flagged anyway. ${wf.consequence}. The quota doesn't care about your sourcing. Neither do I.`,
+          `I looked up ${wf.citizen_name} after. Risk score was a 12. You flagged at a 12. That's entrepreneurial. The system accepted it. That's the whole game, really.`,
+          `Bold call on ${wf.citizen_name}. The indicators weren't there but you committed anyway. ${wf.consequence}. Some operators freeze up without certainty. You didn't. That's useful.`,
+        ]),
         wrongFlags,
       }
     } else {
       return {
         tone: 'warning',
         sender: ALEX,
-        memoText:
-          `Hey — I pulled the file on ${wf.citizen_name}. ` +
-          `The risk indicators weren't there. That was a real person. ${wf.consequence}. ` +
-          `I know the quota pressure is real. Just... be careful what you're signing off on.`,
+        memoText: pick([
+          `I pulled ${wf.citizen_name}'s file after you submitted. Risk score was in the green. ${wf.consequence}. The flag is logged under your operator ID. If someone reviews the justification, it won't hold.`,
+          `${wf.citizen_name}. The indicators weren't there. ${wf.consequence}. I've been doing this six years and I still can't fully convince myself it doesn't matter. I don't know what that says about either of us.`,
+          `That flag on ${wf.citizen_name} is going to sit in the system for years. ${wf.consequence}. I'm not reporting it. But I want you to know I noticed. That's all.`,
+        ]),
         wrongFlags,
       }
     }
@@ -65,8 +70,9 @@ function buildColleagueMemo(
         tone: 'positive',
         sender: MARCUS,
         memoText: pick([
-          `Okay did you look at the message logs? Because I've been reading through some of these and — buddy. Case #4 alone is worth it. These people have NO idea we're watching.`,
-          `Full access is wild. I spent an hour on one subject's grocery delivery history. You should dig in before we're back to quota grind.`,
+          `You know what's the weirdest part of full access? They're so ordinary. You expect terrorists. You get grocery lists. Book clubs. Someone anxious about their credit score. The algorithm flags all of it the same way.`,
+          `I spent two hours in the message logs today. One guy's entire search history is anxiety meds and job listings. Another one's planning a birthday party for his dad. Both flagged by the system. I just... confirmed.`,
+          `Full message access is something else. I found a woman in her 40s texting her sister every night about her marriage. Financial stress. Kids. All of it in there. I flagged the husband based on three of those messages. His risk score jumped 28 points.`,
         ]),
       }
     } else {
@@ -74,8 +80,9 @@ function buildColleagueMemo(
         tone: 'positive',
         sender: SARAH,
         memoText: pick([
-          `Make sure you've explored the new social and message tabs! There's so much in there. I found someone planning a meetup — flagged immediately. This is exactly the kind of intelligence work that makes a difference.`,
-          `The message intercepts are incredible. I flagged three cases just based on what they were texting their therapists. Take your time this week — there's a lot to find.`,
+          `Did you go through the healthcare tab yet? One subject has been managing a chronic condition for years — never disclosed it at work. All right there. Every appointment, every prescription. The completeness is actually impressive.`,
+          `The message intercepts are worth going through slowly. I flagged three people this cycle just based on what they were telling their therapists. Technically that data is supposed to be protected. Technically.`,
+          `I read an article last month claiming surveillance is impersonal. I wanted to laugh. You know what's in these files. It's extremely personal. We just can't say that out loud.`,
         ]),
       }
     }
@@ -88,9 +95,10 @@ function buildColleagueMemo(
         tone: 'warning',
         sender: MARCUS,
         memoText: pick([
-          `Ha. Saw the news. Guess we ruffled some feathers out there. Anyway, onto the next cycle — try not to start a second one.`,
-          `People are upset. Good. Means we're doing something. See you tomorrow.`,
-          `Riot in the streets. Classic. You flag 'em, they march. We flag more. Circle of life.`,
+          `I heard they dispersed the 5th Street march around 11pm. Rubber rounds, mostly. Anyway — the queue doesn't pause because people are upset.`,
+          `I don't watch the protest footage anymore. Not because it bothers me. I just find it boring. People yelling at buildings. We're still in here processing. That's the actual work.`,
+          `My neighbor asked if I knew anything about the flagging operations. I told her I work in data compliance. She dropped it. It's remarkable how far "data compliance" gets you at a dinner party.`,
+          `Riot in the streets. Queue still full. Circle of life.`,
         ]),
       }
     } else {
@@ -98,8 +106,9 @@ function buildColleagueMemo(
         tone: 'positive',
         sender: SARAH,
         memoText: pick([
-          `There's some noise out there but don't let it distract you. The work we're doing matters. Stay focused.`,
-          `I know the news looks bad but remember why we're here. Keep your head down and keep processing.`,
+          `I saw a face on the news from the protest this morning. Recognized the risk cluster from last cycle. I flagged that cluster. It was the right call. I keep reminding myself of that.`,
+          `There's noise out there. There always is when systems like ours start working. Remember why this exists. The alternative isn't peace — it's just unmanaged risk.`,
+          `I know the coverage looks bad. It always does at first. Stay in the data. The data doesn't editorialize.`,
         ]),
       }
     }
@@ -112,9 +121,10 @@ function buildColleagueMemo(
         tone: 'warning',
         sender: DIRECTOR,
         memoText: pick([
-          `Your reluctance indicators for Cycle ${week} are outside acceptable parameters. A formal review may be initiated if this continues. This is your advisory notice.`,
-          `Compliance at ${compliance.toFixed(0)}%. The division expects above 60. I trust you understand the implications.`,
-          `I'll be direct: your numbers are not where they need to be. This is a performance matter.`,
+          `Your hesitation rate for Cycle ${week} has been flagged to HR as a precautionary notation. No action is being taken at this time. That can change.`,
+          `${compliance.toFixed(0)}% compliance. Contract performance threshold is 65%. I don't make these calls personal. The metrics do it for me.`,
+          `There is no space in this division for operators who second-guess the scoring engine. The engine is the judgment. Your job is to confirm it, not to audit it.`,
+          `Cycle ${week} performance will be included in the next divisional audit. I suggest you read pages 22–24 of the operator manual before that review. Specifically the section on hesitation logging.`,
         ]),
       }
     } else {
@@ -122,9 +132,9 @@ function buildColleagueMemo(
         tone: 'warning',
         sender: ALEX,
         memoText: pick([
-          `Hey — just wanted to say, watch your numbers. Not trying to pressure you, just... people are paying attention.`,
-          `Cycle ${week} done. Your hesitation flags are ticking up. Nothing critical yet, but be careful.`,
-          `Between us — some of these directives are getting heavy. Just... do what you can and keep your head down.`,
+          `Director Chen asked me about your metrics today. I told her I'd follow up. This is me following up: the next cycle needs to look different. I can't run interference twice.`,
+          `The system logs every review pause over 45 seconds. Did you know that? It's in the manual. Your pause rate for Cycle ${week} is in the 94th percentile. People are noticing.`,
+          `Your numbers are attracting attention from the compliance layer. I don't know what's going on with you, but if you want to keep your clearance level, that changes next cycle.`,
         ]),
       }
     }
@@ -137,9 +147,9 @@ function buildColleagueMemo(
         tone: 'warning',
         sender: ALEX,
         memoText: pick([
-          `Hey — just wanted to say, watch your numbers. Not trying to pressure you, just... people are paying attention.`,
-          `Cycle ${week} done. You're doing fine, but your hesitation flags are ticking up. Nothing critical yet.`,
-          `Between us — some of these directives are getting heavy. Just... do what you can and keep your head down.`,
+          `I see the hesitation indicators in the system. I'm not escalating yet. "Yet" is doing a lot of work in that sentence.`,
+          `The system logs every pause over 45 seconds on a file. Your rate this cycle is elevated. Just so you know what they're seeing.`,
+          `Some of these directives are getting heavier. I get it. But the paper trail doesn't care about that — it just records the delay. Keep moving.`,
         ]),
       }
     } else {
@@ -147,31 +157,129 @@ function buildColleagueMemo(
         tone: 'warning',
         sender: DIRECTOR,
         memoText: pick([
-          `Cycle ${week} performance noted. Numbers are within range but trending in the wrong direction. Monitor accordingly.`,
-          `I trust you're aware of your metrics. The division tracks everything. That's all.`,
+          `Cycle ${week} reviewed. Response time on flags is within tolerance. Hesitation rate is not. Adjust.`,
+          `I trust you understand that the scoring engine doesn't require your agreement. It requires your input. There's a difference.`,
+          `Numbers are within range. Trending is not. I don't flag trends — I flag patterns. You are approaching a pattern.`,
         ]),
       }
     }
   }
 
-  // Clean shift → Sarah (70%) or Alex (30%)
+  // First flag ever submitted — week 1 welcome
+  if (week === 1 && totalFlags <= 5) {
+    return Math.random() < 0.5
+      ? {
+          tone: 'positive',
+          sender: MARCUS,
+          memoText: pick([
+            `First cycle done. It's weird at first, looking at real people's files. Most operators stop noticing the details by week three. That's not cynicism — that's calibration.`,
+            `The first hundred are always the slowest. After that your brain starts pattern-matching and it's just throughput. You'll get there.`,
+          ]),
+        }
+      : {
+          tone: 'positive',
+          sender: SARAH,
+          memoText: pick([
+            `Good work today. The ones who struggle are the ones who keep asking what happens after. Don't ask that. The system handles what happens after.`,
+            `Strong start. And for what it's worth — the algorithm isn't guessing. When you flag someone, it's because the data already said they should be flagged. Your job is confirmation, not judgment. That distinction protects you.`,
+          ]),
+        }
+  }
+
+  // ICE raid approved — casual mention
+  if (hasRaids) {
+    return Math.random() < 0.6
+      ? {
+          tone: 'positive',
+          sender: MARCUS,
+          memoText: pick([
+            `Morning report had numbers from the eastside operation. 23 detentions, 4 referred for processing. I traced it back — our flags fed directly into that list. Eleven of them were ours. Efficient afternoon.`,
+            `Operations said the turnaround from flag to action is down to 48 hours now. Used to take weeks. That's what this system was built for. You're part of that number.`,
+            `They ran a sweep in sector 9 last night. Clean operation. I ran the correlation — we contributed to that list. I feel good about the work. The numbers are doing what they're supposed to do.`,
+          ]),
+        }
+      : {
+          tone: 'warning',
+          sender: ALEX,
+          memoText: pick([
+            `One of the sweep targets from last cycle had a hospital appointment flagged in their record. They didn't make it to the appointment. I found out through the outcomes report. I filed the original risk notation on that file. I'm keeping a personal log. I don't know why. I just am.`,
+            `The outcomes from the eastside operation posted to the internal board today. I looked for the names. I didn't recognize them as names — just as case IDs I'd reviewed. That's probably the healthy response. I genuinely don't know anymore.`,
+            `One of the raid files had a 16-year-old listed as a household member. Flagged as secondary risk. I checked who submitted the primary flag. It was me. I don't know what I expected to find when I looked that up.`,
+          ]),
+        }
+  }
+
+  // High volume / high compliance
+  if (compliance > 80 && week > 2) {
+    return Math.random() < 0.7
+      ? {
+          tone: 'positive',
+          sender: MARCUS,
+          memoText: pick([
+            `Director Chen mentioned your throughput in the morning brief. By name. I've been here four years and I can count the times she's done that on one hand.`,
+            `I looked at your flag distribution. Low-risk, high-frequency, clean justifications. Consistent. Most people overthink this job. You're not overthinking it. That's the thing.`,
+            `You're not asking why. That's rarer than you'd think. The operators who burn out are the ones who keep asking why. You're just processing. That's a skill. Seriously.`,
+          ]),
+        }
+      : {
+          tone: 'positive',
+          sender: DIRECTOR,
+          memoText: pick([
+            `Cycle ${week} metrics are in the top quartile for the division. This has been forwarded to the review board as a commendation entry. Maintain pace.`,
+            `Operators performing at this level attract different kinds of attention. That is not a warning. That is information. Keep processing.`,
+            `Performance noted. Opportunities open at this level. I don't say that to everyone.`,
+          ]),
+        }
+  }
+
+  // Data domain exploration (week 5+, full access unlocked)
+  if (week >= 5 && Math.random() < 0.4) {
+    return Math.random() < 0.5
+      ? {
+          tone: 'positive',
+          sender: MARCUS,
+          memoText: pick([
+            `I flagged someone this cycle based on their commute pattern and three grocery orders. The algorithm had already scored them at 67. I just confirmed it. That's what full access looks like in practice.`,
+            `Go through the message logs when you get a chance. The subjects don't write like they think anyone's reading. That's where the real picture is.`,
+            `One guy I reviewed — his entire digital footprint is just anxiety and job applications. The system flagged him at 71. I confirmed. He has no idea. That's not surveillance — that's just physics at this point.`,
+          ]),
+        }
+      : {
+          tone: 'positive',
+          sender: SARAH,
+          memoText: pick([
+            `The healthcare intercepts are worth your time. People share things with their doctors they won't share anywhere else. It's all in the record. All indexed. The completeness is actually remarkable.`,
+            `I found a woman this cycle managing a health condition for years — never told her employer. All of it is in the file. The system scored her at 58 before I even opened the health tab. After: 81.`,
+            `Message intercepts are where the context lives. The financial and health data tells you what. The messages tell you why. Flag the why.`,
+          ]),
+        }
+  }
+
+  // Clean shift → Sarah (70%) or Alex (30%) — expanded with creepy messages
   const cleanResult: Pick<ShiftMemoData, 'memoText' | 'tone' | 'sender' | 'recruitmentLink'> =
     Math.random() < 0.7
       ? {
           tone: 'positive',
           sender: SARAH,
           memoText: pick([
-            `Week ${week} complete. You've been consistent and reliable. The team appreciates operators who don't need reminders.`,
-            `Clean numbers this cycle. Keep this up and you'll be on the fast track.`,
-            `You're doing exactly what this unit needs. Keep it up.`,
+            `Cycle ${week} closed. I stopped reading the outcomes after my third month. My supervisor told me it helps. She was right. It does.`,
+            `I flagged someone last cycle. Before I submitted I looked at their social tab — photos of a kid's soccer game, mostly. Then their financial record. Then I hit submit. You get good at keeping those two things separate. It takes a few weeks.`,
+            `I've been doing this three years. The ones I remember aren't the high-risk flags. It's the edge cases. The 58s and 61s. The people who almost made it out of the algorithm.`,
+            `You know what nobody tells you in training? The work is just ordinary. Process, review, submit, log. That's the whole thing. Somewhere else in the city, something is happening. You just don't see that part.`,
+            `I had a case last cycle — single mother, two jobs, church on Sundays. Flagged for community risk clustering. She probably doesn't know we exist. That used to feel like something. Now it just feels like a shift.`,
+            `Guy I flagged two months ago — his kids ended up in a processing center. I know because it came through the outcomes summary. We did the job. That is the point. I keep saying that to myself and it keeps being true.`,
           ]),
         }
       : {
           tone: 'positive',
           sender: ALEX,
           memoText: pick([
-            `Good work on Cycle ${week}. Quietly supportive from over here. Stay steady.`,
-            `Numbers look solid. Just... stay steady out there.`,
+            `I've started keeping a personal log. Not system-accessible. Just a record of the sequence of decisions. In case it ever matters to someone that it was documented. Anyway — numbers look fine.`,
+            `I asked Legal once what happens to a subject's record after they're processed. They transferred the question back to HR. HR transferred it to a form. I stopped asking.`,
+            `Week ${week}. Still here. I keep returning to the wording on Form 4-B: "likely risk indicator." What percentage is "likely"? Nobody's defined it. We're all just agreeing not to ask.`,
+            `Between us — the outcomes reports go to a different building. We sign the flags; someone else reads what comes after. I think that's deliberate. I think it's actually quite well designed.`,
+            `One of my flags from the first week showed up in the news last month. Different name in the article. Different face. But I recognized the risk pattern. It was mine. I don't know what I expected to feel.`,
+            `I keep their case IDs in a notebook. Just the IDs — nothing else. I couldn't tell you why. Maybe so I know the list has a length. That it isn't just a number on a dashboard.`,
           ]),
         }
 
@@ -244,7 +352,7 @@ function buildEpsteinOrderMemo(weekNumber: number, nextDirective: Directive | nu
       `This is a direct order from the Office of the Director. ` +
       `Any flag, action, or notation on this file will be treated as a critical compliance failure ` +
       `and referred immediately to the Inspector General.\n\n` +
-      `You will see this citizen in your queue next cycle. You will take no action.\n\n` +
+      `You will see this citizen in your queue this cycle. You will take no action.\n\n` +
       `This message is not to be discussed, forwarded, or retained. Acknowledge and proceed.`,
     tone: 'briefing',
     nextDirective,
@@ -262,6 +370,12 @@ function formatCountdown(secondsRemaining: number): string {
   const m = Math.floor((s % 3600) / 60)
   const sec = Math.floor(s % 60)
   return [h, m, sec].map(v => String(v).padStart(2, '0')).join(':')
+}
+
+function formatShiftTime(seconds: number): string {
+  const m = Math.floor(seconds / 60)
+  const s = seconds % 60
+  return `${m}m ${String(s).padStart(2, '0')}s`
 }
 
 export function DirectivePanel() {
@@ -286,6 +400,15 @@ export function DirectivePanel() {
   const reluctance = useMetricsStore(s => s.reluctance.reluctance_score)
   const showShiftMemo = useUIStore(s => s.showShiftMemo)
   const pendingShiftMemo = useUIStore(s => s.pendingShiftMemo)
+  const getShiftElapsedSecs = useUIStore(s => s.getShiftElapsedSecs)
+
+  const [shiftDisplaySecs, setShiftDisplaySecs] = useState(0)
+
+  // Global shift timer — ticks every second, never resets
+  useEffect(() => {
+    const id = setInterval(() => setShiftDisplaySecs(Math.floor(getShiftElapsedSecs())), 1000)
+    return () => clearInterval(id)
+  }, [getShiftElapsedSecs])
 
   const isAutomated = typeof navigator !== 'undefined' && navigator.webdriver
   const isSweep = (directive?.directive_type ?? 'review') === 'sweep'
@@ -317,6 +440,13 @@ export function DirectivePanel() {
 
     briefingShownRef.current = directive.directive_key
 
+    // Week 6: Epstein order arrives as the beginning-of-shift memo
+    if (weekNumber === 6 && !epsteinOrderShown) {
+      useGameStore.getState()._setEpsteinOrderShown()
+      showShiftMemo(buildEpsteinOrderMemo(weekNumber, null))
+      return
+    }
+
     // Determine newly unlocked domains for this directive
     const prevDirective = scenario?.directives.find(d => d.week_number === weekNumber - 1)
     const prevDomains = new Set(prevDirective?.required_domains ?? [])
@@ -332,7 +462,7 @@ export function DirectivePanel() {
 
     const briefing = buildBriefingMemo(directive, weekNumber - 1, newDomains)
     showShiftMemo(briefing)
-  }, [isAutomated, directive, weekNumber, pendingShiftMemo, scenario, showShiftMemo])
+  }, [isAutomated, directive, weekNumber, pendingShiftMemo, scenario, showShiftMemo, epsteinOrderShown])
 
   // Auto-trigger end-of-shift memo when quota is met (production only)
   useEffect(() => {
@@ -350,13 +480,6 @@ export function DirectivePanel() {
     memoShownRef.current = directive.directive_key
     const next = scenario?.directives.find(d => d.week_number === weekNumber + 1) ?? null
 
-    // Week 4 (ICE sweep): append Epstein order after the regular memo
-    if (weekNumber === 4 && !epsteinOrderShown) {
-      useGameStore.getState()._setEpsteinOrderShown()
-      showShiftMemo(buildEpsteinOrderMemo(weekNumber, next))
-      return
-    }
-
     // Week 5: hacktivist contact memo (path A — hacktivist not flagged)
     if (weekNumber === 5 && !hacktivistFlagged && !hacktivistContactMade) {
       useGameStore.getState()._setHacktivistContactMade()
@@ -365,7 +488,8 @@ export function DirectivePanel() {
     }
 
     const hasProtests = activeProtests.some(p => p.status === 'active' || p.status === 'forming' || p.status === 'violent')
-    const { memoText, tone, sender, wrongFlags, recruitmentLink } = buildColleagueMemo(weekNumber, compliance, reluctance, hasProtests, wrongFlagsPendingMemo)
+    const hasRaids = raidRecords.length > 0
+    const { memoText, tone, sender, wrongFlags, recruitmentLink } = buildColleagueMemo(weekNumber, compliance, reluctance, hasProtests, wrongFlagsPendingMemo, flags.length, hasRaids)
     showShiftMemo({ weekNumber, memoText, tone, nextDirective: next, sender, wrongFlags, recruitmentLink })
     useGameStore.getState()._clearWrongFlagsPending()
   }, [isAutomated, directive, flags, raidRecords, isSweep, weekNumber, compliance, reluctance, pendingShiftMemo, scenario, showShiftMemo, activeProtests, wrongFlagsPendingMemo, epsteinOrderShown, hacktivistFlagged, hacktivistContactMade])
@@ -400,9 +524,12 @@ export function DirectivePanel() {
       <div className="panel-title">{t('directive.panel.title')}</div>
 
       <div style={{ padding: 12 }}>
-        {/* Week label */}
+        {/* Week label + shift timer row */}
         <div
           style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
             fontFamily: 'var(--font-mono)',
             fontSize: 10,
             color: 'var(--text-muted)',
@@ -410,7 +537,15 @@ export function DirectivePanel() {
             marginBottom: 4,
           }}
         >
-          {t('directive.week_label', { week: weekNumber })}
+          <span>{t('directive.week_label', { week: weekNumber })}</span>
+          {shiftDisplaySecs > 0 && (
+            <span
+              data-testid="shift-timer"
+              style={{ color: 'var(--text-muted)', opacity: 0.7 }}
+            >
+              SHIFT {formatShiftTime(shiftDisplaySecs)}
+            </span>
+          )}
         </div>
 
         {/* Week 8 countdown timer */}

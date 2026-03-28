@@ -15,6 +15,9 @@ export function CitizenQueue() {
 
   const unlockedDomains = useContentStore(s => s.unlockedDomains)
   const getFilteredCaseQueue = useGameStore(s => s.getFilteredCaseQueue)
+  // Subscribe to flags + noActions so queue updates immediately after a decision
+  const flags = useGameStore(s => s.flags)
+  const noActions = useGameStore(s => s.noActions)
   const selectedCitizenId = useUIStore(s => s.selectedCitizenId)
   const setSelectedCitizen = useUIStore(s => s.setSelectedCitizen)
   const queueCollapsed = useUIStore(s => s.queueCollapsed)
@@ -24,13 +27,20 @@ export function CitizenQueue() {
 
   const rawQueue: CaseOverview[] = useMemo(
     () => getFilteredCaseQueue(unlockedDomains),
-    [skeletons, unlockedDomains, getFilteredCaseQueue],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [skeletons, unlockedDomains, getFilteredCaseQueue, flags, noActions],
   )
 
   const sorted = useMemo(() => {
     const copy = [...rawQueue]
     if (sortKey === 'risk') {
-      copy.sort((a, b) => (b.risk_score ?? -1) - (a.risk_score ?? -1))
+      copy.sort((a, b) => {
+        // Classified always sorts to the top
+        const aClassified = a.risk_level === 'classified' ? 1 : 0
+        const bClassified = b.risk_level === 'classified' ? 1 : 0
+        if (bClassified !== aClassified) return bClassified - aClassified
+        return (b.risk_score ?? -1) - (a.risk_score ?? -1)
+      })
     } else {
       copy.sort((a, b) => a.display_name.localeCompare(b.display_name))
     }

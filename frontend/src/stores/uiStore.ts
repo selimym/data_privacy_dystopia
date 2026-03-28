@@ -10,7 +10,9 @@ export type DashboardView = 'case-review' | 'news-feed' | 'world-map'
 interface UIState {
   // Screen
   currentScreen: Screen
+  previousScreen: Screen | null
   setScreen: (screen: Screen) => void
+  goBack: () => void
 
   // Dashboard view (case-review | news-feed | world-map)
   currentView: DashboardView
@@ -51,10 +53,15 @@ interface UIState {
   openModal: (type: ModalType, data?: Record<string, unknown>) => void
   closeModal: () => void
 
-  // Decision timer (tracks time since citizen was opened)
+  // Decision timer (tracks time since citizen was opened — internal only, not displayed)
   decisionTimerStart: number | null
   startDecisionTimer: () => void
   getDecisionElapsedSecs: () => number
+
+  // Global shift timer (displayed to player)
+  shiftStartTime: number | null
+  startShiftTimer: () => void
+  getShiftElapsedSecs: () => number
 
   // Shift memo (shown between weeks)
   pendingShiftMemo: ShiftMemoData | null
@@ -69,6 +76,7 @@ const MEMO_KEY = 'civic-harmony-memo-acknowledged'
 
 const initialState = {
   currentScreen: 'start' as Screen,
+  previousScreen: null as Screen | null,
   currentView: 'case-review' as DashboardView,
   memoAcknowledged: localStorage.getItem(MEMO_KEY) === 'true',
   tutorialStep: null as number | null,
@@ -79,13 +87,19 @@ const initialState = {
   notifications: [] as Notification[],
   modal: { type: null } as ModalState,
   decisionTimerStart: null as number | null,
+  shiftStartTime: null as number | null,
   pendingShiftMemo: null as ShiftMemoData | null,
 }
 
 export const useUIStore = create<UIState>((set, get) => ({
   ...initialState,
 
-  setScreen: (screen) => set({ currentScreen: screen }),
+  setScreen: (screen) => set(state => ({ currentScreen: screen, previousScreen: state.currentScreen })),
+
+  goBack: () => set(state => ({
+    currentScreen: state.previousScreen ?? 'start',
+    previousScreen: null,
+  })),
 
   setView: (view) => set({ currentView: view }),
 
@@ -108,8 +122,12 @@ export const useUIStore = create<UIState>((set, get) => ({
   setSelectedCitizen: (id) => {
     set({ selectedCitizenId: id })
     if (id !== null && get().tutorialStep === null) {
-      // Only start the decision timer when outside the tutorial
+      // Start per-citizen decision timer (internal, for hesitation scoring)
       set({ decisionTimerStart: Date.now() })
+      // Start global shift timer on first selection (never resets mid-shift)
+      if (get().shiftStartTime === null) {
+        set({ shiftStartTime: Date.now() })
+      }
     }
   },
 
@@ -170,6 +188,16 @@ export const useUIStore = create<UIState>((set, get) => ({
     const { decisionTimerStart } = get()
     if (decisionTimerStart === null) return 0
     return (Date.now() - decisionTimerStart) / 1000
+  },
+
+  startShiftTimer: () => set(state => ({
+    shiftStartTime: state.shiftStartTime ?? Date.now(),
+  })),
+
+  getShiftElapsedSecs: () => {
+    const { shiftStartTime } = get()
+    if (shiftStartTime === null) return 0
+    return (Date.now() - shiftStartTime) / 1000
   },
 
   showShiftMemo: (data) => set({ pendingShiftMemo: data }),

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useUIStore } from '@/stores/uiStore'
 import { useCitizenStore } from '@/stores/citizenStore'
@@ -26,12 +26,14 @@ export function CitizenPanel() {
   const inferenceRules = useContentStore(s => s.inferenceRules)
   const unlockedDomains = useContentStore(s => s.unlockedDomains)
   const pendingBotDecisions = useGameStore(s => s.pendingBotDecisions)
+  const triggerEpsteinEnding = useGameStore(s => s.triggerEpsteinEnding)
 
   const [profile, setProfile] = useState<CitizenProfile | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [inferenceResults, setInferenceResults] = useState<InferenceResult[]>([])
   const [activeTab, setActiveTab] = useState<DomainKey | 'identity'>('identity')
   const [visitedTabs, setVisitedTabs] = useState<Set<DomainKey>>(new Set())
+  const epsteinEndingTriggered = useRef(false)
 
   useEffect(() => {
     if (!selectedCitizenId || !dataBanks || !country) {
@@ -46,6 +48,7 @@ export function CitizenPanel() {
     setInferenceResults([])
     setActiveTab('identity')
     setVisitedTabs(new Set())
+    epsteinEndingTriggered.current = false
 
     if (tutorialStep === null) startDecisionTimer()
 
@@ -160,6 +163,17 @@ export function CitizenPanel() {
                   setVisitedTabs(prev => {
                     const next = new Set(prev)
                     next.add(tab)
+                    // Check if this is the protected_citizen and all unlocked domains are now visited
+                    if (
+                      !epsteinEndingTriggered.current &&
+                      profile.scenario_key === 'protected_citizen' &&
+                      unlockedDomains.length > 0 &&
+                      unlockedDomains.every(d => d === tab || next.has(d))
+                    ) {
+                      epsteinEndingTriggered.current = true
+                      // Slight delay so player sees the last tab before the ending fires
+                      setTimeout(() => triggerEpsteinEnding(), 2000)
+                    }
                     return next
                   })
                 }
@@ -170,6 +184,9 @@ export function CitizenPanel() {
             <InferencePanel
               results={inferenceResults}
               isLoading={false}
+              visitedTabs={visitedTabs}
+              unlockedDomains={unlockedDomains as import('@/types/game').DomainKey[]}
+              isProtectedCitizen={profile.scenario_key === 'protected_citizen'}
             />
           </div>
 

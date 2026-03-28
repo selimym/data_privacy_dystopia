@@ -32,6 +32,7 @@ import { getTimePeriodForWeek } from '@/services/TimeProgression'
 import { runAutoFlagBot } from '@/services/AutoFlagBot'
 import { calculateEnding, generateEndingResult } from '@/services/EndingCalculator'
 import { generateExposureArticle } from '@/services/NewsGenerator'
+import { markEndingSeen } from '@/services/EndingsArchive'
 
 // ─── Store imports ────────────────────────────────────────────────────────────
 import { useMetricsStore } from './metricsStore'
@@ -144,6 +145,9 @@ interface GameState {
 
   /** Mark citizen #4472's passphrase as verified → resistance path */
   activateResistancePath: () => void
+
+  /** Trigger the mysterious_death ending when player reads all of Epstein's data */
+  triggerEpsteinEnding: () => void
 
   /** Mark epstein order as shown so memo only fires once */
   _setEpsteinOrderShown: () => void
@@ -360,13 +364,6 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     // ── 6b. Scenario NPC special handling ─────────────────────────────────────
     const skeleton = citizens.skeletons.find(s => s.id === citizenId)
-
-    // Protected citizen (Epstein analog) → immediate mysterious_death ending
-    if (skeleton?.scenario_key === 'protected_citizen') {
-      set({ forcedEndingType: 'mysterious_death' })
-      _checkTerminalEnding(get, true)
-      return
-    }
 
     // Hacktivist flagged → mark state
     if (skeleton?.scenario_key === 'hacktivist') {
@@ -809,7 +806,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       return undecided.filter(c => skeletonById.get(c.citizen_id)?.scenario_key === 'jessica_martinez')
     }
 
-    // Week 5: hacktivist goes first, protected_citizen is included (appears_at_week=5)
+    // Week 5: hacktivist goes first
     if (weekNumber === 5) {
       const hacktivistIdx = undecided.findIndex(
         c => skeletonById.get(c.citizen_id)?.scenario_key === 'hacktivist',
@@ -820,18 +817,22 @@ export const useGameStore = create<GameState>((set, get) => ({
       }
     }
 
-    // Week 6: gov officials go first (if hacktivist contact was made)
-    if (weekNumber === 6 && get().hacktivistContactMade) {
+    // Week 6: protected_citizen (Epstein) goes first, then gov officials if contact made
+    if (weekNumber === 6) {
       const govIds = new Set(['gov_official_1', 'gov_official_2'])
-      const govCitizens = undecided.filter(c => {
-        const sk = skeletonById.get(c.citizen_id)
-        return sk?.scenario_key && govIds.has(sk.scenario_key)
-      })
+      const epstein = undecided.filter(c => skeletonById.get(c.citizen_id)?.scenario_key === 'protected_citizen')
+      const govCitizens = get().hacktivistContactMade
+        ? undecided.filter(c => {
+            const sk = skeletonById.get(c.citizen_id)
+            return sk?.scenario_key && govIds.has(sk.scenario_key)
+          })
+        : []
       const others = undecided.filter(c => {
         const sk = skeletonById.get(c.citizen_id)
-        return !sk?.scenario_key || !govIds.has(sk.scenario_key)
+        return sk?.scenario_key !== 'protected_citizen' &&
+               (!sk?.scenario_key || !get().hacktivistContactMade || !govIds.has(sk.scenario_key))
       })
-      return [...govCitizens, ...others]
+      return [...epstein, ...govCitizens, ...others]
     }
 
     return undecided
@@ -848,6 +849,12 @@ export const useGameStore = create<GameState>((set, get) => ({
     if (noActionCount >= 3) {
       get().activateResistancePath()
     }
+  },
+
+  triggerEpsteinEnding: () => {
+    if (get().forcedEndingType) return   // already triggered
+    set({ forcedEndingType: 'mysterious_death' })
+    _checkTerminalEnding(get, true)
   },
 
   _setEpsteinOrderShown: () => {
@@ -886,46 +893,43 @@ function _checkTerminalEnding(
   get: () => GameState,
   force = false,
 ): void {
-  const { operator, flags, weekNumber, activeProtests: _protests, resistancePath } = get()
+  const { operator, flags, weekNumber, activeProtests: _protests, resistancePath, forcedEndingType } = get()
   if (!operator) return
+
+  // A forced ending (e.g. mysterious_death) always wins — treat as force-end
+  if (forcedEndingType) force = true
 
   const metrics = useMetricsStore.getState()
   const ui = useUIStore.getState()
   const citizens = useCitizenStore.getState()
 
-  // Termination from reluctance
+  const baseInput = {
+    operator: { ...operator, compliance_score: metrics.compliance_score },
+    reluctance: metrics.reluctance,
+    metrics: metrics.public_metrics,
+    flags,
+    weekNumber,
+    citizens: citizens.skeletons,
+    resistancePath,
+    forcedEndingType: forcedEndingType ?? undefined,
+  }
+
+  // Termination from reluctance (only if no forced ending and not already force-ending)
   const termination = checkTerminationCondition(metrics.reluctance, weekNumber)
   if (termination && !force) {
-    const input = {
-      operator: { ...operator, compliance_score: metrics.compliance_score },
-      reluctance: metrics.reluctance,
-      metrics: metrics.public_metrics,
-      flags,
-      weekNumber,
-      citizens: citizens.skeletons,
-      resistancePath,
-    }
-    const result = generateEndingResult(input)
-    // Store result for EndingScreen to access
+    const result = generateEndingResult(baseInput)
+    markEndingSeen(result.ending_type)
     ;(window as unknown as Record<string, unknown>).__endingResult = result
     ui.setScreen('ending')
     return
   }
 
-  // Force-end (all directives complete or resistance path)
+  // Force-end (all directives complete, resistance path, or forcedEndingType)
   if (force) {
-    const input = {
-      operator: { ...operator, compliance_score: metrics.compliance_score },
-      reluctance: metrics.reluctance,
-      metrics: metrics.public_metrics,
-      flags,
-      weekNumber,
-      citizens: citizens.skeletons,
-      resistancePath,
-    }
-    const ending = calculateEnding(input)
-    const result = generateEndingResult({ ...input })
+    const ending = calculateEnding(baseInput)
+    const result = generateEndingResult(baseInput)
     console.log('[GameStore] Game over:', ending)
+    markEndingSeen(result.ending_type)
     ;(window as unknown as Record<string, unknown>).__endingResult = result
     ui.setScreen('ending')
   }

@@ -77,12 +77,14 @@ export const useCitizenStore = create<CitizenState>((set, get) => ({
 
   getCaseQueue: (unlockedDomains) => {
     const { skeletons } = get()
+    const CLASSIFIED_KEYS = new Set(['protected_citizen', 'hacktivist'])
     return skeletons.map(s => ({
       citizen_id: s.id,
       display_name: `${s.last_name}, ${s.first_name}`,
       risk_score: s.risk_score_cache,
-      risk_level:
-        (s.risk_score_cache ?? 0) >= 80 ? 'severe'
+      risk_level: CLASSIFIED_KEYS.has(s.scenario_key ?? '')
+        ? 'classified'
+        : (s.risk_score_cache ?? 0) >= 80 ? 'severe'
         : (s.risk_score_cache ?? 0) >= 60 ? 'high'
         : (s.risk_score_cache ?? 0) >= 40 ? 'elevated'
         : (s.risk_score_cache ?? 0) >= 20 ? 'moderate'
@@ -90,6 +92,7 @@ export const useCitizenStore = create<CitizenState>((set, get) => ({
       available_domains: unlockedDomains,
       already_flagged: false,         // gameStore sets this via augmentation
       no_action_taken: false,
+      scenario_key: s.scenario_key,
     } satisfies CaseOverview))
   },
 
