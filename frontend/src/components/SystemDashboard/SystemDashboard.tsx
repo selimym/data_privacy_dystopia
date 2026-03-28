@@ -16,6 +16,7 @@ import { MetricsPanel } from './MetricsPanel/MetricsPanel'
 import { AlertsPanel } from './AlertsPanel/AlertsPanel'
 import { NewsPanel } from './NewsPanel/NewsPanel'
 import WorldMapContainer from './WorldMapContainer/WorldMapContainer'
+import { MapErrorBoundary } from './WorldMapContainer/MapErrorBoundary'
 import { NeighborhoodSweepPanel } from './NeighborhoodSweepPanel/NeighborhoodSweepPanel'
 import { SweepStatusPanel } from './SweepStatusPanel/SweepStatusPanel'
 
@@ -72,7 +73,9 @@ export default function SystemDashboard() {
       {/* ── World Map view ── */}
       {currentView === 'world-map' && (
         <div className="dashboard-full-view">
-          <WorldMapContainer />
+          <MapErrorBoundary>
+            <WorldMapContainer />
+          </MapErrorBoundary>
         </div>
       )}
 

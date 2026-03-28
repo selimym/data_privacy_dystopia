@@ -38,11 +38,15 @@ export function WorldMapContainer() {
     if (currentView !== 'world-map') return
     if (!containerRef.current || startedRef.current) return
     startedRef.current = true
-    getOrCreateEventBus()
+
+    const bus = getOrCreateEventBus()
+    const onReady = () => setInitialized(true)
+    bus.addEventListener('map-ready', onReady, { once: true })
+
     gameRef.current = createWorldMapGame(containerRef.current)
-    setInitialized(true)
 
     return () => {
+      bus.removeEventListener('map-ready', onReady)
       gameRef.current?.destroy(true)
       gameRef.current = null
     }
@@ -74,11 +78,55 @@ export function WorldMapContainer() {
   }, [currentCinematic])
 
   return (
-    <div
-      ref={containerRef}
-      style={{ width: '100%', height: '100%' }}
-      data-testid="world-map-container"
-    />
+    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+      {/* Phaser canvas mount point */}
+      <div
+        ref={containerRef}
+        style={{ width: '100%', height: '100%' }}
+        data-testid="world-map-container"
+      />
+
+      {/* Loading overlay — shown until Phaser signals map-ready */}
+      {!initialized && (
+        <div
+          data-testid="map-loading"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'var(--bg-primary)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 10,
+            pointerEvents: 'none',
+          }}
+        >
+          <div
+            style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: 10,
+              color: 'var(--color-green)',
+              letterSpacing: '0.2em',
+              textTransform: 'uppercase',
+            }}
+          >
+            ◈ ESTABLISHING SATELLITE UPLINK...
+          </div>
+          <div
+            style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: 9,
+              color: 'var(--text-muted)',
+              letterSpacing: '0.15em',
+              opacity: 0.6,
+            }}
+          >
+            GEOSPATIAL FEED INITIALIZING
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
 
