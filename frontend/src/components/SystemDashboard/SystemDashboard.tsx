@@ -19,6 +19,7 @@ import WorldMapContainer from './WorldMapContainer/WorldMapContainer'
 import { MapErrorBoundary } from './WorldMapContainer/MapErrorBoundary'
 import { NeighborhoodSweepPanel } from './NeighborhoodSweepPanel/NeighborhoodSweepPanel'
 import { SweepStatusPanel } from './SweepStatusPanel/SweepStatusPanel'
+import { NewsTicker } from './NewsTicker/NewsTicker'
 
 export default function SystemDashboard() {
   const currentView = useUIStore(s => s.currentView)
@@ -88,6 +89,9 @@ export default function SystemDashboard() {
 
       {/* ── Tutorial overlay ── */}
       {tutorialStep !== null && <TutorialOverlay />}
+
+      {/* ── News ticker — bottom strip, all views ── */}
+      <NewsTicker />
 
       <ShiftMemoOverlay />
       <CinematicOverlay />

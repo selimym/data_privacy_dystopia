@@ -9,14 +9,21 @@ import type { DashboardView } from '@/stores/uiStore'
 const VIEWS: { key: DashboardView; label: string }[] = [
   { key: 'case-review', label: 'CASE REVIEW' },
   { key: 'news-feed', label: 'NEWS FEED' },
-  { key: 'world-map', label: '🗺 WORLD MAP' },
+  { key: 'world-map', label: 'WORLD MAP' },
 ]
 
 export default function TopBar() {
   const currentView = useUIStore(s => s.currentView)
   const setView = useUIStore(s => s.setView)
+  const lastNewsViewedAt = useUIStore(s => s.lastNewsViewedAt)
   const weekNumber = useGameStore(s => s.weekNumber)
   const operator = useGameStore(s => s.operator)
+  const newsArticles = useGameStore(s => s.newsArticles)
+
+  // Badge: any article published after the last time user viewed the news feed
+  const hasUnreadNews = newsArticles.some(a =>
+    lastNewsViewedAt === null || new Date(a.published_at) > new Date(lastNewsViewedAt)
+  )
 
   return (
     <div
@@ -45,27 +52,48 @@ export default function TopBar() {
 
       {/* View switcher — centred */}
       <div style={{ display: 'flex', gap: 4, margin: '0 auto' }}>
-        {VIEWS.map(({ key, label }) => (
-          <button
-            key={key}
-            data-testid={`view-btn-${key}`}
-            onClick={() => setView(key)}
-            style={{
-              background: 'transparent',
-              border: `1px solid ${currentView === key ? 'var(--color-green)' : 'var(--border-subtle)'}`,
-              color: currentView === key ? 'var(--color-green)' : 'var(--text-muted)',
-              fontFamily: 'var(--font-mono)',
-              fontSize: 11,
-              letterSpacing: '0.12em',
-              padding: '3px 10px',
-              borderRadius: 2,
-              cursor: 'pointer',
-              transition: 'border-color 0.15s, color 0.15s',
-            }}
-          >
-            {label}
-          </button>
-        ))}
+        {VIEWS.map(({ key, label }) => {
+          const isActive = currentView === key
+          const showBadge = key === 'news-feed' && hasUnreadNews && !isActive
+          return (
+            <button
+              key={key}
+              data-testid={`view-btn-${key}`}
+              onClick={() => setView(key)}
+              style={{
+                position: 'relative',
+                background: 'transparent',
+                border: `1px solid ${isActive ? 'var(--color-green)' : 'var(--border-subtle)'}`,
+                color: isActive ? 'var(--color-green)' : 'var(--text-muted)',
+                fontFamily: 'var(--font-mono)',
+                fontSize: 11,
+                letterSpacing: '0.12em',
+                padding: '3px 10px',
+                borderRadius: 2,
+                cursor: 'pointer',
+                transition: 'border-color 0.15s, color 0.15s',
+              }}
+            >
+              {label}
+              {showBadge && (
+                <span
+                  data-testid="news-unread-badge"
+                  style={{
+                    position: 'absolute',
+                    top: -3,
+                    right: -3,
+                    width: 7,
+                    height: 7,
+                    borderRadius: '50%',
+                    background: 'var(--color-red)',
+                    border: '1px solid var(--bg-primary)',
+                    display: 'block',
+                  }}
+                />
+              )}
+            </button>
+          )
+        })}
       </div>
 
       {/* Operator info */}

@@ -68,6 +68,21 @@ interface UIState {
   showShiftMemo: (data: ShiftMemoData) => void
   dismissShiftMemo: () => void
 
+  // Memo history — all shift memos shown this run (for archive)
+  memoHistory: ShiftMemoData[]
+
+  // News unread tracking
+  lastNewsViewedAt: string | null
+
+  // Briefing suppression — set after end-of-shift memo already shows next briefing
+  suppressBriefingForKey: string | null
+  setSuppressBriefingForKey: (key: string | null) => void
+
+  // Newly unlocked domains (show NEW badge until visited)
+  newlyUnlockedDomains: import('@/types/game').DomainKey[]
+  markDomainVisited: (domain: import('@/types/game').DomainKey) => void
+  addNewlyUnlockedDomains: (domains: import('@/types/game').DomainKey[]) => void
+
   // Reset
   reset: () => void
 }
@@ -89,6 +104,10 @@ const initialState = {
   decisionTimerStart: null as number | null,
   shiftStartTime: null as number | null,
   pendingShiftMemo: null as ShiftMemoData | null,
+  memoHistory: [] as ShiftMemoData[],
+  lastNewsViewedAt: null as string | null,
+  suppressBriefingForKey: null as string | null,
+  newlyUnlockedDomains: [] as import('@/types/game').DomainKey[],
 }
 
 export const useUIStore = create<UIState>((set, get) => ({
@@ -101,7 +120,12 @@ export const useUIStore = create<UIState>((set, get) => ({
     previousScreen: null,
   })),
 
-  setView: (view) => set({ currentView: view }),
+  setView: (view) => {
+    set({ currentView: view })
+    if (view === 'news-feed') {
+      set({ lastNewsViewedAt: new Date().toISOString() })
+    }
+  },
 
   acknowledgeMemo: () => {
     localStorage.setItem(MEMO_KEY, 'true')
@@ -200,8 +224,21 @@ export const useUIStore = create<UIState>((set, get) => ({
     return (Date.now() - shiftStartTime) / 1000
   },
 
-  showShiftMemo: (data) => set({ pendingShiftMemo: data }),
+  showShiftMemo: (data) => set(state => ({
+    pendingShiftMemo: data,
+    memoHistory: [...state.memoHistory, data],
+  })),
   dismissShiftMemo: () => set({ pendingShiftMemo: null }),
+
+  setSuppressBriefingForKey: (key) => set({ suppressBriefingForKey: key }),
+
+  markDomainVisited: (domain) => set(state => ({
+    newlyUnlockedDomains: state.newlyUnlockedDomains.filter(d => d !== domain),
+  })),
+
+  addNewlyUnlockedDomains: (domains) => set(state => ({
+    newlyUnlockedDomains: [...new Set([...state.newlyUnlockedDomains, ...domains])],
+  })),
 
   reset: () => set({ ...initialState, memoAcknowledged: localStorage.getItem(MEMO_KEY) === 'true' }),
 }))
