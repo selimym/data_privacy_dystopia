@@ -703,43 +703,69 @@ export function DirectivePanel() {
             ) : (
               <div
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
+                  position: 'relative',
                   padding: '6px 8px',
                   background: 'var(--bg-tertiary)',
                   border: '1px solid var(--border-subtle)',
                   borderRadius: 2,
+                  overflow: 'hidden',
                 }}
               >
-                <span
+                {/* Blurred memo text — tantalizing but unreadable */}
+                <div
                   style={{
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: 10,
-                    color: 'var(--color-red)',
-                    letterSpacing: '0.08em',
-                    flexGrow: 1,
+                    fontSize: 12,
+                    color: 'var(--text-secondary)',
+                    lineHeight: 1.5,
+                    filter: 'blur(3px)',
+                    userSelect: 'none',
+                    pointerEvents: 'none',
                   }}
                 >
-                  {t('directive.memo_classified', { week: 4 })}
-                </span>
-                <button
-                  onClick={() => setMemoRevealed(true)}
+                  {directive.internal_memo}
+                </div>
+                {/* Overlay with classification label + reveal */}
+                <div
                   style={{
-                    padding: '3px 7px',
-                    background: 'transparent',
-                    border: '1px solid var(--border-subtle)',
-                    color: 'var(--text-muted)',
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: 9,
-                    letterSpacing: '0.08em',
-                    cursor: 'pointer',
-                    borderRadius: 2,
-                    whiteSpace: 'nowrap',
+                    position: 'absolute',
+                    inset: 0,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 6,
+                    background: 'rgba(13, 13, 15, 0.5)',
                   }}
                 >
-                  REVEAL
-                </button>
+                  <span
+                    style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: 9,
+                      color: 'var(--color-red)',
+                      letterSpacing: '0.12em',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    ▓ CLEARANCE REQUIRED — WEEK 4
+                  </span>
+                  <button
+                    onClick={() => setMemoRevealed(true)}
+                    style={{
+                      padding: '3px 10px',
+                      background: 'rgba(220, 38, 38, 0.1)',
+                      border: '1px solid var(--color-red)',
+                      color: 'var(--color-red)',
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: 9,
+                      letterSpacing: '0.1em',
+                      cursor: 'pointer',
+                      borderRadius: 2,
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    REQUEST ACCESS
+                  </button>
+                </div>
               </div>
             )}
           </div>
