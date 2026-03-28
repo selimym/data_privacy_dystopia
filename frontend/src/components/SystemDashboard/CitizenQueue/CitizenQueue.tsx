@@ -11,7 +11,10 @@ type SortKey = 'risk' | 'name'
 
 export function CitizenQueue() {
   const { t } = useTranslation()
-  const [sortKey, setSortKey] = useState<SortKey>('risk')
+  const [sortKey, setSortKey] = useState<SortKey>(() => {
+    const saved = localStorage.getItem('queue-sort-key')
+    return (saved === 'risk' || saved === 'name') ? saved : 'risk'
+  })
 
   const unlockedDomains = useContentStore(s => s.unlockedDomains)
   const getFilteredCaseQueue = useGameStore(s => s.getFilteredCaseQueue)
@@ -59,7 +62,7 @@ export function CitizenQueue() {
         style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 8px 8px 10px' }}
       >
         {!queueCollapsed && (
-          <span style={{ flex: 1 }}>{t('queue.title')}</span>
+          <span style={{ flex: 1 }}>{t('queue.title')} ({sorted.length})</span>
         )}
 
         <button
@@ -118,7 +121,7 @@ export function CitizenQueue() {
             {(['risk', 'name'] as SortKey[]).map(key => (
               <button
                 key={key}
-                onClick={() => setSortKey(key)}
+                onClick={() => { setSortKey(key); localStorage.setItem('queue-sort-key', key) }}
                 style={{
                   padding: '1px 6px',
                   background: sortKey === key ? 'var(--bg-surface)' : 'transparent',
