@@ -41,7 +41,7 @@ export function InferencePanel({ results, isLoading, visitedTabs, unlockedDomain
     <div data-testid="inference-panel" style={{ marginTop: 16 }}>
       <div
         style={{
-          fontSize: 9,
+          fontSize: 11,
           fontFamily: 'var(--font-mono)',
           color: 'var(--text-muted)',
           letterSpacing: '0.1em',
@@ -68,7 +68,7 @@ export function InferencePanel({ results, isLoading, visitedTabs, unlockedDomain
             border: '1px solid var(--border-subtle)',
             color: 'var(--text-muted)',
             fontFamily: 'var(--font-mono)',
-            fontSize: 9,
+            fontSize: 10,
             letterSpacing: '0.06em',
             cursor: 'pointer',
             borderRadius: 2,
@@ -133,7 +133,7 @@ export function InferencePanel({ results, isLoading, visitedTabs, unlockedDomain
                       }}
                     >
                       <div style={{ marginBottom: 6 }}>
-                        <span style={{ color: 'var(--text-muted)', fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                        <span style={{ color: 'var(--text-muted)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                           Inference:{' '}
                         </span>
                         <span style={{ color: 'var(--text-secondary)' }}>{r.inference_text}</span>
@@ -141,7 +141,7 @@ export function InferencePanel({ results, isLoading, visitedTabs, unlockedDomain
 
                       {r.supporting_evidence.length > 0 && (
                         <div style={{ marginBottom: 6 }}>
-                          <div style={{ color: 'var(--text-muted)', fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>
+                          <div style={{ color: 'var(--text-muted)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>
                             {t('citizen.inferences.evidence')}:
                           </div>
                           <ul style={{ margin: 0, padding: '0 0 0 16px', color: 'var(--text-secondary)' }}>
@@ -153,7 +153,7 @@ export function InferencePanel({ results, isLoading, visitedTabs, unlockedDomain
                       )}
 
                       <div style={{ marginBottom: 6 }}>
-                        <div style={{ color: 'var(--text-muted)', fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>
+                        <div style={{ color: 'var(--text-muted)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>
                           {t('citizen.inferences.implications')}:
                         </div>
                         <ul style={{ margin: 0, padding: '0 0 0 16px', color: 'var(--color-amber)' }}>
@@ -171,7 +171,7 @@ export function InferencePanel({ results, isLoading, visitedTabs, unlockedDomain
                           fontSize: 10,
                         }}
                       >
-                        <span style={{ color: 'var(--text-muted)', fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                        <span style={{ color: 'var(--text-muted)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                           {t('citizen.inferences.educational_note')}:{' '}
                         </span>
                         {r.educational_note}
@@ -202,7 +202,7 @@ export function InferencePanel({ results, isLoading, visitedTabs, unlockedDomain
             lineHeight: 1.5,
           }}
         >
-          <div style={{ color: '#ef4444', fontSize: 9, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 4 }}>
+          <div style={{ color: '#ef4444', fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 4 }}>
             ◆ CROSS-DOMAIN INFERENCE
           </div>
           Subject's behavioral signature matches surveillance-derived archetype{' '}
@@ -229,7 +229,7 @@ export function InferencePanel({ results, isLoading, visitedTabs, unlockedDomain
             lineHeight: 1.5,
           }}
         >
-          <div style={{ fontSize: 9, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 4 }}>
+          <div style={{ fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 4 }}>
             ⚠ PROTECTED — CROSS-REFERENCE BLOCKED
           </div>
           OPERATOR CLEARANCE INSUFFICIENT.

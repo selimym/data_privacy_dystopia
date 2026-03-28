@@ -96,10 +96,10 @@ export function ShiftMemoOverlay() {
               display: 'inline-block',
             }}
           />
-          <span style={{ color: 'var(--text-muted)', fontSize: 9, letterSpacing: '0.2em' }}>
+          <span style={{ color: 'var(--text-muted)', fontSize: 11, letterSpacing: '0.2em' }}>
             {headerLeft}
           </span>
-          <span style={{ marginLeft: 'auto', color: accentColor, fontSize: 9, letterSpacing: '0.12em' }}>
+          <span style={{ marginLeft: 'auto', color: accentColor, fontSize: 11, letterSpacing: '0.12em' }}>
             {headerRight}
           </span>
         </div>
@@ -109,7 +109,7 @@ export function ShiftMemoOverlay() {
           <div
             style={{
               color: 'var(--text-muted)',
-              fontSize: 9,
+              fontSize: 11,
               letterSpacing: '0.12em',
               marginBottom: 16,
             }}
@@ -128,12 +128,11 @@ export function ShiftMemoOverlay() {
             >
               <div
                 style={{
-                  fontSize: 10,
+                  fontSize: 13,
                   color: accentColor,
                   fontFamily: 'var(--font-mono)',
                   letterSpacing: '0.1em',
                   marginBottom: 8,
-                  opacity: 0.8,
                 }}
               >
                 {memo.sender!.name}
@@ -203,7 +202,7 @@ export function ShiftMemoOverlay() {
               border: `1px solid ${accentColor}`,
               color: accentColor,
               fontFamily: 'var(--font-mono)',
-              fontSize: 9,
+              fontSize: 11,
               letterSpacing: '0.12em',
               padding: '6px 16px',
               borderRadius: 2,

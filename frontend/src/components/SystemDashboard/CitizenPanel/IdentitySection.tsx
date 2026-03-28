@@ -21,7 +21,7 @@ export function IdentitySection({ skeleton }: IdentitySectionProps) {
     .join(', ')
 
   const labelStyle: React.CSSProperties = {
-    fontSize: 10,
+    fontSize: 11,
     fontFamily: 'var(--font-mono)',
     color: 'var(--text-muted)',
     letterSpacing: '0.08em',
@@ -30,7 +30,7 @@ export function IdentitySection({ skeleton }: IdentitySectionProps) {
   }
 
   const valueStyle: React.CSSProperties = {
-    fontSize: 12,
+    fontSize: 13,
     fontFamily: 'var(--font-mono)',
     color: 'var(--text-primary)',
   }
@@ -47,7 +47,7 @@ export function IdentitySection({ skeleton }: IdentitySectionProps) {
     <div data-testid="identity-section" style={{ padding: '8px 0' }}>
       <div
         style={{
-          fontSize: 9,
+          fontSize: 11,
           fontFamily: 'var(--font-mono)',
           color: 'var(--text-muted)',
           letterSpacing: '0.1em',
@@ -87,7 +87,7 @@ export function IdentitySection({ skeleton }: IdentitySectionProps) {
 
         <div style={fieldStyle}>
           <div style={labelStyle}>{t('citizen.identity.role')}</div>
-          <div style={{ ...valueStyle, textTransform: 'uppercase', fontSize: 10 }}>
+          <div style={{ ...valueStyle, textTransform: 'uppercase', fontSize: 11 }}>
             {skeleton.role.replace('_', ' ')}
           </div>
         </div>

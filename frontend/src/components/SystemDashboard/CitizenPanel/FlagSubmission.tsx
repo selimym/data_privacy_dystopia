@@ -76,7 +76,7 @@ export function FlagSubmission({ citizenId, isVisible, inferenceResults, visited
     >
       <div
         style={{
-          fontSize: 9,
+          fontSize: 11,
           fontFamily: 'var(--font-mono)',
           color: 'var(--text-muted)',
           letterSpacing: '0.1em',
@@ -89,12 +89,12 @@ export function FlagSubmission({ citizenId, isVisible, inferenceResults, visited
 
       {/* Directive findings */}
       <div data-testid="findings-panel" style={{ marginBottom: 10 }}>
-        <div style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>
+        <div style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>
           Directive Findings
         </div>
 
         {inferenceResults.length === 0 ? (
-          <div style={{ fontSize: 10, fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', padding: '6px 0' }}>
+          <div style={{ fontSize: 12, fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', padding: '6px 0' }}>
             No findings — review data tabs to surface indicators.
           </div>
         ) : (
@@ -138,7 +138,7 @@ export function FlagSubmission({ citizenId, isVisible, inferenceResults, visited
                     }}>
                       {r.rule_name}
                     </div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-muted)', marginTop: 1 }}>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>
                       {checkable
                         ? r.inference_text
                         : hinted
@@ -156,7 +156,7 @@ export function FlagSubmission({ citizenId, isVisible, inferenceResults, visited
 
       {/* Flag type selection */}
       <div style={{ marginBottom: 10 }}>
-        <div style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>
+        <div style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>
           {t('flag.submission.select_type')}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -169,7 +169,7 @@ export function FlagSubmission({ citizenId, isVisible, inferenceResults, visited
                 gap: 8,
                 cursor: 'pointer',
                 fontFamily: 'var(--font-mono)',
-                fontSize: 11,
+                fontSize: 13,
                 color: selectedType === type ? 'var(--color-amber)' : 'var(--text-secondary)',
                 padding: '3px 6px',
                 background: selectedType === type ? 'var(--bg-surface)' : 'transparent',
@@ -199,9 +199,9 @@ export function FlagSubmission({ citizenId, isVisible, inferenceResults, visited
           disabled={!canSubmit}
           style={{
             flex: 1,
-            padding: '6px 12px',
+            padding: '8px 14px',
             fontFamily: 'var(--font-mono)',
-            fontSize: 10,
+            fontSize: 12,
             letterSpacing: '0.1em',
             textTransform: 'uppercase',
             background: canSubmit ? 'var(--color-red-dim)' : 'var(--bg-tertiary)',
@@ -219,9 +219,9 @@ export function FlagSubmission({ citizenId, isVisible, inferenceResults, visited
           onClick={handleNoAction}
           style={{
             flex: 1,
-            padding: '6px 12px',
+            padding: '8px 14px',
             fontFamily: 'var(--font-mono)',
-            fontSize: 10,
+            fontSize: 12,
             letterSpacing: '0.08em',
             textTransform: 'uppercase',
             background: 'transparent',

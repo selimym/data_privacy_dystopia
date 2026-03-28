@@ -146,9 +146,8 @@ export function CitizenPanel() {
       )}
 
       {!isLoading && profile && (
-        <>
-          {/* Scrollable data section — fills available space */}
-          <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
+          {/* Scrollable data section — fills available space, includes flag submission */}
+          <div style={{ flex: 1, overflowY: 'auto', minHeight: 0, paddingBottom: 20 }}>
             {/* AutoFlag decision panel at top */}
             <AutoFlagDecisionPanel citizenId={selectedCitizenId} />
 
@@ -188,10 +187,8 @@ export function CitizenPanel() {
               unlockedDomains={unlockedDomains as import('@/types/game').DomainKey[]}
               isProtectedCitizen={profile.scenario_key === 'protected_citizen'}
             />
-          </div>
 
-          {/* Flag submission — pinned to bottom */}
-          <div style={{ flexShrink: 0, borderTop: '1px solid var(--border-subtle)' }}>
+            {/* Flag submission — inside scroll flow, no dead zone */}
             <FlagSubmission
               citizenId={selectedCitizenId}
               isVisible={!hasBotDecision}
@@ -199,7 +196,6 @@ export function CitizenPanel() {
               visitedTabs={visitedTabs}
             />
           </div>
-        </>
       )}
     </div>
   )
