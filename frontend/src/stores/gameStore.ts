@@ -174,6 +174,12 @@ interface GameState {
   checkResistanceTrigger: (citizenId: string) => void
 
   reset: () => void
+
+  /** DEV ONLY — skip directly to a week by loading the matching directive */
+  devSkipToWeek: (targetWeek: number) => void
+
+  /** DEV ONLY — immediately force a specific ending */
+  devForceEnding: (type: EndingType) => void
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -598,7 +604,12 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
 
     // Unlock required domains for new directive
+    const priorDomains = new Set(content.unlockedDomains)
+    const newlyUnlocked = nextDirective.required_domains.filter(d => !priorDomains.has(d))
     content.unlockDomains(nextDirective.required_domains)
+    if (newlyUnlocked.length > 0) {
+      useUIStore.getState().addNewlyUnlockedDomains(newlyUnlocked)
+    }
 
     _persist(get)
   },
@@ -857,6 +868,20 @@ export const useGameStore = create<GameState>((set, get) => ({
     _checkTerminalEnding(get, true)
   },
 
+  devSkipToWeek: (targetWeek) => {
+    const scenario = useContentStore.getState().scenario
+    if (!scenario) return
+    const directive = scenario.directives.find(d => d.week_number === targetWeek)
+    if (!directive) return
+    const timePeriod = getTimePeriodForWeek(targetWeek)
+    set({ weekNumber: targetWeek, currentDirective: directive, currentTimePeriod: timePeriod })
+  },
+
+  devForceEnding: (type) => {
+    set({ forcedEndingType: type })
+    _checkTerminalEnding(get, true)
+  },
+
   _setEpsteinOrderShown: () => {
     set({ epsteinOrderShown: true })
   },
@@ -944,7 +969,12 @@ function _fireContractEvent(
   const ui = useUIStore.getState()
 
   // Unlock domains
+  const priorDomains = new Set(content.unlockedDomains)
+  const newlyUnlocked = event.new_domains_unlocked.filter(d => !priorDomains.has(d))
   content.unlockDomains(event.new_domains_unlocked)
+  if (newlyUnlocked.length > 0) {
+    ui.addNewlyUnlockedDomains(newlyUnlocked)
+  }
 
   // Mark contract as fired
   set(state => ({

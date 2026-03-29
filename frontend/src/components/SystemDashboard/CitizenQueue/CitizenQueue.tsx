@@ -9,9 +9,113 @@ import type { CaseOverview } from '@/types/citizen'
 
 type SortKey = 'risk' | 'name'
 
+function tierOf(item: CaseOverview): 'high' | 'medium' | 'low' {
+  if (item.risk_level === 'classified') return 'high'
+  if (item.risk_score !== null && item.risk_score >= 65) return 'high'
+  if (item.risk_score !== null && item.risk_score >= 35) return 'medium'
+  return 'low'
+}
+
+interface TieredQueueProps {
+  items: CaseOverview[]
+  selectedCitizenId: string | null
+  onSelect: (id: string) => void
+  lowExpanded: boolean
+  onToggleLow: () => void
+}
+
+function TierHeader({ label, count, color, expanded, onToggle }: {
+  label: string; count: number; color: string; expanded: boolean; onToggle?: () => void
+}) {
+  return (
+    <div
+      onClick={onToggle}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 6,
+        padding: '4px 10px',
+        background: 'var(--bg-tertiary)',
+        borderBottom: '1px solid var(--border-subtle)',
+        cursor: onToggle ? 'pointer' : 'default',
+        userSelect: 'none',
+      }}
+    >
+      <span style={{ fontSize: 10, color, fontFamily: 'var(--font-mono)', letterSpacing: '0.06em' }}>
+        {expanded ? '▼' : '▶'}
+      </span>
+      <span style={{ fontSize: 11, color, fontFamily: 'var(--font-mono)', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600 }}>
+        {label}
+      </span>
+      <span style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', marginLeft: 2 }}>
+        ({count})
+      </span>
+    </div>
+  )
+}
+
+function TieredQueue({ items, selectedCitizenId, onSelect, lowExpanded, onToggleLow }: TieredQueueProps) {
+  const high = items.filter(i => tierOf(i) === 'high')
+  const medium = items.filter(i => tierOf(i) === 'medium')
+  const low = items.filter(i => tierOf(i) === 'low')
+
+  return (
+    <>
+      {high.length > 0 && (
+        <>
+          <TierHeader label="High Risk" count={high.length} color="var(--color-red)" expanded={true} />
+          {high.map(item => (
+            <CaseRow
+              key={item.citizen_id}
+              caseItem={item}
+              isSelected={selectedCitizenId === item.citizen_id}
+              onSelect={() => onSelect(item.citizen_id)}
+              collapsed={false}
+            />
+          ))}
+        </>
+      )}
+
+      {medium.length > 0 && (
+        <>
+          <TierHeader label="Medium Risk" count={medium.length} color="var(--color-amber)" expanded={true} />
+          {medium.map(item => (
+            <CaseRow
+              key={item.citizen_id}
+              caseItem={item}
+              isSelected={selectedCitizenId === item.citizen_id}
+              onSelect={() => onSelect(item.citizen_id)}
+              collapsed={false}
+            />
+          ))}
+        </>
+      )}
+
+      {low.length > 0 && (
+        <>
+          <TierHeader label="Low Risk" count={low.length} color="var(--color-green)" expanded={lowExpanded} onToggle={onToggleLow} />
+          {lowExpanded && low.map(item => (
+            <CaseRow
+              key={item.citizen_id}
+              caseItem={item}
+              isSelected={selectedCitizenId === item.citizen_id}
+              onSelect={() => onSelect(item.citizen_id)}
+              collapsed={false}
+            />
+          ))}
+        </>
+      )}
+    </>
+  )
+}
+
 export function CitizenQueue() {
   const { t } = useTranslation()
-  const [sortKey, setSortKey] = useState<SortKey>('risk')
+  const [sortKey, setSortKey] = useState<SortKey>(() => {
+    const saved = localStorage.getItem('queue-sort-key')
+    return (saved === 'risk' || saved === 'name') ? saved : 'risk'
+  })
+  const [lowExpanded, setLowExpanded] = useState(false)
 
   const unlockedDomains = useContentStore(s => s.unlockedDomains)
   const getFilteredCaseQueue = useGameStore(s => s.getFilteredCaseQueue)
@@ -59,7 +163,7 @@ export function CitizenQueue() {
         style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 8px 8px 10px' }}
       >
         {!queueCollapsed && (
-          <span style={{ flex: 1 }}>{t('queue.title')}</span>
+          <span style={{ flex: 1 }}>{t('queue.title')} ({sorted.length})</span>
         )}
 
         <button
@@ -118,14 +222,14 @@ export function CitizenQueue() {
             {(['risk', 'name'] as SortKey[]).map(key => (
               <button
                 key={key}
-                onClick={() => setSortKey(key)}
+                onClick={() => { setSortKey(key); localStorage.setItem('queue-sort-key', key) }}
                 style={{
                   padding: '1px 6px',
                   background: sortKey === key ? 'var(--bg-surface)' : 'transparent',
                   border: '1px solid var(--border-subtle)',
                   color: sortKey === key ? 'var(--text-primary)' : 'var(--text-muted)',
                   fontFamily: 'var(--font-mono)',
-                  fontSize: 9,
+                  fontSize: 10,
                   letterSpacing: '0.08em',
                   cursor: 'pointer',
                   borderRadius: 2,
@@ -136,7 +240,7 @@ export function CitizenQueue() {
             ))}
           </div>
 
-          {/* Rows */}
+          {/* Tiered rows */}
           <div style={{ flex: 1, overflowY: 'auto' }}>
             {sorted.length === 0 ? (
               <div
@@ -151,15 +255,13 @@ export function CitizenQueue() {
                 {t('queue.empty')}
               </div>
             ) : (
-              sorted.map(item => (
-                <CaseRow
-                  key={item.citizen_id}
-                  caseItem={item}
-                  isSelected={selectedCitizenId === item.citizen_id}
-                  onSelect={() => setSelectedCitizen(item.citizen_id)}
-                  collapsed={false}
-                />
-              ))
+              <TieredQueue
+                items={sorted}
+                selectedCitizenId={selectedCitizenId}
+                onSelect={setSelectedCitizen}
+                lowExpanded={lowExpanded}
+                onToggleLow={() => setLowExpanded(e => !e)}
+              />
             )}
           </div>
         </>

@@ -22,6 +22,10 @@ export function ShiftMemoOverlay() {
   function handleAcknowledge() {
     if (!memo) return
     if (!isBriefing) {
+      // If we showed the next directive's briefing inline, suppress the separate briefing popup
+      if (memo.nextDirectiveBriefing) {
+        useUIStore.getState().setSuppressBriefingForKey(memo.nextDirectiveBriefing.directiveKey)
+      }
       useGameStore.getState().advanceDirective(memo.nextDirective)
     }
     dismissShiftMemo()
@@ -96,10 +100,10 @@ export function ShiftMemoOverlay() {
               display: 'inline-block',
             }}
           />
-          <span style={{ color: 'var(--text-muted)', fontSize: 9, letterSpacing: '0.2em' }}>
+          <span style={{ color: 'var(--text-muted)', fontSize: 11, letterSpacing: '0.2em' }}>
             {headerLeft}
           </span>
-          <span style={{ marginLeft: 'auto', color: accentColor, fontSize: 9, letterSpacing: '0.12em' }}>
+          <span style={{ marginLeft: 'auto', color: accentColor, fontSize: 11, letterSpacing: '0.12em' }}>
             {headerRight}
           </span>
         </div>
@@ -109,7 +113,7 @@ export function ShiftMemoOverlay() {
           <div
             style={{
               color: 'var(--text-muted)',
-              fontSize: 9,
+              fontSize: 11,
               letterSpacing: '0.12em',
               marginBottom: 16,
             }}
@@ -128,12 +132,11 @@ export function ShiftMemoOverlay() {
             >
               <div
                 style={{
-                  fontSize: 10,
+                  fontSize: 13,
                   color: accentColor,
                   fontFamily: 'var(--font-mono)',
                   letterSpacing: '0.1em',
                   marginBottom: 8,
-                  opacity: 0.8,
                 }}
               >
                 {memo.sender!.name}
@@ -183,6 +186,74 @@ export function ShiftMemoOverlay() {
               </a>
             </div>
           )}
+
+          {/* Next directive preview — shown inline to avoid a second popup */}
+          {!isBriefing && memo.nextDirectiveBriefing && (
+            <div
+              style={{
+                marginTop: 20,
+                borderTop: '1px solid var(--border-subtle)',
+                paddingTop: 16,
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: 10,
+                  color: 'var(--text-muted)',
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                  marginBottom: 10,
+                }}
+              >
+                ▶ NEXT DIRECTIVE — CYCLE {memo.weekNumber + 1}
+              </div>
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: 'var(--text-primary)',
+                  marginBottom: 6,
+                  letterSpacing: '0.02em',
+                }}
+              >
+                {memo.nextDirectiveBriefing.title}
+              </div>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: 'var(--text-secondary)',
+                  lineHeight: 1.6,
+                  marginBottom: 8,
+                }}
+              >
+                {memo.nextDirectiveBriefing.description}
+              </div>
+              <div
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: 11,
+                  color: 'var(--text-muted)',
+                  letterSpacing: '0.06em',
+                }}
+              >
+                QUOTA: {memo.nextDirectiveBriefing.quota} {memo.nextDirectiveBriefing.flagType} required
+              </div>
+              {memo.nextDirectiveBriefing.newDomains.length > 0 && (
+                <div
+                  style={{
+                    marginTop: 8,
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: 10,
+                    color: 'var(--color-green)',
+                    letterSpacing: '0.08em',
+                  }}
+                >
+                  NEW DATA ACCESS: {memo.nextDirectiveBriefing.newDomains.map(d => d.toUpperCase()).join(' · ')}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Footer */}
@@ -203,7 +274,7 @@ export function ShiftMemoOverlay() {
               border: `1px solid ${accentColor}`,
               color: accentColor,
               fontFamily: 'var(--font-mono)',
-              fontSize: 9,
+              fontSize: 11,
               letterSpacing: '0.12em',
               padding: '6px 16px',
               borderRadius: 2,

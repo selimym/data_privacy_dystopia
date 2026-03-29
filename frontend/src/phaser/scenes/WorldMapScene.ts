@@ -44,6 +44,10 @@ export class WorldMapScene extends Phaser.Scene {
     this.setupCamera()
     this.setupDragPan()
     this.setupEventListeners()
+
+    // Signal React that the map is fully initialised
+    const bus = getWorldEvents()
+    if (bus) bus.dispatchEvent(new Event('map-ready'))
   }
 
   private createMap() {

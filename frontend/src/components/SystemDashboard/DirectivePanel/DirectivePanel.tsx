@@ -401,6 +401,7 @@ export function DirectivePanel() {
   const showShiftMemo = useUIStore(s => s.showShiftMemo)
   const pendingShiftMemo = useUIStore(s => s.pendingShiftMemo)
   const getShiftElapsedSecs = useUIStore(s => s.getShiftElapsedSecs)
+  const suppressBriefingForKey = useUIStore(s => s.suppressBriefingForKey)
 
   const [shiftDisplaySecs, setShiftDisplaySecs] = useState(0)
 
@@ -440,6 +441,12 @@ export function DirectivePanel() {
 
     briefingShownRef.current = directive.directive_key
 
+    // If the end-of-shift overlay already included this directive's briefing, skip
+    if (suppressBriefingForKey === directive.directive_key) {
+      useUIStore.getState().setSuppressBriefingForKey(null)
+      return
+    }
+
     // Week 6: Epstein order arrives as the beginning-of-shift memo
     if (weekNumber === 6 && !epsteinOrderShown) {
       useGameStore.getState()._setEpsteinOrderShown()
@@ -462,7 +469,7 @@ export function DirectivePanel() {
 
     const briefing = buildBriefingMemo(directive, weekNumber - 1, newDomains)
     showShiftMemo(briefing)
-  }, [isAutomated, directive, weekNumber, pendingShiftMemo, scenario, showShiftMemo, epsteinOrderShown])
+  }, [isAutomated, directive, weekNumber, pendingShiftMemo, scenario, showShiftMemo, epsteinOrderShown, suppressBriefingForKey])
 
   // Auto-trigger end-of-shift memo when quota is met (production only)
   useEffect(() => {
@@ -490,7 +497,30 @@ export function DirectivePanel() {
     const hasProtests = activeProtests.some(p => p.status === 'active' || p.status === 'forming' || p.status === 'violent')
     const hasRaids = raidRecords.length > 0
     const { memoText, tone, sender, wrongFlags, recruitmentLink } = buildColleagueMemo(weekNumber, compliance, reluctance, hasProtests, wrongFlagsPendingMemo, flags.length, hasRaids)
-    showShiftMemo({ weekNumber, memoText, tone, nextDirective: next, sender, wrongFlags, recruitmentLink })
+
+    // Compute next directive briefing to embed inline (avoids separate briefing popup)
+    let nextDirectiveBriefing: import('@/types/ui').ShiftMemoData['nextDirectiveBriefing'] = undefined
+    if (next) {
+      const currDomains = new Set(directive.required_domains)
+      const nextNewDomains = next.required_domains.filter(d => !currDomains.has(d))
+      // Also include contract event domains for next week
+      const contractEvent = scenario?.contract_events.find(ce => ce.week_number === next.week_number)
+      if (contractEvent) {
+        contractEvent.new_domains_unlocked.forEach(d => {
+          if (!nextNewDomains.includes(d)) nextNewDomains.push(d)
+        })
+      }
+      nextDirectiveBriefing = {
+        directiveKey: next.directive_key,
+        title: next.title,
+        description: next.description,
+        quota: next.flag_quota,
+        flagType: (next.directive_type ?? 'review') === 'sweep' ? 'arrests' : 'flags',
+        newDomains: nextNewDomains,
+      }
+    }
+
+    showShiftMemo({ weekNumber, memoText, tone, nextDirective: next, sender, wrongFlags, recruitmentLink, nextDirectiveBriefing })
     useGameStore.getState()._clearWrongFlagsPending()
   }, [isAutomated, directive, flags, raidRecords, isSweep, weekNumber, compliance, reluctance, pendingShiftMemo, scenario, showShiftMemo, activeProtests, wrongFlagsPendingMemo, epsteinOrderShown, hacktivistFlagged, hacktivistContactMade])
 
@@ -531,7 +561,7 @@ export function DirectivePanel() {
             justifyContent: 'space-between',
             alignItems: 'center',
             fontFamily: 'var(--font-mono)',
-            fontSize: 10,
+            fontSize: 13,
             color: 'var(--text-muted)',
             letterSpacing: '0.1em',
             marginBottom: 4,
@@ -567,7 +597,7 @@ export function DirectivePanel() {
             <div
               style={{
                 fontFamily: 'var(--font-mono)',
-                fontSize: 9,
+                fontSize: 11,
                 color: 'var(--text-muted)',
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
@@ -609,7 +639,7 @@ export function DirectivePanel() {
           data-testid="directive-title"
           style={{
             color: 'var(--text-primary)',
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: 600,
             marginBottom: 6,
             letterSpacing: '0.02em',
@@ -622,8 +652,8 @@ export function DirectivePanel() {
         <div
           data-testid="directive-description"
           style={{
-            color: 'var(--text-muted)',
-            fontSize: 11,
+            color: 'var(--text-secondary)',
+            fontSize: 14,
             lineHeight: 1.5,
             marginBottom: 10,
           }}
@@ -640,7 +670,7 @@ export function DirectivePanel() {
             <div
               style={{
                 fontFamily: 'var(--font-mono)',
-                fontSize: 10,
+                fontSize: 13,
                 color: 'var(--color-green)',
                 letterSpacing: '0.1em',
                 marginBottom: 6,
@@ -678,7 +708,7 @@ export function DirectivePanel() {
             <div
               style={{
                 fontFamily: 'var(--font-mono)',
-                fontSize: 10,
+                fontSize: 13,
                 color: 'var(--text-muted)',
                 letterSpacing: '0.1em',
                 marginBottom: 4,
@@ -689,7 +719,7 @@ export function DirectivePanel() {
             {memoVisible ? (
               <div
                 style={{
-                  fontSize: 11,
+                  fontSize: 12,
                   color: 'var(--text-secondary)',
                   lineHeight: 1.5,
                   padding: '6px 8px',
@@ -703,43 +733,69 @@ export function DirectivePanel() {
             ) : (
               <div
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
+                  position: 'relative',
                   padding: '6px 8px',
                   background: 'var(--bg-tertiary)',
                   border: '1px solid var(--border-subtle)',
                   borderRadius: 2,
+                  overflow: 'hidden',
                 }}
               >
-                <span
+                {/* Blurred memo text — tantalizing but unreadable */}
+                <div
                   style={{
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: 10,
-                    color: 'var(--color-red)',
-                    letterSpacing: '0.08em',
-                    flexGrow: 1,
+                    fontSize: 12,
+                    color: 'var(--text-secondary)',
+                    lineHeight: 1.5,
+                    filter: 'blur(3px)',
+                    userSelect: 'none',
+                    pointerEvents: 'none',
                   }}
                 >
-                  {t('directive.memo_classified', { week: 4 })}
-                </span>
-                <button
-                  onClick={() => setMemoRevealed(true)}
+                  {directive.internal_memo}
+                </div>
+                {/* Overlay with classification label + reveal */}
+                <div
                   style={{
-                    padding: '3px 7px',
-                    background: 'transparent',
-                    border: '1px solid var(--border-subtle)',
-                    color: 'var(--text-muted)',
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: 9,
-                    letterSpacing: '0.08em',
-                    cursor: 'pointer',
-                    borderRadius: 2,
-                    whiteSpace: 'nowrap',
+                    position: 'absolute',
+                    inset: 0,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 6,
+                    background: 'rgba(13, 13, 15, 0.5)',
                   }}
                 >
-                  REVEAL
-                </button>
+                  <span
+                    style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: 12,
+                      color: 'var(--color-red)',
+                      letterSpacing: '0.12em',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    ▓ CLEARANCE REQUIRED — WEEK 4
+                  </span>
+                  <button
+                    onClick={() => setMemoRevealed(true)}
+                    style={{
+                      padding: '3px 10px',
+                      background: 'rgba(220, 38, 38, 0.1)',
+                      border: '1px solid var(--color-red)',
+                      color: 'var(--color-red)',
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: 12,
+                      letterSpacing: '0.1em',
+                      cursor: 'pointer',
+                      borderRadius: 2,
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    REQUEST ACCESS
+                  </button>
+                </div>
               </div>
             )}
           </div>

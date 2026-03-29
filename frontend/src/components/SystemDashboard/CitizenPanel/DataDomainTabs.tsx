@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import type { CitizenProfile } from '@/types/citizen'
 import type { DomainKey } from '@/types/game'
 import { useContentStore } from '@/stores/contentStore'
+import { useUIStore } from '@/stores/uiStore'
 import { HealthTab } from './HealthTab'
 import { FinanceTab } from './FinanceTab'
 import { JudicialTab } from './JudicialTab'
@@ -22,11 +23,13 @@ const ALL_DOMAINS: DomainKey[] = ['health', 'finance', 'judicial', 'location', '
 export function DataDomainTabs({ profile, unlockedDomains, activeTab, onTabChange }: DataDomainTabsProps) {
   const { t } = useTranslation()
   const country = useContentStore((s) => s.country)
+  const newlyUnlockedDomains = useUIStore(s => s.newlyUnlockedDomains)
+  const markDomainVisited = useUIStore(s => s.markDomainVisited)
 
   const tabButtonStyle = (isActive: boolean, isLocked: boolean): React.CSSProperties => ({
-    padding: '4px 10px',
+    padding: '5px 11px',
     fontFamily: 'var(--font-mono)',
-    fontSize: 9,
+    fontSize: 12,
     letterSpacing: '0.08em',
     textTransform: 'uppercase',
     cursor: isLocked ? 'not-allowed' : 'pointer',
@@ -64,6 +67,7 @@ export function DataDomainTabs({ profile, unlockedDomains, activeTab, onTabChang
           const isRegionallyAvailable = country === null
             || country.available_domains.includes(domain)
           const isEffectivelyLocked = !isUnlocked
+          const isNew = newlyUnlockedDomains.includes(domain)
           const tooltipText = !isRegionallyAvailable
             ? 'NOT AVAILABLE IN THIS REGION'
             : !isUnlocked ? t('citizen.domains.locked') : undefined
@@ -71,8 +75,12 @@ export function DataDomainTabs({ profile, unlockedDomains, activeTab, onTabChang
             <button
               key={domain}
               data-testid={`tab-${domain}`}
-              style={tabButtonStyle(activeTab === domain, isEffectivelyLocked)}
-              onClick={() => isUnlocked && onTabChange(domain)}
+              style={{ ...tabButtonStyle(activeTab === domain, isEffectivelyLocked), position: 'relative' }}
+              onClick={() => {
+                if (!isUnlocked) return
+                onTabChange(domain)
+                if (isNew) markDomainVisited(domain)
+              }}
               title={tooltipText}
             >
               {isUnlocked
@@ -80,6 +88,23 @@ export function DataDomainTabs({ profile, unlockedDomains, activeTab, onTabChang
                 : !isRegionallyAvailable
                   ? `— ${t(`citizen.domains.${domain}`)}`
                   : `🔒 ${t(`citizen.domains.${domain}`)}`}
+              {isNew && (
+                <span
+                  data-testid={`domain-new-badge-${domain}`}
+                  style={{
+                    position: 'absolute',
+                    top: 1,
+                    right: 2,
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: 7,
+                    color: 'var(--color-green)',
+                    letterSpacing: '0.05em',
+                    lineHeight: 1,
+                  }}
+                >
+                  NEW
+                </span>
+              )}
             </button>
           )
         })}

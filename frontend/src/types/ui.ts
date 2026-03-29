@@ -90,6 +90,18 @@ export interface ShiftMemoData {
   /** Protected citizen order — Central Command "do not process" directive. */
   isEpsteinOrder?: boolean
   protectedCitizenName?: string
+  /**
+   * When present, the end-of-shift overlay also shows the next directive briefing
+   * inline, eliminating the separate "DIRECTIVE BRIEFING" popup.
+   */
+  nextDirectiveBriefing?: {
+    directiveKey: string
+    title: string
+    description: string
+    quota: number
+    flagType: string
+    newDomains: string[]
+  }
 }
 
 // ─── Modal state ──────────────────────────────────────────────────────────────
@@ -102,6 +114,7 @@ export type ModalType =
   | 'save_load'
   | 'ice_raid'
   | 'autoflag_confirm'
+  | 'memo_archive'
   | null
 
 export interface ModalState {

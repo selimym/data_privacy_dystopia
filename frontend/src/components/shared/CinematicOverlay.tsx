@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useUIStore } from '@/stores/uiStore'
 import '@/styles/cinematic.css'
 
@@ -16,6 +17,18 @@ function getTimePeriodClass(label: string): string {
 export function CinematicOverlay() {
   const currentCinematic = useUIStore((s) => s.currentCinematic)
   const advanceCinematic = useUIStore((s) => s.advanceCinematic)
+  const cinematicQueue = useUIStore((s) => s.cinematicQueue)
+  const skipCinematic = useUIStore((s) => s.skipCinematic)
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === ' ') {
+        advanceCinematic()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [advanceCinematic])
 
   if (currentCinematic === null) return null
 
@@ -33,6 +46,17 @@ export function CinematicOverlay() {
         >
           SKIP
         </button>
+        {cinematicQueue.length > 0 && (
+          <button
+            className="cinematic-skip-button"
+            onClick={skipCinematic}
+            data-testid="cinematic-skip-all"
+            type="button"
+            style={{ right: 72, color: 'var(--color-red)', borderColor: 'var(--color-red)' }}
+          >
+            SKIP ALL ({cinematicQueue.length})
+          </button>
+        )}
 
         <div className="cinematic-header">
           <span className="cinematic-citizen-name">{citizen_name}</span>

@@ -23,7 +23,7 @@ export function ComplianceGauge() {
         <span
           style={{
             fontFamily: 'var(--font-mono)',
-            fontSize: 10,
+            fontSize: 13,
             color: 'var(--text-muted)',
             letterSpacing: '0.1em',
           }}
@@ -33,7 +33,7 @@ export function ComplianceGauge() {
         <span
           style={{
             fontFamily: 'var(--font-mono)',
-            fontSize: 12,
+            fontSize: 16,
             color: barColor,
             fontWeight: 700,
           }}
@@ -65,7 +65,7 @@ export function ComplianceGauge() {
       <div
         style={{
           fontFamily: 'var(--font-mono)',
-          fontSize: 9,
+          fontSize: 12,
           color: 'var(--text-muted)',
           marginTop: 2,
           textAlign: 'right',

@@ -1,20 +1,18 @@
 import { test, expect } from '@playwright/test'
 
 /**
- * Test 07 — Flag Submission UI (Option C: inference-based findings)
+ * Test 07 — Flag Submission UI
  *
  * Verifies that a citizen can be selected from the queue,
- * the player visits a domain tab to unlock findings, checks
- * a finding, selects a flag type, and submits.
+ * the player visits a domain tab (inferences auto-populate),
+ * selects a flag type, and submits.
  *
- * Week 1 has no inference rules (location+judicial only).
- * We advance headlessly to week 3 (health+finance unlocked) where
- * 6 inference rules can fire, then exercise the UI flow.
- * We try citizens until one with checkable findings is found.
+ * Inference results are auto-attached on submit — no manual
+ * finding selection is required.
  */
 
 test.describe('07 — Flag Submission UI', () => {
-  test('select citizen → visit domain tab → check finding → submit flag', async ({ page }) => {
+  test('select citizen → visit domain tab → select flag type → submit flag', async ({ page }) => {
     // ── Navigate and start game ───────────────────────────────────────────────
     await page.goto('/')
     await page.waitForSelector('[data-testid="start-screen"]', { timeout: 15000 })
@@ -76,41 +74,20 @@ test.describe('07 — Flag Submission UI', () => {
     )
     await page.waitForTimeout(300)
 
-    // ── Find a citizen with checkable findings by trying each queue entry ─────
+    // ── Select the first citizen in the queue ─────────────────────────────────
+    const firstViewBtn = page.locator('[data-testid^="view-citizen-btn-"]').first()
+    await firstViewBtn.click()
+    await page.waitForSelector('[data-testid="identity-section"]', { timeout: 5000 })
+
+    // Visit available domain tabs to trigger inference calculation
     const domainTabs: string[] = ['location', 'health', 'finance', 'judicial']
-    let citizenPanelReady = false
-
-    for (let attempt = 0; attempt < 8; attempt++) {
-      const viewBtns = page.locator('[data-testid^="view-citizen-btn-"]')
-      const count = await viewBtns.count()
-      if (attempt >= count) break
-
-      await viewBtns.nth(attempt).click()
-      await page.waitForSelector('[data-testid="identity-section"]', { timeout: 5000 })
-
-      // Visit all available domain tabs
-      for (const domain of domainTabs) {
-        const tab = page.locator(`[data-testid="tab-${domain}"]`)
-        if (await tab.count() > 0) {
-          await tab.click()
-          await page.waitForTimeout(100)
-        }
-      }
-
-      // Check if any checkable (enabled) finding appeared
-      const hasFindings = await page.locator('[data-testid^="finding-checkbox-"]:not([disabled])').count()
-      if (hasFindings > 0) {
-        citizenPanelReady = true
-        break
+    for (const domain of domainTabs) {
+      const tab = page.locator(`[data-testid="tab-${domain}"]`)
+      if (await tab.count() > 0) {
+        await tab.click()
+        await page.waitForTimeout(100)
       }
     }
-
-    expect(citizenPanelReady).toBe(true)
-
-    // ── Check the first enabled finding ──────────────────────────────────────
-    const firstCheckbox = page.locator('[data-testid^="finding-checkbox-"]:not([disabled])').first()
-    await firstCheckbox.click()
-    await expect(firstCheckbox).toBeChecked()
 
     // ── Select "monitoring" flag type ─────────────────────────────────────────
     const monitoringRadio = page.locator('[data-testid="flag-type-monitoring"]')
@@ -118,7 +95,7 @@ test.describe('07 — Flag Submission UI', () => {
     await monitoringRadio.click()
     await expect(monitoringRadio).toBeChecked()
 
-    // ── Submit button should now be enabled ───────────────────────────────────
+    // ── Submit button should now be enabled (flag type selected is sufficient) ─
     const submitBtn = page.locator('[data-testid="submit-flag-btn"]')
     await expect(submitBtn).toBeEnabled()
     await submitBtn.click()

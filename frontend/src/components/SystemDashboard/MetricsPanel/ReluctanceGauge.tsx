@@ -7,18 +7,23 @@ export function ReluctanceGauge() {
   const score = reluctance.reluctance_score
   const hasWarning = reluctance.warnings_received > 0
 
+  // Tolerance is the inverse — how much room the operator has left
+  const tolerance = 100 - score
+
+  const barColor =
+    score >= 70 ? 'var(--color-red)' :
+    score >= 30 ? 'var(--color-amber)' :
+    'var(--color-green)'
+
+  const scoreColor =
+    score >= 70 ? 'var(--color-red)' :
+    score >= 30 ? 'var(--color-amber)' :
+    'var(--text-muted)'
+
   const borderStyle =
     score >= 90 ? '1px solid var(--color-red)' :
     score >= 70 ? '1px solid var(--color-amber)' :
     '1px solid transparent'
-
-  const scoreColor =
-    score >= 90 ? 'var(--color-red)' :
-    score >= 70 ? 'var(--color-amber)' :
-    'var(--color-red)'
-
-  // Reluctance bar is always red — higher is worse
-  const barColor = 'var(--color-red)'
 
   return (
     <div
@@ -36,14 +41,14 @@ export function ReluctanceGauge() {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: 4,
+          marginBottom: 2,
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <span
             style={{
               fontFamily: 'var(--font-mono)',
-              fontSize: 10,
+              fontSize: 13,
               color: 'var(--text-muted)',
               letterSpacing: '0.1em',
             }}
@@ -55,7 +60,7 @@ export function ReluctanceGauge() {
               data-testid="reluctance-warning-badge"
               style={{
                 fontFamily: 'var(--font-mono)',
-                fontSize: 8,
+                fontSize: 11,
                 color: 'var(--color-amber)',
                 background: 'rgba(217, 119, 6, 0.15)',
                 border: '1px solid var(--color-amber)',
@@ -71,7 +76,7 @@ export function ReluctanceGauge() {
         <span
           style={{
             fontFamily: 'var(--font-mono)',
-            fontSize: 12,
+            fontSize: 16,
             color: scoreColor,
             fontWeight: 700,
           }}
@@ -80,7 +85,21 @@ export function ReluctanceGauge() {
         </span>
       </div>
 
-      {/* Bar track */}
+      {/* Tolerance sub-label */}
+      <div
+        style={{
+          fontFamily: 'var(--font-mono)',
+          fontSize: 12,
+          color: 'var(--text-muted)',
+          letterSpacing: '0.06em',
+          marginBottom: 4,
+          opacity: 0.7,
+        }}
+      >
+        TOLERANCE: {tolerance}%
+      </div>
+
+      {/* Bar track — shows REMAINING tolerance, depletes as reluctance rises */}
       <div
         style={{
           width: '100%',
@@ -92,10 +111,10 @@ export function ReluctanceGauge() {
       >
         <div
           style={{
-            width: `${score}%`,
+            width: `${tolerance}%`,
             height: '100%',
             background: barColor,
-            transition: 'width 0.4s ease',
+            transition: 'width 0.4s ease, background 0.4s ease',
           }}
         />
       </div>
@@ -103,7 +122,7 @@ export function ReluctanceGauge() {
       <div
         style={{
           fontFamily: 'var(--font-mono)',
-          fontSize: 9,
+          fontSize: 12,
           color: 'var(--text-muted)',
           marginTop: 2,
           textAlign: 'right',

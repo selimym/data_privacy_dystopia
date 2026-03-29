@@ -512,7 +512,7 @@ const REAL_WORLD_PARALLELS: Record<EndingType, RealWorldParallel> = {
         name: 'Reality Winner',
         country: 'United States',
         year: '2017',
-        description: 'NSA contractor who leaked evidence of Russian election interference. Served 5+ years — the longest sentence under the Espionage Act for a media leak.',
+        description: 'NSA contractor who leaked classified government intelligence documents. Served 5+ years — the longest sentence under the Espionage Act for a media leak.',
       },
       {
         name: 'Digital Rights Activists',
@@ -559,10 +559,10 @@ const REAL_WORLD_PARALLELS: Record<EndingType, RealWorldParallel> = {
         description: 'Army intelligence analyst imprisoned for exposing war crimes. Tortured in pre-trial detention. Pardoned after 7 years but repeatedly jailed for refusing grand jury testimony.',
       },
       {
-        name: 'Chinese Anti-Corruption Officials',
-        country: 'China',
-        year: '2012–present',
-        description: 'Under Xi Jinping, even officials enforcing surveillance face purges. The watchers are never safe from being watched.',
+        name: 'GCHQ Whistleblowers',
+        country: 'United Kingdom',
+        year: '2013–present',
+        description: 'Multiple GCHQ insiders faced prosecution under the Official Secrets Act after raising concerns about mass surveillance programmes. The watchers are never safe from being watched.',
       },
     ],
     call_to_action:

@@ -14,6 +14,10 @@ interface InferencePanelProps {
   isProtectedCitizen?: boolean
 }
 
+function formatCategory(key: string): string {
+  return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+}
+
 function scarinessVariant(level: number): 'muted' | 'blue' | 'amber' | 'red' {
   if (level >= 5) return 'red'
   if (level >= 4) return 'red'
@@ -38,10 +42,10 @@ export function InferencePanel({ results, isLoading, visitedTabs, unlockedDomain
   const [expandedKey, setExpandedKey] = useState<string | null>(null)
 
   return (
-    <div data-testid="inference-panel" style={{ marginTop: 16 }}>
+    <div data-testid="inference-panel">
       <div
         style={{
-          fontSize: 9,
+          fontSize: 11,
           fontFamily: 'var(--font-mono)',
           color: 'var(--text-muted)',
           letterSpacing: '0.1em',
@@ -68,7 +72,7 @@ export function InferencePanel({ results, isLoading, visitedTabs, unlockedDomain
             border: '1px solid var(--border-subtle)',
             color: 'var(--text-muted)',
             fontFamily: 'var(--font-mono)',
-            fontSize: 9,
+            fontSize: 10,
             letterSpacing: '0.06em',
             cursor: 'pointer',
             borderRadius: 2,
@@ -91,12 +95,19 @@ export function InferencePanel({ results, isLoading, visitedTabs, unlockedDomain
           {t('citizen.inferences.empty')}
         </div>
       ) : (
-        <table className="data-table">
+        <table className="data-table" style={{ tableLayout: 'fixed', width: '100%' }}>
+          <colgroup>
+            <col style={{ width: 140 }} />
+            <col />
+            <col style={{ width: 90 }} />
+            <col style={{ width: 70 }} />
+            <col style={{ width: 28 }} />
+          </colgroup>
           <thead>
             <tr>
               <th>Category</th>
               <th>Inference</th>
-              <th>{t('citizen.inferences.scariness')}</th>
+              <th>Level</th>
               <th>Confidence</th>
               <th></th>
             </tr>
@@ -109,8 +120,8 @@ export function InferencePanel({ results, isLoading, visitedTabs, unlockedDomain
                   style={{ cursor: 'pointer' }}
                   onClick={() => setExpandedKey(expandedKey === r.rule_key ? null : r.rule_key)}
                 >
-                  <td style={{ textTransform: 'capitalize' }}>{r.category}</td>
-                  <td>{r.rule_name}</td>
+                  <td style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{formatCategory(r.category)}</td>
+                  <td style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.rule_name}</td>
                   <td>
                     <Badge variant={scarinessVariant(r.scariness_level)}>
                       {scarinessLabel(r.scariness_level)}
@@ -127,21 +138,21 @@ export function InferencePanel({ results, isLoading, visitedTabs, unlockedDomain
                       colSpan={5}
                       style={{
                         background: 'var(--bg-tertiary)',
-                        padding: '8px 12px',
+                        padding: '10px 14px',
                         fontFamily: 'var(--font-mono)',
-                        fontSize: 11,
+                        fontSize: 13,
                       }}
                     >
-                      <div style={{ marginBottom: 6 }}>
-                        <span style={{ color: 'var(--text-muted)', fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                      <div style={{ marginBottom: 8 }}>
+                        <span style={{ color: 'var(--text-muted)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                           Inference:{' '}
                         </span>
                         <span style={{ color: 'var(--text-secondary)' }}>{r.inference_text}</span>
                       </div>
 
                       {r.supporting_evidence.length > 0 && (
-                        <div style={{ marginBottom: 6 }}>
-                          <div style={{ color: 'var(--text-muted)', fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>
+                        <div style={{ marginBottom: 8 }}>
+                          <div style={{ color: 'var(--text-muted)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>
                             {t('citizen.inferences.evidence')}:
                           </div>
                           <ul style={{ margin: 0, padding: '0 0 0 16px', color: 'var(--text-secondary)' }}>
@@ -152,8 +163,8 @@ export function InferencePanel({ results, isLoading, visitedTabs, unlockedDomain
                         </div>
                       )}
 
-                      <div style={{ marginBottom: 6 }}>
-                        <div style={{ color: 'var(--text-muted)', fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>
+                      <div style={{ marginBottom: 8 }}>
+                        <div style={{ color: 'var(--text-muted)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>
                           {t('citizen.inferences.implications')}:
                         </div>
                         <ul style={{ margin: 0, padding: '0 0 0 16px', color: 'var(--color-amber)' }}>
@@ -166,12 +177,12 @@ export function InferencePanel({ results, isLoading, visitedTabs, unlockedDomain
                       <div
                         style={{
                           borderTop: '1px solid var(--border-subtle)',
-                          paddingTop: 6,
+                          paddingTop: 8,
                           color: 'var(--color-green)',
-                          fontSize: 10,
+                          fontSize: 12,
                         }}
                       >
-                        <span style={{ color: 'var(--text-muted)', fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                        <span style={{ color: 'var(--text-muted)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                           {t('citizen.inferences.educational_note')}:{' '}
                         </span>
                         {r.educational_note}
@@ -202,7 +213,7 @@ export function InferencePanel({ results, isLoading, visitedTabs, unlockedDomain
             lineHeight: 1.5,
           }}
         >
-          <div style={{ color: '#ef4444', fontSize: 9, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 4 }}>
+          <div style={{ color: '#ef4444', fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 4 }}>
             ◆ CROSS-DOMAIN INFERENCE
           </div>
           Subject's behavioral signature matches surveillance-derived archetype{' '}
@@ -229,7 +240,7 @@ export function InferencePanel({ results, isLoading, visitedTabs, unlockedDomain
             lineHeight: 1.5,
           }}
         >
-          <div style={{ fontSize: 9, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 4 }}>
+          <div style={{ fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 4 }}>
             ⚠ PROTECTED — CROSS-REFERENCE BLOCKED
           </div>
           OPERATOR CLEARANCE INSUFFICIENT.

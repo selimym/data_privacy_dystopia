@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { FlagType, DomainKey } from '@/types/game'
+import type { FlagType } from '@/types/game'
 import type { InferenceResult } from '@/types/citizen'
 import { useGameStore } from '@/stores/gameStore'
 import { useContentStore } from '@/stores/contentStore'
@@ -9,15 +9,13 @@ interface FlagSubmissionProps {
   citizenId: string
   isVisible: boolean
   inferenceResults: InferenceResult[]
-  visitedTabs: Set<DomainKey>
 }
 
 const FLAG_TYPES: FlagType[] = ['monitoring', 'restriction', 'intervention', 'detention']
 
-export function FlagSubmission({ citizenId, isVisible, inferenceResults, visitedTabs }: FlagSubmissionProps) {
+export function FlagSubmission({ citizenId, isVisible, inferenceResults }: FlagSubmissionProps) {
   const { t } = useTranslation()
   const [selectedType, setSelectedType] = useState<FlagType | null>(null)
-  const [selectedFindings, setSelectedFindings] = useState<Set<string>>(new Set())
 
   const submitFlag = useGameStore(s => s.submitFlag)
   const submitNoAction = useGameStore(s => s.submitNoAction)
@@ -26,153 +24,52 @@ export function FlagSubmission({ citizenId, isVisible, inferenceResults, visited
   // Reset form when citizen changes
   useEffect(() => {
     setSelectedType(null)
-    setSelectedFindings(new Set())
   }, [citizenId])
 
   if (!isVisible) return null
 
-  const canSubmit = selectedType !== null && selectedFindings.size > 0
-
-  const toggleFinding = (ruleKey: string) => {
-    setSelectedFindings(prev => {
-      const next = new Set(prev)
-      if (next.has(ruleKey)) next.delete(ruleKey)
-      else next.add(ruleKey)
-      return next
-    })
-  }
+  const canSubmit = selectedType !== null
 
   const handleSubmit = () => {
     if (!canSubmit || selectedType === null) return
-    const findings = [...selectedFindings]
+    const findings = inferenceResults.map(r => r.rule_key)
     const justification = findings.join(', ')
     submitFlag(citizenId, selectedType, justification, findings)
     setSelectedType(null)
-    setSelectedFindings(new Set())
   }
 
   const handleNoAction = () => {
     submitNoAction(citizenId)
   }
 
-  // A finding is checkable if the player has visited all its domains
-  const isCheckable = (r: InferenceResult) =>
-    r.domains_used.every(d => visitedTabs.has(d))
-
-  // A finding is hinted if some domains are visited but not all
-  const isHinted = (r: InferenceResult) =>
-    !isCheckable(r) && r.domains_used.some(d => visitedTabs.has(d))
-
-  const missingDomains = (r: InferenceResult): DomainKey[] =>
-    r.domains_used.filter(d => !visitedTabs.has(d))
-
   return (
     <div
       style={{
         borderTop: '1px solid var(--border-subtle)',
-        paddingTop: 12,
-        marginTop: 12,
+        padding: '10px 12px 12px',
+        background: 'var(--bg-secondary)',
       }}
     >
-      <div
-        style={{
-          fontSize: 9,
-          fontFamily: 'var(--font-mono)',
-          color: 'var(--text-muted)',
-          letterSpacing: '0.1em',
-          textTransform: 'uppercase',
-          marginBottom: 10,
-        }}
-      >
-        {t('flag.submission.title')}
-      </div>
-
-      {/* Directive findings */}
-      <div data-testid="findings-panel" style={{ marginBottom: 10 }}>
-        <div style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>
-          Directive Findings
-        </div>
-
-        {inferenceResults.length === 0 ? (
-          <div style={{ fontSize: 10, fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', padding: '6px 0' }}>
-            No findings — review data tabs to surface indicators.
-          </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            {inferenceResults.map(r => {
-              const checkable = isCheckable(r)
-              const hinted = isHinted(r)
-              const checked = selectedFindings.has(r.rule_key)
-
-              return (
-                <div
-                  key={r.rule_key}
-                  data-testid={`finding-${r.rule_key}`}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: 8,
-                    padding: '5px 8px',
-                    background: checked ? 'var(--bg-surface)' : 'transparent',
-                    border: `1px solid ${checked ? 'var(--color-amber)' : 'var(--border-subtle)'}`,
-                    borderRadius: 2,
-                    opacity: checkable ? 1 : 0.5,
-                    cursor: checkable ? 'pointer' : 'default',
-                  }}
-                  onClick={() => checkable && toggleFinding(r.rule_key)}
-                >
-                  <input
-                    type="checkbox"
-                    data-testid={`finding-checkbox-${r.rule_key}`}
-                    checked={checked}
-                    disabled={!checkable}
-                    onChange={e => { e.stopPropagation(); checkable && toggleFinding(r.rule_key) }}
-                    onClick={e => e.stopPropagation()}
-                    style={{ accentColor: 'var(--color-amber)', marginTop: 1, flexShrink: 0 }}
-                  />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{
-                      fontFamily: 'var(--font-mono)',
-                      fontSize: 11,
-                      color: checkable ? (checked ? 'var(--color-amber)' : 'var(--text-secondary)') : 'var(--text-muted)',
-                    }}>
-                      {r.rule_name}
-                    </div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-muted)', marginTop: 1 }}>
-                      {checkable
-                        ? r.inference_text
-                        : hinted
-                          ? `→ Review ${missingDomains(r).join(', ')} data to assess`
-                          : `→ Review ${r.domains_used.join(', ')} data to assess`
-                      }
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* Flag type selection */}
+      {/* Flag type selection — horizontal chips */}
       <div style={{ marginBottom: 10 }}>
-        <div style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>
+        <div style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>
           {t('flag.submission.select_type')}
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
           {FLAG_TYPES.map(type => (
             <label
               key={type}
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 8,
+                gap: 6,
                 cursor: 'pointer',
                 fontFamily: 'var(--font-mono)',
-                fontSize: 11,
+                fontSize: 12,
                 color: selectedType === type ? 'var(--color-amber)' : 'var(--text-secondary)',
-                padding: '3px 6px',
+                padding: '4px 9px',
                 background: selectedType === type ? 'var(--bg-surface)' : 'transparent',
+                border: `1px solid ${selectedType === type ? 'var(--color-amber)' : 'var(--border-subtle)'}`,
                 borderRadius: 2,
               }}
             >
@@ -183,7 +80,7 @@ export function FlagSubmission({ citizenId, isVisible, inferenceResults, visited
                 checked={selectedType === type}
                 onChange={() => setSelectedType(type)}
                 data-testid={`flag-type-${type}`}
-                style={{ accentColor: 'var(--color-amber)' }}
+                style={{ accentColor: 'var(--color-amber)', width: 12, height: 12 }}
               />
               {country?.ui_flavor.flag_labels[type] ?? t(`flag.type.${type}`)}
             </label>
@@ -199,9 +96,9 @@ export function FlagSubmission({ citizenId, isVisible, inferenceResults, visited
           disabled={!canSubmit}
           style={{
             flex: 1,
-            padding: '6px 12px',
+            padding: '8px 14px',
             fontFamily: 'var(--font-mono)',
-            fontSize: 10,
+            fontSize: 13,
             letterSpacing: '0.1em',
             textTransform: 'uppercase',
             background: canSubmit ? 'var(--color-red-dim)' : 'var(--bg-tertiary)',
@@ -219,9 +116,9 @@ export function FlagSubmission({ citizenId, isVisible, inferenceResults, visited
           onClick={handleNoAction}
           style={{
             flex: 1,
-            padding: '6px 12px',
+            padding: '8px 14px',
             fontFamily: 'var(--font-mono)',
-            fontSize: 10,
+            fontSize: 13,
             letterSpacing: '0.08em',
             textTransform: 'uppercase',
             background: 'transparent',
