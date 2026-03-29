@@ -23,7 +23,7 @@ function MetricRow({ label, value, barColor, arrowColor, testId }: MetricRowProp
         <span
           style={{
             fontFamily: 'var(--font-mono)',
-            fontSize: 10,
+            fontSize: 13,
             color: 'var(--text-muted)',
             letterSpacing: '0.08em',
           }}
@@ -33,7 +33,7 @@ function MetricRow({ label, value, barColor, arrowColor, testId }: MetricRowProp
         <span
           style={{
             fontFamily: 'var(--font-mono)',
-            fontSize: 11,
+            fontSize: 14,
             color: arrowColor,
             fontWeight: 600,
           }}

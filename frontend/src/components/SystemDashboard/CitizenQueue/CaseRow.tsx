@@ -106,7 +106,7 @@ export function CaseRow({ caseItem, isSelected, onSelect, collapsed }: CaseRowPr
           style={{
             flex: 1,
             fontFamily: 'var(--font-mono)',
-            fontSize: 11,
+            fontSize: 13,
             color: isSelected ? 'var(--text-primary)' : 'var(--text-secondary)',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -119,7 +119,7 @@ export function CaseRow({ caseItem, isSelected, onSelect, collapsed }: CaseRowPr
           data-testid={`risk-badge-${caseItem.citizen_id}`}
           style={{
             fontFamily: 'var(--font-mono)',
-            fontSize: isClassified ? 13 : 11,
+            fontSize: isClassified ? 15 : 12,
             fontWeight: 600,
             color,
             flexShrink: 0,

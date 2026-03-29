@@ -48,7 +48,7 @@ export function ReluctanceGauge() {
           <span
             style={{
               fontFamily: 'var(--font-mono)',
-              fontSize: 10,
+              fontSize: 13,
               color: 'var(--text-muted)',
               letterSpacing: '0.1em',
             }}
@@ -60,7 +60,7 @@ export function ReluctanceGauge() {
               data-testid="reluctance-warning-badge"
               style={{
                 fontFamily: 'var(--font-mono)',
-                fontSize: 8,
+                fontSize: 11,
                 color: 'var(--color-amber)',
                 background: 'rgba(217, 119, 6, 0.15)',
                 border: '1px solid var(--color-amber)',
@@ -76,7 +76,7 @@ export function ReluctanceGauge() {
         <span
           style={{
             fontFamily: 'var(--font-mono)',
-            fontSize: 12,
+            fontSize: 16,
             color: scoreColor,
             fontWeight: 700,
           }}
@@ -89,7 +89,7 @@ export function ReluctanceGauge() {
       <div
         style={{
           fontFamily: 'var(--font-mono)',
-          fontSize: 9,
+          fontSize: 12,
           color: 'var(--text-muted)',
           letterSpacing: '0.06em',
           marginBottom: 4,
@@ -122,7 +122,7 @@ export function ReluctanceGauge() {
       <div
         style={{
           fontFamily: 'var(--font-mono)',
-          fontSize: 10,
+          fontSize: 12,
           color: 'var(--text-muted)',
           marginTop: 2,
           textAlign: 'right',

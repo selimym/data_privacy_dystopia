@@ -6,21 +6,22 @@
 /* ─── CSS custom properties ─────────────────────────────────────────────────── */
 
 :root {
-  --queue-width: 190px;
-  --right-width: 260px;
+  --queue-width: 275px;
+  --right-width: 375px;
 }
 
 /* ─── Main grid ──────────────────────────────────────────────────────────────── */
 
 .dashboard-layout {
   display: grid;
-  grid-template-rows: auto 1fr 22px;
+  grid-template-rows: auto 1fr 40px;
   grid-template-columns: var(--queue-width) 1fr var(--right-width);
   height: 100vh;
   width: 100vw;
   overflow: hidden;
   background: var(--bg-primary);
   position: relative; /* for tutorial overlay absolute positioning */
+  transition: grid-template-columns 0.15s ease;
 }
 
 /* Collapsed left panel: shrink to a thin dot strip */
@@ -39,10 +40,10 @@
 .dashboard-left {
   grid-column: 1;
   grid-row: 2;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: visible;
   border-right: 1px solid var(--border-subtle);
-  transition: width 0.2s ease;
+  position: relative;
+  z-index: 1; /* stacking context so resize handle floats above center panel */
 }
 
 /* Center panel: current view content */
@@ -59,9 +60,18 @@
 .dashboard-right {
   grid-column: 3;
   grid-row: 2;
-  overflow-y: auto;
   border-left: 1px solid var(--border-subtle);
-  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+  position: relative;
+  z-index: 1;
+}
+
+.dashboard-right-content {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 /* Full-view panels (news feed, world map) — span col 1+2 */
@@ -88,9 +98,9 @@
 
 .news-ticker-label {
   flex-shrink: 0;
-  padding: 0 10px;
+  padding: 0 14px;
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 13px;
   color: var(--color-green);
   letter-spacing: 0.14em;
   border-right: 1px solid var(--border-subtle);
@@ -114,7 +124,7 @@
   display: inline-block;
   white-space: nowrap;
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 13px;
   color: var(--text-muted);
   letter-spacing: 0.05em;
   animation: ticker-scroll 60s linear infinite;
@@ -130,6 +140,44 @@
   100% { transform: translateX(-50%); }
 }
 
+/* ─── Panel resize handles ───────────────────────────────────────────────────── */
+
+.panel-resizer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  cursor: col-resize;
+  z-index: 200;
+  background: rgba(255, 255, 255, 0.04);
+  transition: background 0.15s;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.panel-resizer::after {
+  content: '';
+  display: block;
+  width: 2px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 1px;
+  transition: background 0.15s, height 0.15s;
+}
+
+.panel-resizer:hover,
+.panel-resizer.resizing {
+  background: rgba(5, 150, 105, 0.15);
+}
+
+.panel-resizer:hover::after,
+.panel-resizer.resizing::after {
+  background: var(--color-green);
+  height: 48px;
+}
+
 /* ─── Panel utilities ────────────────────────────────────────────────────────── */
 
 .panel {
@@ -139,11 +187,11 @@
 
 .panel-title {
   font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.15em;
+  font-size: 14px;
+  letter-spacing: 0.13em;
   color: var(--text-muted);
   text-transform: uppercase;
-  padding: 8px 12px;
+  padding: 12px 16px;
   border-bottom: 1px solid var(--border-subtle);
 }
 
@@ -156,22 +204,22 @@
 .data-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .data-table th {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.1em;
   color: var(--text-muted);
   text-transform: uppercase;
-  padding: 6px 12px;
+  padding: 8px 12px;
   text-align: left;
   border-bottom: 1px solid var(--border-subtle);
 }
 
 .data-table td {
-  padding: 6px 12px;
+  padding: 8px 12px;
   border-bottom: 1px solid var(--border-subtle);
   color: var(--text-secondary);
 }
@@ -189,8 +237,8 @@
 
 .risk-badge {
   font-family: var(--font-mono);
-  font-size: 10px;
-  padding: 2px 6px;
+  font-size: 13px;
+  padding: 3px 8px;
   border-radius: 2px;
   letter-spacing: 0.05em;
 }

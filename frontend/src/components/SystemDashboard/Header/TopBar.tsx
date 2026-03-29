@@ -2,9 +2,48 @@
  * TopBar — view switcher (CASE REVIEW | NEWS FEED | WORLD MAP) + operator info.
  * Replaces the old DashboardHeader as the primary navigation bar.
  */
+import { useState, useEffect } from 'react'
 import { useUIStore } from '@/stores/uiStore'
 import { useGameStore } from '@/stores/gameStore'
 import type { DashboardView } from '@/stores/uiStore'
+
+function ShiftTimer() {
+  const shiftStartTime = useUIStore(s => s.shiftStartTime)
+  const [elapsed, setElapsed] = useState(0)
+
+  useEffect(() => {
+    if (!shiftStartTime) return
+    const update = () => setElapsed(Math.floor((Date.now() - shiftStartTime) / 1000))
+    update()
+    const id = setInterval(update, 1000)
+    return () => clearInterval(id)
+  }, [shiftStartTime])
+
+  if (!shiftStartTime) return null
+
+  const m = Math.floor(elapsed / 60)
+  const s = elapsed % 60
+  const display = `${m}:${String(s).padStart(2, '0')}`
+  const isLong = elapsed > 1800 // >30 min — amber warning
+
+  return (
+    <span
+      title="Shift elapsed time"
+      style={{
+        fontFamily: 'var(--font-mono)',
+        fontSize: 11,
+        letterSpacing: '0.12em',
+        color: isLong ? 'var(--color-amber)' : 'var(--text-muted)',
+        whiteSpace: 'nowrap',
+        padding: '2px 8px',
+        border: `1px solid ${isLong ? 'var(--color-amber)' : 'var(--border-subtle)'}`,
+        borderRadius: 2,
+      }}
+    >
+      ⏱ {display}
+    </span>
+  )
+}
 
 const VIEWS: { key: DashboardView; label: string }[] = [
   { key: 'case-review', label: 'CASE REVIEW' },
@@ -42,7 +81,7 @@ export default function TopBar() {
       <span
         style={{
           color: 'var(--text-muted)',
-          fontSize: 10,
+          fontSize: 12,
           letterSpacing: '0.15em',
           whiteSpace: 'nowrap',
         }}
@@ -66,9 +105,9 @@ export default function TopBar() {
                 border: `1px solid ${isActive ? 'var(--color-green)' : 'var(--border-subtle)'}`,
                 color: isActive ? 'var(--color-green)' : 'var(--text-muted)',
                 fontFamily: 'var(--font-mono)',
-                fontSize: 11,
+                fontSize: 12,
                 letterSpacing: '0.12em',
-                padding: '3px 10px',
+                padding: '4px 12px',
                 borderRadius: 2,
                 cursor: 'pointer',
                 transition: 'border-color 0.15s, color 0.15s',
@@ -96,8 +135,9 @@ export default function TopBar() {
         })}
       </div>
 
-      {/* Right side: operator info + memo archive */}
+      {/* Right side: shift timer + operator info + memo archive */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <ShiftTimer />
         <button
           data-testid="open-memo-archive"
           onClick={() => useUIStore.getState().openModal('memo_archive')}
@@ -106,9 +146,9 @@ export default function TopBar() {
             border: '1px solid var(--border-subtle)',
             color: 'var(--text-muted)',
             fontFamily: 'var(--font-mono)',
-            fontSize: 10,
+            fontSize: 11,
             letterSpacing: '0.1em',
-            padding: '2px 8px',
+            padding: '3px 9px',
             borderRadius: 2,
             cursor: 'pointer',
             whiteSpace: 'nowrap',
@@ -119,7 +159,7 @@ export default function TopBar() {
         <span
           style={{
             color: 'var(--text-muted)',
-            fontSize: 10,
+            fontSize: 11,
             letterSpacing: '0.1em',
             whiteSpace: 'nowrap',
           }}

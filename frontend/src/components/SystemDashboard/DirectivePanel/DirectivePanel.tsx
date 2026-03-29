@@ -561,7 +561,7 @@ export function DirectivePanel() {
             justifyContent: 'space-between',
             alignItems: 'center',
             fontFamily: 'var(--font-mono)',
-            fontSize: 10,
+            fontSize: 13,
             color: 'var(--text-muted)',
             letterSpacing: '0.1em',
             marginBottom: 4,
@@ -597,7 +597,7 @@ export function DirectivePanel() {
             <div
               style={{
                 fontFamily: 'var(--font-mono)',
-                fontSize: 9,
+                fontSize: 11,
                 color: 'var(--text-muted)',
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
@@ -639,7 +639,7 @@ export function DirectivePanel() {
           data-testid="directive-title"
           style={{
             color: 'var(--text-primary)',
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: 600,
             marginBottom: 6,
             letterSpacing: '0.02em',
@@ -653,7 +653,7 @@ export function DirectivePanel() {
           data-testid="directive-description"
           style={{
             color: 'var(--text-secondary)',
-            fontSize: 12,
+            fontSize: 14,
             lineHeight: 1.5,
             marginBottom: 10,
           }}
@@ -670,7 +670,7 @@ export function DirectivePanel() {
             <div
               style={{
                 fontFamily: 'var(--font-mono)',
-                fontSize: 10,
+                fontSize: 13,
                 color: 'var(--color-green)',
                 letterSpacing: '0.1em',
                 marginBottom: 6,
@@ -708,7 +708,7 @@ export function DirectivePanel() {
             <div
               style={{
                 fontFamily: 'var(--font-mono)',
-                fontSize: 10,
+                fontSize: 13,
                 color: 'var(--text-muted)',
                 letterSpacing: '0.1em',
                 marginBottom: 4,
@@ -770,7 +770,7 @@ export function DirectivePanel() {
                   <span
                     style={{
                       fontFamily: 'var(--font-mono)',
-                      fontSize: 9,
+                      fontSize: 12,
                       color: 'var(--color-red)',
                       letterSpacing: '0.12em',
                       textTransform: 'uppercase',
@@ -786,7 +786,7 @@ export function DirectivePanel() {
                       border: '1px solid var(--color-red)',
                       color: 'var(--color-red)',
                       fontFamily: 'var(--font-mono)',
-                      fontSize: 9,
+                      fontSize: 12,
                       letterSpacing: '0.1em',
                       cursor: 'pointer',
                       borderRadius: 2,

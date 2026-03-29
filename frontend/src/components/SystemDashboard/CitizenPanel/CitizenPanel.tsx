@@ -146,12 +146,10 @@ export function CitizenPanel() {
       )}
 
       {!isLoading && profile && (
-          /* Scrollable data section — fills available space, includes flag submission */
-          <div style={{ flex: 1, overflowY: 'auto', minHeight: 0, paddingBottom: 20 }}>
-            {/* AutoFlag decision panel at top */}
-            <AutoFlagDecisionPanel citizenId={selectedCitizenId} />
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
 
-            {/* Domain tabs */}
+          {/* TOP ZONE — fills remaining space above inference panel */}
+          <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
             <DataDomainTabs
               profile={profile}
               unlockedDomains={unlockedDomains}
@@ -162,7 +160,6 @@ export function CitizenPanel() {
                   setVisitedTabs(prev => {
                     const next = new Set(prev)
                     next.add(tab)
-                    // Check if this is the protected_citizen and all unlocked domains are now visited
                     if (
                       !epsteinEndingTriggered.current &&
                       profile.scenario_key === 'protected_citizen' &&
@@ -170,7 +167,6 @@ export function CitizenPanel() {
                       unlockedDomains.every(d => d === tab || next.has(d))
                     ) {
                       epsteinEndingTriggered.current = true
-                      // Slight delay so player sees the last tab before the ending fires
                       setTimeout(() => triggerEpsteinEnding(), 2000)
                     }
                     return next
@@ -178,24 +174,39 @@ export function CitizenPanel() {
                 }
               }}
             />
-
-            {/* Inference panel */}
-            <InferencePanel
-              results={inferenceResults}
-              isLoading={false}
-              visitedTabs={visitedTabs}
-              unlockedDomains={unlockedDomains as import('@/types/game').DomainKey[]}
-              isProtectedCitizen={profile.scenario_key === 'protected_citizen'}
-            />
-
-            {/* Flag submission — inside scroll flow, no dead zone */}
-            <FlagSubmission
-              citizenId={selectedCitizenId}
-              isVisible={!hasBotDecision}
-              inferenceResults={inferenceResults}
-              visitedTabs={visitedTabs}
-            />
           </div>
+
+          {/* Divider */}
+          <div style={{ height: 2, background: 'var(--border-default)', flexShrink: 0 }} />
+
+          {/* BOTTOM ZONE — pinned bottom, grows upward when rows expand (max 55% of panel) */}
+          <div style={{ flexShrink: 0, maxHeight: '55%', display: 'flex', flexDirection: 'column', background: 'var(--bg-secondary)' }}>
+            <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
+              {hasBotDecision
+                ? <AutoFlagDecisionPanel citizenId={selectedCitizenId} />
+                : (
+                  <InferencePanel
+                    results={inferenceResults}
+                    isLoading={false}
+                    visitedTabs={visitedTabs}
+                    unlockedDomains={unlockedDomains as import('@/types/game').DomainKey[]}
+                    isProtectedCitizen={profile.scenario_key === 'protected_citizen'}
+                  />
+                )
+              }
+            </div>
+            {!hasBotDecision && (
+              <div style={{ flexShrink: 0 }}>
+                <FlagSubmission
+                  citizenId={selectedCitizenId}
+                  isVisible={true}
+                  inferenceResults={inferenceResults}
+                />
+              </div>
+            )}
+          </div>
+
+        </div>
       )}
     </div>
   )

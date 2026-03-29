@@ -27,9 +27,9 @@ export function DataDomainTabs({ profile, unlockedDomains, activeTab, onTabChang
   const markDomainVisited = useUIStore(s => s.markDomainVisited)
 
   const tabButtonStyle = (isActive: boolean, isLocked: boolean): React.CSSProperties => ({
-    padding: '4px 10px',
+    padding: '5px 11px',
     fontFamily: 'var(--font-mono)',
-    fontSize: 11,
+    fontSize: 12,
     letterSpacing: '0.08em',
     textTransform: 'uppercase',
     cursor: isLocked ? 'not-allowed' : 'pointer',

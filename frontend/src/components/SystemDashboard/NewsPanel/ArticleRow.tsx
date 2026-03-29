@@ -56,8 +56,8 @@ export function ArticleRow({ article }: ArticleRowProps) {
     t('news.stance.independent')
 
   const truncatedHeadline =
-    article.headline.length > 60
-      ? article.headline.slice(0, 60) + '…'
+    article.headline.length > 90
+      ? article.headline.slice(0, 90) + '…'
       : article.headline
 
   return (
@@ -66,23 +66,23 @@ export function ArticleRow({ article }: ArticleRowProps) {
       style={{
         display: 'grid',
         gridTemplateColumns: '1fr auto',
-        gap: '4px 8px',
-        padding: '6px 0',
+        gap: '5px 10px',
+        padding: '9px 0',
         borderBottom: '1px solid var(--border-subtle)',
       }}
     >
       {/* Top row: channel + stance badge */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
         <span
           style={{
             fontFamily: 'var(--font-mono)',
-            fontSize: 9,
+            fontSize: 11,
             color: 'var(--text-muted)',
             letterSpacing: '0.05em',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
-            maxWidth: 120,
+            maxWidth: 140,
           }}
         >
           {article.channel_name}
@@ -90,9 +90,9 @@ export function ArticleRow({ article }: ArticleRowProps) {
         <span
           style={{
             fontFamily: 'var(--font-mono)',
-            fontSize: 8,
+            fontSize: 10,
             letterSpacing: '0.08em',
-            padding: '1px 4px',
+            padding: '1px 5px',
             borderRadius: 2,
             whiteSpace: 'nowrap',
             ...stanceBadgeStyle(article.stance),
@@ -106,7 +106,7 @@ export function ArticleRow({ article }: ArticleRowProps) {
       <span
         style={{
           fontFamily: 'var(--font-mono)',
-          fontSize: 9,
+          fontSize: 11,
           color: 'var(--text-muted)',
           whiteSpace: 'nowrap',
           textAlign: 'right',
@@ -119,9 +119,9 @@ export function ArticleRow({ article }: ArticleRowProps) {
       <div
         style={{
           gridColumn: '1 / -1',
-          fontSize: 11,
+          fontSize: 13,
           color: 'var(--text-secondary)',
-          lineHeight: 1.4,
+          lineHeight: 1.45,
         }}
       >
         {truncatedHeadline}

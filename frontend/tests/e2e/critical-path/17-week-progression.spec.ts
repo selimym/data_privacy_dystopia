@@ -16,7 +16,7 @@ import { test, expect } from '@playwright/test'
  */
 
 test.describe('17 — Week progression and finding availability', () => {
-  test('week 1: visiting domain tabs unlocks at least one checkable finding', async ({ page }) => {
+  test('week 1: visiting domain tabs and selecting flag type enables submit', async ({ page }) => {
     await page.goto('/')
     await page.waitForSelector('[data-testid="start-screen"]', { timeout: 15000 })
 
@@ -38,13 +38,10 @@ test.describe('17 — Week progression and finding availability', () => {
       }
     }
 
-    // At least one finding checkbox must become enabled (not disabled)
-    await page.waitForSelector('[data-testid^="finding-checkbox-"]:not([disabled])', { timeout: 5000 })
-    const enabledCheckboxes = page.locator('[data-testid^="finding-checkbox-"]:not([disabled])')
-    expect(await enabledCheckboxes.count()).toBeGreaterThanOrEqual(1)
+    // Inference panel should be visible
+    await expect(page.locator('[data-testid="inference-panel"]')).toBeVisible()
 
-    // Selecting a finding + flag type must enable submit
-    await enabledCheckboxes.first().click()
+    // Selecting a flag type must enable submit (no finding selection required)
     await page.locator('[data-testid="flag-type-monitoring"]').click()
     await expect(page.locator('[data-testid="submit-flag-btn"]')).toBeEnabled()
   })
