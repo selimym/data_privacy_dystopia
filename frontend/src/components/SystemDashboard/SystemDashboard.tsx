@@ -20,6 +20,7 @@ import { MapErrorBoundary } from './WorldMapContainer/MapErrorBoundary'
 import { NeighborhoodSweepPanel } from './NeighborhoodSweepPanel/NeighborhoodSweepPanel'
 import { SweepStatusPanel } from './SweepStatusPanel/SweepStatusPanel'
 import { NewsTicker } from './NewsTicker/NewsTicker'
+import { ProtestBanner } from './ProtestBanner/ProtestBanner'
 
 export default function SystemDashboard() {
   const currentView = useUIStore(s => s.currentView)
@@ -59,6 +60,7 @@ export default function SystemDashboard() {
           </aside>
           <main className="dashboard-center" data-tutorial-panel="center">
             <DirectiveBanner />
+            <ProtestBanner />
             {isSweep ? <NeighborhoodSweepPanel /> : <CitizenPanel />}
           </main>
         </>
