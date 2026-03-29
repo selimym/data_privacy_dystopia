@@ -1,5 +1,6 @@
 import { Suspense, lazy } from 'react'
 import { useUIStore } from './stores/uiStore'
+import InfoPopup from './components/shared/InfoPopup'
 
 // Screens — lazily loaded to keep initial bundle small
 const StartScreen = lazy(() => import('./components/StartScreen/StartScreen'))
@@ -31,11 +32,14 @@ export default function App() {
   const screen = useUIStore(state => state.currentScreen)
 
   return (
-    <Suspense fallback={<LoadingFallback />}>
-      {screen === 'start' && <StartScreen />}
-      {screen === 'dashboard' && <SystemDashboard />}
-      {screen === 'ending' && <EndingScreen />}
-      {screen === 'endings_archive' && <EndingsArchive />}
-    </Suspense>
+    <>
+      <Suspense fallback={<LoadingFallback />}>
+        {screen === 'start' && <StartScreen />}
+        {screen === 'dashboard' && <SystemDashboard />}
+        {screen === 'ending' && <EndingScreen />}
+        {screen === 'endings_archive' && <EndingsArchive />}
+      </Suspense>
+      <InfoPopup />
+    </>
   )
 }

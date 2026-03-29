@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react'
 import { useUIStore } from '@/stores/uiStore'
 import { useGameStore } from '@/stores/gameStore'
 import type { DashboardView } from '@/stores/uiStore'
+import DevToolsPanel from './DevToolsPanel'
 
 function ShiftTimer() {
   const shiftStartTime = useUIStore(s => s.shiftStartTime)
@@ -58,6 +59,7 @@ export default function TopBar() {
   const weekNumber = useGameStore(s => s.weekNumber)
   const operator = useGameStore(s => s.operator)
   const newsArticles = useGameStore(s => s.newsArticles)
+  const [devOpen, setDevOpen] = useState(false)
 
   // Badge: any article published after the last time user viewed the news feed
   const hasUnreadNews = newsArticles.some(a =>
@@ -77,17 +79,24 @@ export default function TopBar() {
         fontFamily: 'var(--font-mono)',
       }}
     >
-      {/* Platform name */}
-      <span
-        style={{
-          color: 'var(--text-muted)',
-          fontSize: 12,
-          letterSpacing: '0.15em',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        CIVIC HARMONY v2.0
-      </span>
+      {/* Platform name — click to open dev tools */}
+      <div style={{ position: 'relative' }}>
+        <span
+          data-testid="civic-harmony-title"
+          onClick={() => setDevOpen(v => !v)}
+          style={{
+            color: 'var(--text-muted)',
+            fontSize: 12,
+            letterSpacing: '0.15em',
+            whiteSpace: 'nowrap',
+            cursor: 'pointer',
+            userSelect: 'none',
+          }}
+        >
+          CIVIC HARMONY v2.0
+        </span>
+        {devOpen && <DevToolsPanel onClose={() => setDevOpen(false)} />}
+      </div>
 
       {/* View switcher — centred */}
       <div style={{ display: 'flex', gap: 4, margin: '0 auto' }}>

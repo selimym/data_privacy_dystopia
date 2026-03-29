@@ -174,6 +174,12 @@ interface GameState {
   checkResistanceTrigger: (citizenId: string) => void
 
   reset: () => void
+
+  /** DEV ONLY — skip directly to a week by loading the matching directive */
+  devSkipToWeek: (targetWeek: number) => void
+
+  /** DEV ONLY — immediately force a specific ending */
+  devForceEnding: (type: EndingType) => void
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -859,6 +865,20 @@ export const useGameStore = create<GameState>((set, get) => ({
   triggerEpsteinEnding: () => {
     if (get().forcedEndingType) return   // already triggered
     set({ forcedEndingType: 'mysterious_death' })
+    _checkTerminalEnding(get, true)
+  },
+
+  devSkipToWeek: (targetWeek) => {
+    const scenario = useContentStore.getState().scenario
+    if (!scenario) return
+    const directive = scenario.directives.find(d => d.week_number === targetWeek)
+    if (!directive) return
+    const timePeriod = getTimePeriodForWeek(targetWeek)
+    set({ weekNumber: targetWeek, currentDirective: directive, currentTimePeriod: timePeriod })
+  },
+
+  devForceEnding: (type) => {
+    set({ forcedEndingType: type })
     _checkTerminalEnding(get, true)
   },
 

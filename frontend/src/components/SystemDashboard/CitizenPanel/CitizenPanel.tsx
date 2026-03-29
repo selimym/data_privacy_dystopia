@@ -148,8 +148,8 @@ export function CitizenPanel() {
       {!isLoading && profile && (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
 
-          {/* TOP ZONE — fills remaining space above inference panel */}
-          <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+          {/* TOP ZONE — fills remaining space above inference panel, scrollable */}
+          <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
             <DataDomainTabs
               profile={profile}
               unlockedDomains={unlockedDomains}
