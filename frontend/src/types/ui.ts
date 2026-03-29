@@ -114,6 +114,7 @@ export type ModalType =
   | 'save_load'
   | 'ice_raid'
   | 'autoflag_confirm'
+  | 'memo_archive'
   | null
 
 export interface ModalState {

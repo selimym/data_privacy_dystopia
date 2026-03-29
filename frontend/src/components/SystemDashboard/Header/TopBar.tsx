@@ -96,18 +96,38 @@ export default function TopBar() {
         })}
       </div>
 
-      {/* Operator info */}
-      <span
-        style={{
-          color: 'var(--text-muted)',
-          fontSize: 10,
-          letterSpacing: '0.1em',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        {operator?.operator_code ?? 'SYS-OP-001'} · WK{' '}
-        <span data-testid="week-indicator">{weekNumber}</span>
-      </span>
+      {/* Right side: operator info + memo archive */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <button
+          data-testid="open-memo-archive"
+          onClick={() => useUIStore.getState().openModal('memo_archive')}
+          style={{
+            background: 'transparent',
+            border: '1px solid var(--border-subtle)',
+            color: 'var(--text-muted)',
+            fontFamily: 'var(--font-mono)',
+            fontSize: 10,
+            letterSpacing: '0.1em',
+            padding: '2px 8px',
+            borderRadius: 2,
+            cursor: 'pointer',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          MEMOS
+        </button>
+        <span
+          style={{
+            color: 'var(--text-muted)',
+            fontSize: 10,
+            letterSpacing: '0.1em',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {operator?.operator_code ?? 'SYS-OP-001'} · WK{' '}
+          <span data-testid="week-indicator">{weekNumber}</span>
+        </span>
+      </div>
     </div>
   )
 }
