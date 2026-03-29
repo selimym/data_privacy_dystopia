@@ -401,6 +401,7 @@ export function DirectivePanel() {
   const showShiftMemo = useUIStore(s => s.showShiftMemo)
   const pendingShiftMemo = useUIStore(s => s.pendingShiftMemo)
   const getShiftElapsedSecs = useUIStore(s => s.getShiftElapsedSecs)
+  const suppressBriefingForKey = useUIStore(s => s.suppressBriefingForKey)
 
   const [shiftDisplaySecs, setShiftDisplaySecs] = useState(0)
 
@@ -440,6 +441,12 @@ export function DirectivePanel() {
 
     briefingShownRef.current = directive.directive_key
 
+    // If the end-of-shift overlay already included this directive's briefing, skip
+    if (suppressBriefingForKey === directive.directive_key) {
+      useUIStore.getState().setSuppressBriefingForKey(null)
+      return
+    }
+
     // Week 6: Epstein order arrives as the beginning-of-shift memo
     if (weekNumber === 6 && !epsteinOrderShown) {
       useGameStore.getState()._setEpsteinOrderShown()
@@ -462,7 +469,7 @@ export function DirectivePanel() {
 
     const briefing = buildBriefingMemo(directive, weekNumber - 1, newDomains)
     showShiftMemo(briefing)
-  }, [isAutomated, directive, weekNumber, pendingShiftMemo, scenario, showShiftMemo, epsteinOrderShown])
+  }, [isAutomated, directive, weekNumber, pendingShiftMemo, scenario, showShiftMemo, epsteinOrderShown, suppressBriefingForKey])
 
   // Auto-trigger end-of-shift memo when quota is met (production only)
   useEffect(() => {
@@ -490,7 +497,30 @@ export function DirectivePanel() {
     const hasProtests = activeProtests.some(p => p.status === 'active' || p.status === 'forming' || p.status === 'violent')
     const hasRaids = raidRecords.length > 0
     const { memoText, tone, sender, wrongFlags, recruitmentLink } = buildColleagueMemo(weekNumber, compliance, reluctance, hasProtests, wrongFlagsPendingMemo, flags.length, hasRaids)
-    showShiftMemo({ weekNumber, memoText, tone, nextDirective: next, sender, wrongFlags, recruitmentLink })
+
+    // Compute next directive briefing to embed inline (avoids separate briefing popup)
+    let nextDirectiveBriefing: import('@/types/ui').ShiftMemoData['nextDirectiveBriefing'] = undefined
+    if (next) {
+      const currDomains = new Set(directive.required_domains)
+      const nextNewDomains = next.required_domains.filter(d => !currDomains.has(d))
+      // Also include contract event domains for next week
+      const contractEvent = scenario?.contract_events.find(ce => ce.week_number === next.week_number)
+      if (contractEvent) {
+        contractEvent.new_domains_unlocked.forEach(d => {
+          if (!nextNewDomains.includes(d)) nextNewDomains.push(d)
+        })
+      }
+      nextDirectiveBriefing = {
+        directiveKey: next.directive_key,
+        title: next.title,
+        description: next.description,
+        quota: next.flag_quota,
+        flagType: (next.directive_type ?? 'review') === 'sweep' ? 'arrests' : 'flags',
+        newDomains: nextNewDomains,
+      }
+    }
+
+    showShiftMemo({ weekNumber, memoText, tone, nextDirective: next, sender, wrongFlags, recruitmentLink, nextDirectiveBriefing })
     useGameStore.getState()._clearWrongFlagsPending()
   }, [isAutomated, directive, flags, raidRecords, isSweep, weekNumber, compliance, reluctance, pendingShiftMemo, scenario, showShiftMemo, activeProtests, wrongFlagsPendingMemo, epsteinOrderShown, hacktivistFlagged, hacktivistContactMade])
 
