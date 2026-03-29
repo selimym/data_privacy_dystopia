@@ -598,7 +598,12 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
 
     // Unlock required domains for new directive
+    const priorDomains = new Set(content.unlockedDomains)
+    const newlyUnlocked = nextDirective.required_domains.filter(d => !priorDomains.has(d))
     content.unlockDomains(nextDirective.required_domains)
+    if (newlyUnlocked.length > 0) {
+      useUIStore.getState().addNewlyUnlockedDomains(newlyUnlocked)
+    }
 
     _persist(get)
   },
@@ -944,7 +949,12 @@ function _fireContractEvent(
   const ui = useUIStore.getState()
 
   // Unlock domains
+  const priorDomains = new Set(content.unlockedDomains)
+  const newlyUnlocked = event.new_domains_unlocked.filter(d => !priorDomains.has(d))
   content.unlockDomains(event.new_domains_unlocked)
+  if (newlyUnlocked.length > 0) {
+    ui.addNewlyUnlockedDomains(newlyUnlocked)
+  }
 
   // Mark contract as fired
   set(state => ({
