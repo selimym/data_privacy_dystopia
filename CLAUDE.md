@@ -1,22 +1,12 @@
 # CLAUDE.md
 
-Guide for Claude Code when working with this repository.
+## Project
 
-## Project Overview
-
-Educational browser game demonstrating data privacy risks. The player operates a surveillance intelligence platform — reviewing citizen files, submitting flags, and watching consequences unfold. The game is structured as a **boiling frog** narrative: work starts reasonable and gradually becomes authoritarian without any single obvious moral crossroads.
-
-**Architecture**: Fat client — all game logic runs in the browser. No backend. Static hosting.
+Educational browser game about surveillance normalization. Fat client — all logic in the browser, no backend. See `docs/GAMEPLAY.md` for narrative/mechanics, `README.md` for architecture.
 
 ## Tech Stack
 
-- **React 18 + TypeScript** — UI and state
-- **Zustand 5** — 5 stores (game, citizen, metrics, ui, content)
-- **Phaser 3** — 2D world map only, mounted as a React component
-- **Faker.js 10** — deterministic citizen data generation
-- **idb** — IndexedDB persistence wrapper
-- **Vite 6** — bundler (Phaser aliased to ESM build)
-- **Playwright + Vitest** — E2E and unit tests
+React 18 + TypeScript, Zustand 5 (5 stores), Phaser 3 (world map only), Faker.js 10 (deterministic seeds), idb (IndexedDB), Vite 6, Playwright + Vitest.
 
 ## Commands
 
@@ -33,22 +23,18 @@ make clean            # Remove node_modules + dist
 
 ## Key Directories
 
-All active code is in `frontend/`:
-
 ```
 frontend/src/
-  components/         ← React components (StartScreen, SystemDashboard, EndingScreen)
-  services/           ← Pure TypeScript game logic (no store imports)
-  stores/             ← Zustand stores (gameStore, citizenStore, metricsStore, uiStore, contentStore)
-  phaser/             ← Phaser scenes (WorldMapGame.ts, PreloadScene.ts, WorldMapScene.ts)
-  types/              ← TypeScript type definitions (zero `any`)
-  i18n.ts             ← react-i18next setup
+  components/   ← React UI
+  services/     ← Pure TS game logic (no store imports)
+  stores/       ← Zustand (game, citizen, metrics, ui, content)
+  phaser/       ← WorldMapGame.ts, PreloadScene.ts, WorldMapScene.ts
+  types/        ← zero `any`
 
 frontend/public/content/
-  scenarios/          ← default.json: directives + contract events per week
-  countries/          ← 3 country profiles (usa, uk, france)
+  scenarios/default.json   ← 8 directives + contract events
   inference_rules.json
-  data_banks/         ← health, finance, judicial, social, messages
+  data_banks/              ← health, finance, judicial, social, messages
   outcomes.json
   locales/en.json
 ```
@@ -56,41 +42,14 @@ frontend/public/content/
 ## Architecture Rules
 
 - **Stores call services. Components call stores. Phaser never touches stores.**
-- Phaser communicates with React via a one-way `EventTarget` bridge
-- All Phaser imports must use `import * as Phaser from 'phaser'` (ESM, no default export)
-- All entities use `crypto.randomUUID()` UUIDs
-- All citizen data generation uses Faker.js with deterministic seeds
-- IndexedDB via `idb` wrapper in `stores/persistence.ts`
-- `window.__stores` is exposed in development for test access
+- Phaser ↔ React via one-way `EventTarget` bridge only
+- `import * as Phaser from 'phaser'` — never default import
+- All UUIDs via `crypto.randomUUID()`
+- All citizen data via Faker.js with deterministic seeds
+- All interactive elements need `data-testid` attributes
+- All strings through `useTranslation()` in components
 
-## Service Architecture
-
-```
-services/
-  GameOrchestrator.ts   ← initializes everything; only entry point for game start
-  InferenceEngine.ts    ← rule-based data fusion analysis
-  RiskScorer.ts         ← citizen risk score (pure function)
-  OutcomeGenerator.ts   ← consequence narratives (pure function)
-  AutoFlagBot.ts        ← deterministic flagging algorithm; bot decisions log under operator ID
-  EndingCalculator.ts   ← 9 endings in priority order
-  ProtestManager.ts     ← protest trigger + suppression
-  ReluctanceTracker.ts  ← warnings at 70/80/90
-  NewsGenerator.ts      ← dynamic article generation
-  CitizenGenerator.ts   ← generateSkeleton() + generateFullProfile() (lazy)
-  TimeProgression.ts    ← week/directive advancement, contract event firing
-  ContentLoader.ts      ← async JSON loaders for /content/
-```
-
-## Game Mechanics
-
-- **6 directives** across 6 weeks; player flags citizens to meet quotas
-- **Contract events** (weeks 3–4) unlock new data domains progressively
-- **AutoFlag Bot** (week 4+) can process the queue automatically; player bears responsibility
-- **Jessica Martinez** at seed slot 4472 is the narrative focal point in week 6
-- **ICE raid orders** generated under quota pressure + low anger
-- **9 endings** determined by: compliance, reluctance, bot usage, protest suppression, ICE approvals
-
-## Store Data Flow
+## Store Data Flow (flag submission)
 
 ```
 submitFlag(citizenId, flagType, justification)
@@ -104,21 +63,19 @@ submitFlag(citizenId, flagType, justification)
   → persistence.save()
 ```
 
-## Testing
+`GameOrchestrator.ts` is the only entry point for game initialization.
 
-```
-frontend/tests/
-  e2e/critical-path/    ← 4 specs; must all pass
-  unit/                 ← EndingCalculator, ProtestManager, ReluctanceTracker, AutoFlagBot
-```
+## Game Facts
 
-Run `make test-critical` before any PR. Unit tests cover all 9 endings, protest formulas, reluctance thresholds, bot determinism.
+- 8 weeks / 8 directives; Jessica Martinez (week 8) is the narrative focal point
+- AutoFlag Bot available from week 4; all bot decisions log under the player's operator ID
+- 9 endings determined by: compliance, reluctance, bot usage, protest suppression, ICE approvals
 
 ## Important Rules
 
-- Never add a backend — fat client only
-- Never use `import Phaser from 'phaser'` — use `import * as Phaser from 'phaser'`
+- No backend — fat client only
 - TypeScript strict mode — zero `any`
-- Keep services pure and testable
+- Services must remain pure and testable
+- Run `make test-critical` before any PR
 - All strings through `useTranslation()` in components
 - All interactive elements need `data-testid` attributes

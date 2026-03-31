@@ -39,7 +39,7 @@ console.log('📁 scenarios/default.json')
 const scenario = loadJSON(join(contentDir, 'scenarios/default.json'))
 if (scenario) {
   check(scenario.scenario_key === 'default', 'scenario_key is "default"')
-  check(Array.isArray(scenario.directives) && scenario.directives.length === 6, 'has 6 directives')
+  check(Array.isArray(scenario.directives) && scenario.directives.length === 8, 'has 8 directives')
   check(Array.isArray(scenario.contract_events) && scenario.contract_events.length === 4, 'has 4 contract events')
   check(Array.isArray(scenario.special_npcs) && scenario.special_npcs.length >= 1, 'has special NPCs')
   scenario.directives.forEach((d, i) => {
