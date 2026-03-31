@@ -163,7 +163,6 @@ export default function InfoPopup() {
                 <div style={{ marginBottom: 8, color: '#6b7280' }}>This is not a game. These systems are real:</div>
                 <FooterLink href="https://www.972mag.com/lavender-ai-israeli-army-gaza/" label="Lavender: The AI machine directing Israel's bombing spree in Gaza — +972 Magazine" />
                 <FooterLink href="https://www.404media.co/elite-the-palantir-app-ice-uses-to-find-neighborhoods-to-raid/" label="ELITE: The Palantir App ICE Uses to Find Neighborhoods to Raid — 404 Media" />
-                <div style={{ marginTop: 8, color: '#6b7280' }}>I am not suicidal and live a happy life.</div>
               </div>
             </div>
           </div>

@@ -167,7 +167,7 @@ interface GameState {
   /** Run the bot and immediately approve all pending bot decisions */
   processAutoFlagBatch: () => void
 
-  /** Filtered case queue: week 6 locks to Jessica Martinez; excludes already-flagged and no-action citizens */
+  /** Filtered case queue: week 8 locks to Jessica Martinez; excludes already-flagged and no-action citizens */
   getFilteredCaseQueue: (unlockedDomains: DomainKey[]) => CaseOverview[]
 
   /** Check whether Jessica Martinez's no-action count has reached threshold → trigger resistance path */

@@ -581,7 +581,7 @@ export function DirectivePanel() {
         {/* Week 8 countdown timer */}
         {weekNumber === 8 && (
           <div
-            data-testid="week6-timer"
+            data-testid="week8-timer"
             style={{
               marginBottom: 10,
               padding: '8px 10px',
