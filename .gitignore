@@ -94,3 +94,6 @@ frontend-v2/playwright-report/
 
 # Test results (root level)
 test-results/.worktrees/
+
+# Assets
+frontend/public/assets/

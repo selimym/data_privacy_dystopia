@@ -6,9 +6,9 @@ The game is designed around **the boiling frog effect**: the work starts reasona
 
 > **Work in progress.** The game is playable but not finished — some mechanics, endings, and content are still being developed.
 >
-> **[Play it here → selimym.github.io/data_privacy_distopia](https://selimym.github.io/data_privacy_distopia/)**
+> **[Play it here → selimym.github.io/data_privacy_dystopia](https://selimym.github.io/data_privacy_dystopia/)**
 >
-> Feedback and bug reports are very welcome — please [open an issue](https://github.com/selimym/data_privacy_distopia/issues).
+> Feedback and bug reports are very welcome — please [open an issue](https://github.com/selimym/data_privacy_dystopia/issues).
 
 ---
 
