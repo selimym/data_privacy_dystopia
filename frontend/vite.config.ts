@@ -3,11 +3,12 @@ import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
 
 export default defineConfig({
-  base: process.env.GITHUB_ACTIONS ? '/data_privacy_distopia/' : '/',
+  base: process.env.GITHUB_ACTIONS ? '/data_privacy_dystopia/' : '/',
   test: {
     globals: true,
     environment: 'node',
     include: ['tests/unit/**/*.test.ts'],
+    setupFiles: ['tests/unit/setup.ts'],
     resolve: {
       alias: {
         '@': resolve(__dirname, './src'),

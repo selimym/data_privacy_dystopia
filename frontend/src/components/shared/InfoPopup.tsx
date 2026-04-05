@@ -136,7 +136,7 @@ export default function InfoPopup() {
               {/* Bug report card */}
               <a
                 data-testid="info-popup-bug-report"
-                href="https://github.com/selimym/data_privacy_distopia/issues"
+                href="https://github.com/selimym/data_privacy_dystopia/issues"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ textDecoration: 'none', display: 'block' }}
